@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
-    "simple-peer": "^6.0.5"
+    "simple-peer": "^6.0.5",
+    "socket-io": "0.0.0"
   }
 }
