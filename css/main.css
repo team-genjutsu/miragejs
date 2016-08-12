@@ -1,0 +1,17 @@
+#booth {
+  width: 400px;
+  background: #ccc;
+  border: 10px solid #ddd;
+  margin: 0 auto;
+}
+
+#video {
+  height: 400px;
+  width: 300px;
+}
+
+#canvas {
+  height: 400px;
+  width: 400px;
+}
+
