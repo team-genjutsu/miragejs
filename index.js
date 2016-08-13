@@ -1,6 +1,9 @@
 (function() {
 
-    var vendorUrl = window.URL || window.webkitURL;
+    var vendorUrl = window.URL || window.webkitURL,
+        video,
+        canvas,
+        context;
 
     navigator.getMedia = navigator.getUserMedia ||
         navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
@@ -39,23 +42,25 @@
         })
 
         peer.on('stream', function(stream) {
-            var video = document.createElement('video');
+            video = document.createElement('video');
             video.setAttribute('id', 'video');
             document.getElementById('booth').appendChild(video);
 
-            var newCanvas = document.createElement('canvas');
-            newCanvas.setAttribute('id', 'canvas');
-            document.getElementById('booth').appendChild(newCanvas);
 
             video.src = vendorUrl.createObjectURL(stream);
             video.play();
 
-            var canvas = document.getElementById('canvas'),
-                context = canvas.getContext('2d'),
-                video = document.getElementById('video');
+            canvas = document.createElement('canvas');
+            canvas.setAttribute('id', 'canvas');
+            document.getElementById('booth').appendChild(canvas);
+
+            context = canvas.getContext('2d');
 
             video.addEventListener('play', function() {
-                draw(this, context, 400, 300);
+                canvas.width = 640;
+                canvas.height = 480;
+
+                draw(this, context, canvas.width, canvas.height);
             }, false);
 
         })
@@ -63,17 +68,10 @@
         console.error(err);
     })
 
-    // var canvas = document.getElementById('canvas'),
-    // context = canvas.getContext('2d'),
-    // video = document.getElementById('video');
-
-    // video.addEventListener('play', function() {
-    // draw(this, context, 400, 300);
-    // }, false);
-
 
     function draw(video, context, width, height) {
         // console.log('canvas: ' + canvas, 'context: ' + context);
+
         var image, data, i, r, g, b, brightness;
 
         context.drawImage(video, 0, 0, width, height);
@@ -82,12 +80,12 @@
         data = image.data;
 
         for (i = 0; i < data.length; i = i + 4) {
-            r = data[i];
-            g = data[i + 1];
-            b = data[i + 2];
-            brightness = (r + b + g) / 3;
+        r = data[i];
+        g = data[i + 1];
+        b = data[i + 2];
+        brightness = (r + b + g);
 
-            data[i] = data[i + 1] = data[i + 2] = brightness;
+        data[i] = data[i + 1] = data[i + 2] = brightness;
         }
 
         image.data = data;
