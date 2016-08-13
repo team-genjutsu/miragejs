@@ -5,6 +5,10 @@ const https = require('https');
 const express = require('express');
 const app = express();
 
+let connections = [];
+let initialClientId;
+let secondClientId;
+
 app.use(express.static(__dirname));
 
 const options = {
@@ -33,8 +37,25 @@ const options = {
 
 // });
 
-https.createServer(options, app).listen(8000, function() {
-    console.log('Listening on port 8000');
-});
+const server = https.createServer(options, app).listen(8000);
 
+const io = require('socket.io').listen(server);
 
+io.sockets.on('connection', function(socket) {
+  connections.push(socket);
+
+  socket.on('initial', function(payload) {
+    initialClientId = payload;
+    io.sockets.emit('initalConnected', payload);
+  });
+
+  socket.on('second', function(payload) {
+    this.emit('secondPart2', initialClientId);
+  });
+
+  socket.on('third', function(payload) {
+    secondClientId = payload;
+    io.sockets.emit('thirdPart2', payload);
+  });
+
+})

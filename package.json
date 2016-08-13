@@ -4,13 +4,18 @@
   "description": "testing media streams",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
   },
   "author": "Blake",
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
     "simple-peer": "^6.0.5",
-    "socket-io": "0.0.0"
+    "socket-io": "0.0.0",
+    "socket.io-client": "^1.4.8"
+  },
+  "devDependencies": {
+    "nodemon": "^1.10.0"
   }
 }
