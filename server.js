@@ -19,6 +19,7 @@ let connections = [];
 let initialClientId;
 let secondClientId;
 
+
 app.use(express.static(__dirname));
 
 const options = {
@@ -51,8 +52,11 @@ const server = https.createServer(options, app).listen(8000);
 
 const io = require('socket.io').listen(server);
 
+
 io.sockets.on('connection', function(socket) {
   connections.push(socket);
+  //
+  // socket.or
 
   socket.on('initial', function(payload) {
     initialClientId = payload;
