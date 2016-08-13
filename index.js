@@ -1,6 +1,7 @@
 (function() {
 
     var vendorUrl = window.URL || window.webkitURL;
+    let peer;
 
     navigator.getMedia = navigator.getUserMedia ||
         navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
@@ -10,83 +11,103 @@
         video: true,
         audio: false
     }, function(stream) {
-        socket = io();
-        initialClient = false;
-        console.log(stream);
-        var peer = new SimplePeer({
-            initiator: location.hash === '#init',
-            trickle: false,
-            stream: stream
-        })
+        const socket = io();
 
-        peer.on('signal', function(data) {
-            document.getElementById('yourId').value = JSON.stringify(data);
-            if (window.location.href.match(/#init/)){
-              initialClient = true;
+        // var initialClient = false;
+        console.log(stream);
+
+        socket.emit('initiator?', JSON.stringify(stream.id));
+        socket.on('initiated', (chatter) => {
+
+          if (chatter.initiator) {
+
+            peer = new SimplePeer({
+              initiator: true,
+              trickle: false,
+              stream: stream
+            })
+          } else {
+
+              peer = new SimplePeer({
+                initiator: false,
+                trickle: false,
+                stream: stream
+              })
             }
-              if (initialClient) {
-              socket.emit('initial', JSON.stringify(data));
-            } else if (!initialClient) {
-              socket.emit('third', JSON.stringify(data));
-            }
-        })
+
+            peer.on('signal', function(data) {
+              document.getElementById('yourId').value = JSON.stringify(data);
+              // if (window.location.href.match(/#init/)){
+              //   initialClient = true;
+              // }
+              if (peer.initator) {
+                socket.emit('initial', JSON.stringify(data));
+              } else if (!peer.initator) {
+                socket.emit('third', JSON.stringify(data));
+              }
+            })
+
+            peer.on('data', function(data) {
+              document.getElementById('messages').textContent += data + '\n';
+            })
+
+            peer.on('stream', function(stream) {
+              var video = document.createElement('video');
+              video.setAttribute('id', 'video');
+              document.getElementById('booth').appendChild(video);
+
+              var newCanvas = document.createElement('canvas');
+              newCanvas.setAttribute('id', 'canvas');
+              document.getElementById('booth').appendChild(newCanvas);
+
+              video.src = vendorUrl.createObjectURL(stream);
+              video.play();
+
+              var canvas = document.getElementById('canvas'),
+              context = canvas.getContext('2d'),
+              video = document.getElementById('video');
+
+              video.addEventListener('play', function() {
+                draw(this, context, 400, 300);
+              }, false);
+
+            });
+
+
+          });
+
+
 
         document.getElementById('connect').addEventListener('click', function() {
-            // var otherId = JSON.parse(document.getElementById('otherId').value);
-            // peer.signal(otherId);
-
-            if (!initialClient) {
-              socket.emit('second')
+            if (!peer.initator) {
+              socket.emit('second');
             }
         })
 
         socket.on('initalConnected', function(){
-          if (!initialClient){
-            console.log('Initiator ready to connect')
+          if (!peer.initator){
+            console.log('Initiator ready to connect');
           }
         })
 
-        socket.on('secondPart2', function(initialClientId){
+        socket.on('secondPart2', (initialClientId) => {
           peer.signal(initialClientId);
         })
 
         socket.on('thirdPart2', function(secondClientId){
-          if (initialClient){
+          if (peer.initiator){
             peer.signal(secondClientId);
           }
         })
 
         document.getElementById('send').addEventListener('click', function() {
-            var yourMessage = document.getElementById('yourMessage').value;
-            peer.send(yourMessage);
+            // var yourMessage = document.getElementById('yourMessage').value;
+            // peer.send(yourMessage);
+            peer.initiator = true
+            console.log(peer)
         })
 
 
-        peer.on('data', function(data) {
-            document.getElementById('messages').textContent += data + '\n';
-        })
-
-        peer.on('stream', function(stream) {
-            var video = document.createElement('video');
-            video.setAttribute('id', 'video');
-            document.getElementById('booth').appendChild(video);
-
-            var newCanvas = document.createElement('canvas');
-            newCanvas.setAttribute('id', 'canvas');
-            document.getElementById('booth').appendChild(newCanvas);
-
-            video.src = vendorUrl.createObjectURL(stream);
-            video.play();
-
-            var canvas = document.getElementById('canvas'),
-                context = canvas.getContext('2d'),
-                video = document.getElementById('video');
-
-            video.addEventListener('play', function() {
-                draw(this, context, 400, 300);
-            }, false);
-
-        })
     }, function(err) {
         console.error(err);
     })

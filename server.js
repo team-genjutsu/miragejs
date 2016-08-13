@@ -15,7 +15,8 @@ const compiler = webpack(config);
 app.use(webpackDevMiddleware(compiler, {noInfo: true, publicPath: config.output.publicPath}));
 app.use(webpackHotMiddleware(compiler));
 
-let connections = [];
+const connections = [];
+const chatters = [];
 let initialClientId;
 let secondClientId;
 
@@ -56,10 +57,25 @@ const io = require('socket.io').listen(server);
 io.sockets.on('connection', function(socket) {
   connections.push(socket);
   //
-  // socket.or
+
+  socket.on('initiator?', (payload) => {
+      let chatter = {
+        id: payload,
+        initiator: false
+      }
+      if (chatters.filter(chatter => chatter.initiator === true).length === 0) {
+        chatter.initiator = true;
+      }
+      chatters.push(chatter);
+      console.log(chatter)
+      this.emit('initiated', chatter);
+  });
+
+
 
   socket.on('initial', function(payload) {
     initialClientId = payload;
+
     io.sockets.emit('initalConnected', payload);
   });
 
