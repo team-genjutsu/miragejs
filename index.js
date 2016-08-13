@@ -37,7 +37,6 @@
 
             if (!initialClient) {
               socket.emit('second')
-
             }
         })
 
@@ -102,7 +101,7 @@
 
 
     function draw(video, context, width, height) {
-        // console.log('canvas: ' + canvas, 'context: ' + context);
+        // console.log ('canvas: ' + canvas, 'context: ' + context);
         var image, data, i, r, g, b, brightness;
 
         context.drawImage(video, 0, 0, width, height);
