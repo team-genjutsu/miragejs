@@ -17,7 +17,7 @@
         initialClient = false;
         console.log(stream);
         var peer = new SimplePeer({
-            initiator: location.hash === '#init',
+            // initiator: location.hash === '#init',
             trickle: false,
             stream: stream
         })
