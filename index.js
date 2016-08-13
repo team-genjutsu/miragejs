@@ -13,7 +13,8 @@
         video: true,
         audio: false
     }, function(stream) {
-
+        socket = io();
+        initialClient = false;
         console.log(stream);
         var peer = new SimplePeer({
             initiator: location.hash === '#init',
@@ -23,13 +24,40 @@
 
         peer.on('signal', function(data) {
             document.getElementById('yourId').value = JSON.stringify(data);
+            if (window.location.href.match(/#init/)){
+              initialClient = true;
+            }
+              if (initialClient) {
+              socket.emit('initial', JSON.stringify(data));
+            } else if (!initialClient) {
+              socket.emit('third', JSON.stringify(data));
+            }
         })
 
         document.getElementById('connect').addEventListener('click', function() {
-            var otherId = JSON.parse(document.getElementById('otherId').value);
-            peer.signal(otherId);
+            // var otherId = JSON.parse(document.getElementById('otherId').value);
+            // peer.signal(otherId);
+
+            if (!initialClient) {
+              socket.emit('second')
+            }
         })
 
+        socket.on('initalConnected', function(){
+          if (!initialClient){
+            console.log('Initiator ready to connect')
+          }
+        })
+
+        socket.on('secondPart2', function(initialClientId){
+          peer.signal(initialClientId);
+        })
+
+        socket.on('thirdPart2', function(secondClientId){
+          if (initialClient){
+            peer.signal(secondClientId);
+          }
+        })
 
         document.getElementById('send').addEventListener('click', function() {
             var yourMessage = document.getElementById('yourMessage').value;
@@ -70,8 +98,6 @@
 
 
     function draw(video, context, width, height) {
-        // console.log('canvas: ' + canvas, 'context: ' + context);
-
         var image, data, i, r, g, b, brightness;
 
         context.drawImage(video, 0, 0, width, height);
