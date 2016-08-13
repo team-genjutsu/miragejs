@@ -4,6 +4,7 @@ const fs = require('fs');
 const https = require('https');
 const express = require('express');
 const app = express();
+const _ = require('lodash')
 
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
@@ -57,10 +58,20 @@ const io = require('socket.io').listen(server);
 io.sockets.on('connection', function(socket) {
   connections.push(socket);
   //
+
+  socket.once('disconnect', function() {
+    let member = chatters.filter(chatter => chatter.id === socket.id);
+    if (member) {
+      chatters.splice(chatters.indexOf(member),1);
+      io.sockets.emit('updateChatters', chatters);
+    }
+    connections.splice(connections.indexOf(socket), 1);
+    socket.disconnect()
+  })
+
   socket.on('initiator?', (payload) => {
-      console.log(connections[0]===connections[1])
       let chatter = {
-        id: payload,
+        id: socket.id,
         initiator: false
       }
       if (chatters.filter(chatter => chatter.initiator === true).length === 0) {
