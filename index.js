@@ -17,7 +17,7 @@
 
         // var initialClient = false;
         console.log(stream);
-        socket.emit('initiator?', JSON.stringify(stream.id));
+        // socket.emit('initiator?', JSON.stringify(stream.id));
         socket.on('initiated', (chatter) => {
 
           if (chattersClient.filter(clientChatter => clientChatter.id !== chatter.id).length || !chattersClient.length) {
