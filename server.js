@@ -57,8 +57,8 @@ const io = require('socket.io').listen(server);
 io.sockets.on('connection', function(socket) {
   connections.push(socket);
   //
-
   socket.on('initiator?', (payload) => {
+      console.log(connections[0]===connections[1])
       let chatter = {
         id: payload,
         initiator: false
@@ -67,20 +67,17 @@ io.sockets.on('connection', function(socket) {
         chatter.initiator = true;
       }
       chatters.push(chatter);
-      console.log(chatter)
-      this.emit('initiated', chatter);
+
+      io.to(socket.id).emit('initiated', chatter);
   });
-
-
 
   socket.on('initial', function(payload) {
     initialClientId = payload;
-
-    io.sockets.emit('initalConnected', payload);
+    io.sockets.emit('initialConnected', payload);
   });
 
   socket.on('second', function(payload) {
-    this.emit('secondPart2', initialClientId);
+    io.to(socket.id).emit('secondPart2', initialClientId);
   });
 
   socket.on('third', function(payload) {
