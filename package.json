@@ -1,5 +1,5 @@
 {
-  "name": "streamtest",
+  "name": "streamar",
   "version": "1.0.0",
   "description": "testing media streams",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
   },
-  "author": "Blake",
+  "author": "KMB",
   "license": "ISC",
   "dependencies": {
     "babel-preset-react-hmre": "^1.1.1",
