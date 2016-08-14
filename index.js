@@ -20,8 +20,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     socket.emit('initiator?', JSON.stringify(stream.id));
     socket.on('initiated', (chatter) => {
-      if (chattersClient.filter(clientChatter => clientChatter.id !== chatter.id).length) {
+      if (chattersClient.filter(clientChatter => clientChatter.id !== chatter.id).length || !chattersClient.length) {
         chattersClient.push(chatter);
+        chatterThisClient = chatter.id;
       }
       if (chatter.initiator) {
         // console.log('i am initiated 1')
@@ -54,33 +55,39 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
       peer.on('data', function(data) {
         document.getElementById('messages').textContent += data + '\n';
-      })
+      });
 
       document.getElementById('connect').addEventListener('click', function() {
         if (!peer.initiator) {
           socket.emit('second');
         }
-      })
+      });
 
       socket.on('initialConnected', function() {
         // console.log('initialConnected', peer.initiator)
         if (!peer.initiator) {
           console.log('Initial connected good');
         }
-      })
+      });
 
       socket.on('secondPart2', (initialClientId) => {
         if (!peer.initiator) {
           peer.signal(initialClientId);
         }
-      })
+      });
 
       socket.on('thirdPart2', function(secondClientId) {
         // console.log(peer.initiator)
         if (peer.initiator) {
           peer.signal(secondClientId);
         }
-      })
+      });
+
+      socket.on('updateChatters', (chatter) => {
+        console.log(chattersClient)
+        chattersClient.splice(chattersClient.indexOf(chatter), 1);
+        console.log(chattersClient)
+      });
 
       document.getElementById('send').addEventListener('click', function() {
         // var yourMessage = document.getElementById('yourMessage').value;
