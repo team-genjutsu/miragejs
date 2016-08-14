@@ -118,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   })
 
 
+
   function draw(video, context, width, height) {
     var image, data, i, r, g, b, brightness;
 
@@ -140,6 +141,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
     context.putImageData(image, 0, 0);
 
     setTimeout(draw, 10, video, context, width, height);
+  } 
+
+  function make_base() {
+    base_image = new Image();
+    base_image.src = 'assets/twistedFace.png';
+    base_image.onload = function() {
+      context.drawImage(base_image, 50, 50);
+    }
   }
 
 });
