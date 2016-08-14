@@ -48,7 +48,7 @@ io.sockets.on('connection', function(socket) {
       io.sockets.emit('updateChatters', chatters);
     }
     connections.splice(connections.indexOf(socket), 1);
-    socket.disconnect()
+    socket.disconnect();
   })
 
   socket.on('initiator?', (payload) => {
