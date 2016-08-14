@@ -2,37 +2,37 @@
 <html lang='en'>
 
 <head>
-    <meta charset='UTF-8'>
-    <title>VideoTest</title>
+  <meta charset='UTF-8'>
+  <title>VideoTest</title>
 
-    <link rel='stylesheet' href='css/main.css'>
+  <link rel='stylesheet' href='css/main.css'>
 </head>
 
 <body>
-    <!-- <div class='booth'> -->
-    <!-- <video id='video' width='400' height='300' autoplay></video> -->
-    <!-- <canvas id='canvas' width='400' height='300'></canvas> -->
-    <!-- </div> -->
-    <div id='identity'>
-        <label>Your ID:</label>
-        <textarea id='yourId'></textarea><br/>
-        <label>Other ID:</label><br/>
-        <textarea id='otherId'></textarea>
-        <button id='connect'>connect</button><br/>
-    </div>
+  <!-- <div class='booth'> -->
+  <!-- <video id='video' width='400' height='300' autoplay></video> -->
+  <!-- <canvas id='canvas' width='400' height='300'></canvas> -->
+  <!-- </div> -->
+  <div id='identity'>
+    <label>Your ID:</label>
+    <textarea id='yourId'></textarea><br/>
+    <label>Other ID:</label><br/>
+    <textarea id='otherId'></textarea>
+    <button id='connect'>connect</button><br/>
+  </div>
 
-    <div id='comms'>
-        <label>Enter Message:</label><br/>
-        <textarea id='yourMessage'></textarea>
-        <button id='send'>send</button>
-        <pre id='messages'></pre>
-    </div>
+  <div id='comms'>
+    <label>Enter Message:</label><br/>
+    <textarea id='yourMessage'></textarea>
+    <button id='send'>send</button>
+    <pre id='messages'></pre>
+  </div>
 
-    <div id='booth'></div>
+  <div id='booth'></div>
 
-    <script src='./node_modules/socket.io-client/socket.io.js'></script>
-    <script src='./node_modules/simple-peer/simplepeer.min.js'></script>
-    <script src='./index.js'></script>
+  <script src='./node_modules/socket.io-client/socket.io.js'></script>
+  <script src='./node_modules/simple-peer/simplepeer.min.js'></script>
+  <script src='./index.js'></script>
 </body>
 
 </html>
