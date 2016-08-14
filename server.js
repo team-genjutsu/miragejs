@@ -12,7 +12,10 @@ const webpackHotMiddleware = require('webpack-hot-middleware');
 const config = require('./webpack.config.js');
 
 const compiler = webpack(config);
-app.use(webpackDevMiddleware(compiler, {noInfo: true, publicPath: config.output.publicPath}));
+app.use(webpackDevMiddleware(compiler, {
+  noInfo: true,
+  publicPath: config.output.publicPath
+}));
 app.use(webpackHotMiddleware(compiler));
 
 const connections = [];
@@ -24,8 +27,8 @@ let secondClientId;
 app.use(express.static(__dirname));
 
 const options = {
-    key: fs.readFileSync('server.key'),
-    cert: fs.readFileSync('server.crt')
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.crt')
 };
 
 const server = https.createServer(options, app).listen(8000);
@@ -37,17 +40,17 @@ io.sockets.on('connection', function(socket) {
   connections.push(socket);
   //
   socket.on('initiator?', (payload) => {
-      console.log(connections[0]===connections[1])
-      let chatter = {
-        id: payload,
-        initiator: false
-      }
-      if (chatters.filter(chatter => chatter.initiator === true).length === 0) {
-        chatter.initiator = true;
-      }
-      chatters.push(chatter);
+    console.log(connections[0] === connections[1])
+    let chatter = {
+      id: payload,
+      initiator: false
+    }
+    if (chatters.filter(chatter => chatter.initiator === true).length === 0) {
+      chatter.initiator = true;
+    }
+    chatters.push(chatter);
 
-      io.to(socket.id).emit('initiated', chatter);
+    io.to(socket.id).emit('initiated', chatter);
   });
 
   socket.on('initial', function(payload) {
