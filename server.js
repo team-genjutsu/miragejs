@@ -49,6 +49,7 @@ io.sockets.on('connection', function(socket) {
     }
     connections.splice(connections.indexOf(socket), 1);
     socket.disconnect();
+
   })
 
   socket.on('initiator?', (payload) => {
