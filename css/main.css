@@ -1,16 +1,18 @@
 #booth {
-  width: 400px;
+  width: 640px;
+  height: 965px;
   background: #ccc;
   border: 10px solid #ddd;
   margin: 0 auto;
 }
 
-#video {
-  height: 400px;
-  width: 300px;
+video {
+  /* display: block; */
+  margin: 0 auto;
+  /* height: 400px; */
+  /* width: 300px; */
 }
 
-#canvas {
-  height: 400px;
-  width: 400px;
+canvas {
+  margin: 0 auto;
 }
