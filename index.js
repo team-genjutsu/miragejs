@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       document.getElementById('send').addEventListener('click', function() {
         // var yourMessage = document.getElementById('yourMessage').value;
         // peer.send(yourMessage);
-        peer.initiator = true
+        // peer.initiator = true
           // console.log(peer)
       })
 
@@ -147,6 +147,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     context.putImageData(image, 0, 0);
 
+    make_base();
     setTimeout(draw, 10, video, context, width, height);
   } 
 
