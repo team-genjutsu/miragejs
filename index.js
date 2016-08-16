@@ -18,6 +18,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }, function(stream) {
     const socket = io();
 
+    //creates a video element
+    var myVideo = document.createElement('video');
+    myVideo.setAttribute('id', 'my-video');
+    document.getElementById('booth').appendChild(myVideo);
+
+    //uses the stream from the local webcam before it gets reassigned
+    myVideo.src = window.URL.createObjectURL(stream);
+    myVideo.play();
+
+    myVideo.addEventListener('play', function() {
+      draw(this, context, 400, 300);
+    }, false);
+
     socket.emit('initiator?', JSON.stringify(stream.id));
     socket.on('initiated', (chatter) => {
       if (chattersClient.filter(clientChatter => clientChatter.id !== chatter.id).length || !chattersClient.length) {
@@ -149,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     make_base();
     setTimeout(draw, 10, video, context, width, height);
-  } 
+  }
 
   function make_base() {
     base_image = new Image();

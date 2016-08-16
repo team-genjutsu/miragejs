@@ -41,6 +41,7 @@ io.sockets.on('connection', function(socket) {
   connections.push(socket);
   //
 
+
   socket.once('disconnect', function() {
     let member = chatters.filter(chatter => chatter.id === socket.id);
     if (member) {
@@ -58,6 +59,7 @@ io.sockets.on('connection', function(socket) {
         initiator: false
       }
     if (chatters.filter(chatter => chatter.initiator === true).length === 0) {
+
         chatter.initiator = true;
       }
       chatters.push(chatter);
