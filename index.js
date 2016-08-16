@@ -1,6 +1,9 @@
 (function() {
 
     var vendorUrl = window.URL || window.webkitURL;
+    let peer;
+    let chattersClient = [];
+    let chatterThisClient;
 
     navigator.getMedia = navigator.getUserMedia ||
         navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
@@ -10,94 +13,126 @@
         video: true,
         audio: false
     }, function(stream) {
-        socket = io();
-        initialClient = false;
+        const socket = io();
+        // var initialClient = false;
         console.log(stream);
-        var peer = new SimplePeer({
-            initiator: location.hash === '#init',
-            trickle: false,
-            stream: stream
-        })
 
-        peer.on('signal', function(data) {
-            document.getElementById('yourId').value = JSON.stringify(data);
-            if (window.location.href.match(/#init/)){
-              initialClient = true;
-            }
-              if (initialClient) {
-              socket.emit('initial', JSON.stringify(data));
-            } else if (!initialClient) {
-              socket.emit('third', JSON.stringify(data));
-            }
-        })
+        
+        var myVideo = document.createElement('video');
+        myVideo.setAttribute('id', 'my-video');
+        document.getElementById('booth').appendChild(myVideo);
 
-        document.getElementById('connect').addEventListener('click', function() {
-            // var otherId = JSON.parse(document.getElementById('otherId').value);
-            // peer.signal(otherId);
+        myVideo.src = window.URL.createObjectURL(stream);
+        myVideo.play();
 
-            if (!initialClient) {
-              socket.emit('second')
-            }
-        })
+        myVideo.addEventListener('play', function() {
+          draw(this, context, 400, 300);
+        }, false);
 
-        socket.on('initalConnected', function(){
-          if (!initialClient){
-            console.log('Initiator ready to connect')
+        socket.emit('initiator?', JSON.stringify(stream.id));
+        socket.on('initiated', (chatter) => {
+          if (chattersClient.filter(clientChatter => clientChatter.id !== chatter.id).length) {
+            chattersClient.push(chatter);
           }
-        })
+          if (chatter.initiator) {
+            console.log('i am initiated 1')
+            peer = new SimplePeer({
+              initiator: true,
+              trickle: false,
+              stream: stream
+            });
+          } else {
+            console.log('i am initiator 2')
+              peer = new SimplePeer({
+                initiator: false,
+                trickle: false,
+                stream: stream
+              })
+            }
 
-        socket.on('secondPart2', function(initialClientId){
-          peer.signal(initialClientId);
-        })
+            peer.on('signal', function(data) {
+              document.getElementById('yourId').value = JSON.stringify(data);
+              // if (window.location.href.match(/#init/)){
+              //   initialClient = true;
+              // }
+              if (peer.initiator) {
+                socket.emit('initial', JSON.stringify(data));
+              } else if (!peer.initiator) {
+                socket.emit('third', JSON.stringify(data));
+              }
+            })
 
-        socket.on('thirdPart2', function(secondClientId){
-          if (initialClient){
-            peer.signal(secondClientId);
-          }
-        })
+            peer.on('data', function(data) {
+              document.getElementById('messages').textContent += data + '\n';
+            })
 
-        document.getElementById('send').addEventListener('click', function() {
-            var yourMessage = document.getElementById('yourMessage').value;
-            peer.send(yourMessage);
-        })
+            document.getElementById('connect').addEventListener('click', function() {
+              if (!peer.initiator) {
+                socket.emit('second');
+              }
+            })
 
+            socket.on('initialConnected', function(){
+              console.log('initialConnected', peer.initiator)
+              if (!peer.initiator){
+                console.log('Initial connected good');
+              }
+            })
 
-        peer.on('data', function(data) {
-            document.getElementById('messages').textContent += data + '\n';
-        })
+            socket.on('secondPart2', (initialClientId) => {
+              if (!peer.initiator){
+                peer.signal(initialClientId);
+              }
+            })
 
-        peer.on('stream', function(stream) {
-            var video = document.createElement('video');
-            video.setAttribute('id', 'video');
-            document.getElementById('booth').appendChild(video);
+            socket.on('thirdPart2', function(secondClientId){
+              console.log(peer.initiator)
+              if (peer.initiator){
+                peer.signal(secondClientId);
+              }
+            })
 
-            var newCanvas = document.createElement('canvas');
-            newCanvas.setAttribute('id', 'canvas');
-            document.getElementById('booth').appendChild(newCanvas);
+            document.getElementById('send').addEventListener('click', function() {
+              // var yourMessage = document.getElementById('yourMessage').value;
+              // peer.send(yourMessage);
+              peer.initiator = true
+              console.log(peer)
+            })
 
-            video.src = vendorUrl.createObjectURL(stream);
-            video.play();
+            peer.on('stream', function(stream) {
+              //create peer video
+              var video = document.createElement('video');
+              video.setAttribute('id', 'video');
+              document.getElementById('booth').appendChild(video);
 
-            var canvas = document.getElementById('canvas'),
-                context = canvas.getContext('2d'),
-                video = document.getElementById('video');
+              var newCanvas = document.createElement('canvas');
+              newCanvas.setAttribute('id', 'canvas');
+              document.getElementById('booth').appendChild(newCanvas);
 
-            video.addEventListener('play', function() {
+              video.src = vendorUrl.createObjectURL(stream);
+              video.play();
+
+              var canvas = document.getElementById('canvas'),
+              context = canvas.getContext('2d'),
+              video = document.getElementById('video');
+
+              video.addEventListener('play', function() {
                 draw(this, context, 400, 300);
-            }, false);
+              }, false);
 
-        })
+            });
+
+
+          });
+
+
+
+
+
     }, function(err) {
         console.error(err);
     })
 
-    // var canvas = document.getElementById('canvas'),
-    // context = canvas.getContext('2d'),
-    // video = document.getElementById('video');
-
-    // video.addEventListener('play', function() {
-    // draw(this, context, 400, 300);
-    // }, false);
 
 
     function draw(video, context, width, height) {

@@ -15,7 +15,8 @@ const compiler = webpack(config);
 app.use(webpackDevMiddleware(compiler, {noInfo: true, publicPath: config.output.publicPath}));
 app.use(webpackHotMiddleware(compiler));
 
-let connections = [];
+const connections = [];
+const chatters = [];
 let initialClientId;
 let secondClientId;
 
@@ -56,15 +57,27 @@ const io = require('socket.io').listen(server);
 io.sockets.on('connection', function(socket) {
   connections.push(socket);
   //
-  // socket.or
+  socket.on('initiator?', (payload) => {
+      console.log(connections[0]===connections[1])
+      let chatter = {
+        id: payload,
+        initiator: false
+      }
+      if (chatters.filter(chatter => chatter.initiator === true).length === 0) {
+        chatter.initiator = true;
+      }
+      chatters.push(chatter);
+
+      io.to(socket.id).emit('initiated', chatter);
+  });
 
   socket.on('initial', function(payload) {
     initialClientId = payload;
-    io.sockets.emit('initalConnected', payload);
+    io.sockets.emit('initialConnected', payload);
   });
 
   socket.on('second', function(payload) {
-    this.emit('secondPart2', initialClientId);
+    io.to(socket.id).emit('secondPart2', initialClientId);
   });
 
   socket.on('third', function(payload) {
