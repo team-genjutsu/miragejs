@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
         })
       }
 
-
       peer.on('signal', function(data) {
         document.getElementById('yourId').value = JSON.stringify(data);
         // if (window.location.href.match(/#init/)){
@@ -109,6 +108,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
           // console.log(peer)
       })
 
+
       peer.on('stream', function(stream) {
         video = document.createElement('video');
         video.setAttribute('id', 'video');
@@ -116,6 +116,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         video.src = vendorUrl.createObjectURL(stream);
         video.play();
+        console.log(stream);
 
         canvas = document.createElement('canvas');
         canvas.setAttribute('id', 'canvas');
