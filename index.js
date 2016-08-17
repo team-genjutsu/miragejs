@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
       peer.on('data', function(data) {
         document.getElementById('messages').textContent += data + '\n';
+        console.log('yo')
       });
 
       document.getElementById('connect').addEventListener('click', function() {
@@ -106,20 +107,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
         // var yourMessage = document.getElementById('yourMessage').value;
         // peer.send(yourMessage);
         // peer.initiator = true
-          // console.log(peer)
+        // console.log(peer)
+        peer.send('yo');
       })
+
+
 
       peer.on('stream', function(stream) {
         video = document.createElement('video');
         video.setAttribute('id', 'video');
-        document.getElementById('booth').appendChild(video);
+        document.getElementById('innerbooth').appendChild(video);
 
         video.src = vendorUrl.createObjectURL(stream);
         video.play();
 
         canvas = document.createElement('canvas');
         canvas.setAttribute('id', 'canvas');
-        document.getElementById('booth').appendChild(canvas);
+        document.getElementById('innerbooth').appendChild(canvas);
 
         context = canvas.getContext('2d');
 
@@ -127,8 +131,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
           canvas.width = 640;
           canvas.height = 480;
 
-          draw(this, context, canvas.width, canvas.height);
+          make_base(this, context, canvas.width, canvas.height)
+          // context.drawImage(this, 0, 0, width, height);
+          // draw(this, context, canvas.width, canvas.height);
         }, false);
+
+        video.addEventListener('progress', function() {
+          var show = video.currentTime >= 5 && video.currentTime < 10;
+          canvas.style.visibility = "visible";
+        }, false);
+
       });
     })
 
@@ -160,11 +172,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     context.putImageData(image, 0, 0);
 
-    make_base();
+    // make_base();
     setTimeout(draw, 10, video, context, width, height);
   }
 
-  function make_base() {
+  function make_base(video, context, width, height) {
+    context.drawImage(video, 0, 0, width, height);
     base_image = new Image();
     base_image.src = 'assets/twistedFace.png';
     base_image.onload = function() {
