@@ -1,18 +1,29 @@
 #booth {
-  width: 640px;
-  height: 965px;
+  width: 700px;
+  height: 1000px;
   background: #ccc;
   border: 10px solid #ddd;
   margin: 0 auto;
+  position: relative;
+}
+
+#innerbooth {
+  margin: 0 auto;
+  position: relative;
+  background: #ccc;
+  width: 640px;
+  height: 965px;
 }
 
 video {
-  /* display: block; */
+  position: absolute;
   margin: 0 auto;
-  /* height: 400px; */
-  /* width: 300px; */
+  z-index: 1;
 }
 
 canvas {
+  z-index: 2147483647;
   margin: 0 auto;
+  position: absolute;
+  visibility: hidden;
 }

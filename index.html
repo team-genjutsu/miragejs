@@ -9,33 +9,30 @@
 </head>
 
 <body id="page-top">
-  <nav id="my-navbar" class="navbar navbar-default navbar-fixed-top">
+  <nav id="my-navbar" class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-          <span class="sr-only">Navigation</span>
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse1">
+          <span class="sr-only"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand page-scroll" href="#page-top">PLACEHOLDER</a>
       </div>
+      <div class="navbar-collapse collapse" id="navbar-collapse1">
+        <ul class="nav navbar-nav">
+          <li><a href="#demo">Demo</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#github">Github</a></li>
+        </ul>
+      </div>
   </nav>
-  <!-- <div class='booth'> -->
-  <!-- <video id='video' width='400' height='300' autoplay></video> -->
-  <!-- <canvas id='canvas' width='400' height='300'></canvas> -->
-  <!-- </div> -->
-  <!-- <div id='identity'> -->
-    <!-- <label>Your ID:</label> -->
-    <!-- <textarea id='yourId'></textarea><br/>
-    <label>Other ID:</label><br/>
-    <textarea id='otherId'></textarea> -->
-
+ <textarea id='yourId'></textarea><br/>
     <br/>
     <h1> STREAM AR </h1>
     <button class="btn btn-primary" id='connect'>connect</button><br/>
   </div>
-
 
   <div id='comms'>
     <label>Enter Message:</label><br/>
@@ -44,7 +41,9 @@
     <pre id='messages'></pre>
   </div>
 
-  <div id='booth'></div>
+  <div id='booth'>
+    <div id='innerbooth'></div>
+  </div>
 
   <script src="./node_modules/socket.io-client/socket.io.js"></script>
   <script src='./node_modules/simple-peer/simplepeer.min.js'></script>
