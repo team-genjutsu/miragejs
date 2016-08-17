@@ -4,34 +4,49 @@
 <head>
   <meta charset='UTF-8'>
   <title>VideoTest</title>
-
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link rel='stylesheet' href='css/main.css'>
 </head>
 
-<body>
+<body id="page-top">
+  <nav id="my-navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand page-scroll" href="#page-top">PLACEHOLDER</a>
+      </div>
+  </nav>
   <!-- <div class='booth'> -->
   <!-- <video id='video' width='400' height='300' autoplay></video> -->
   <!-- <canvas id='canvas' width='400' height='300'></canvas> -->
   <!-- </div> -->
-  <div id='identity'>
-    <label>Your ID:</label>
-    <textarea id='yourId'></textarea><br/>
+  <!-- <div id='identity'> -->
+    <!-- <label>Your ID:</label> -->
+    <!-- <textarea id='yourId'></textarea><br/>
     <label>Other ID:</label><br/>
-    <textarea id='otherId'></textarea>
-    <button id='connect'>connect</button><br/>
+    <textarea id='otherId'></textarea> -->
+
+    <br/>
+    <h1> STREAM AR </h1>
+    <button class="btn btn-primary" id='connect'>connect</button><br/>
   </div>
 
 
   <div id='comms'>
     <label>Enter Message:</label><br/>
-    <textarea id='yourMessage'></textarea>
-    <button id='send'>send</button>
+    <textarea class="form-group col-md-4" id='yourMessage'></textarea>
+    <button class="btn btn-secondary" id='send'>send</button>
     <pre id='messages'></pre>
   </div>
 
   <div id='booth'></div>
 
-  <script src='./node_modules/socket.io-client/socket.io.js'></script>
+  <script src="./node_modules/socket.io-client/socket.io.js"></script>
   <script src='./node_modules/simple-peer/simplepeer.min.js'></script>
   <script src='./index.js'></script>
 </body>
