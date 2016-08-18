@@ -67,23 +67,32 @@ document.addEventListener("DOMContentLoaded", function(event) {
       })
 
       peer.on('data', function(data) {
+        //parse data string to get the data object
         var dataObj = JSON.parse(data);
-
+        //check data object for keys indicating if the type of data is a message
         if (dataObj.message){
-
+          //post message in the text content chat box spot
           document.getElementById('messages').textContent += dataObj.message + '\n';
-
+          //check data object for key indicating clicked the 'filter me!' button
         } else if (dataObj.myFilter){
+          //checks the value of the key to see if a filter needs to be added
             if (dataObj.myFilter === 'yes'){
+            //applies filter to video to reflect partner's video
               document.getElementById('video').style.filter = 'saturate(8)';
+              //checks value of key to see if filter needs to be removed
             } else if (dataObj.myFilter === 'no'){
+              //removes filter
               document.getElementById('video').removeAttribute('style');
             }
-
+          //check data object for key indicating user clicked the "filter them" button
         } else if (dataObj.peerFilter){
+          //checks key value to see if a filter needs to be added
           if (dataObj.peerFilter === 'yes'){
+            //applies filter
             document.getElementById('my-video').style.filter = 'saturate(8)';
+            //checks key value to see if a filter needs to be removed
           } else if (dataObj.peerFilter === 'no'){
+            //removes filter
             document.getElementById('my-video').removeAttribute('style');
           }
         }
@@ -122,39 +131,52 @@ document.addEventListener("DOMContentLoaded", function(event) {
         console.log(chattersClient)
       });
 
+      //looks for click event on the send button
       document.getElementById('send').addEventListener('click', function() {
-         var yourMessageObj = JSON.stringify({message: peer.localPort + " " + document.getElementById('yourMessage').value});
-         var yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
-        // peer.send(yourMessage);
-        // peer.initiator = true
-        // console.log(peer)
-        document.getElementById('messages').textContent += yourMessage + '\n';
-        peer.send(yourMessageObj);
-        console.log(peer);
-      })
 
+        //creates a message object with a stringified object containing the local port and the message
+         var yourMessageObj = JSON.stringify({message: peer.localPort + " " + document.getElementById('yourMessage').value});
+         //creates a variable with the same information to display on your side
+         //peer.localPort is a temporary way to identify peers, should be changed
+         var yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
+        //post message in text context on your side
+        document.getElementById('messages').textContent += yourMessage + '\n';
+        //send message object to the data channel
+        peer.send(yourMessageObj);
+      })
+      //click event for the "filter me" button
       document.getElementById('myFilter').addEventListener('click', function() {
 
+        //checks for filter and assigns key yes or no based on whether or not one needs to be applied
         if (!document.getElementById('my-video').style.filter){
+          //creates and stringify object to send to the data channel with instructions to apply filter
           var filterDataObj = JSON.stringify({myFilter: 'yes'});
+          //add filter on your side
           document.getElementById('my-video').style.filter = 'saturate(8)';
         } else {
+          //create and stringify object to send to the data channel with instructions to remove filter
           var filterDataObj = JSON.stringify({myFilter: 'no'});
           document.getElementById('my-video').removeAttribute('style');
         }
-
+        //send object to data channel
         peer.send(filterDataObj);
       })
-
+      //click event for the "filter them" button
       document.getElementById('peerFilter').addEventListener('click', function() {
 
+        //checks for filter and assigns key yes or no based on whether one needs to be applied
         if (!document.getElementById('video').style.filter){
+          //creates and stringify object to send to the data channel with instructions to apply filter
           var filterDataObj = JSON.stringify({peerFilter: 'yes'});
+          //add filter on your side
           document.getElementById('video').style.filter = 'saturate(8)';
         } else {
+          //creates and stringify object to send to the data channel with instructions to remove filter
           var filterDataObj = JSON.stringify({peerFilter: 'no'});
+          //remove filter on your side
           document.getElementById('video').removeAttribute('style');
         }
+        //sends object to the data channel
           peer.send(filterDataObj);
       })
 
