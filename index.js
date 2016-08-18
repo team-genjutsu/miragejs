@@ -44,7 +44,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const socket = io();
 
     //creates a video element
+
     myVideo = document.getElementById('myVideo');
+
 
     //uses the stream from the local webcam before it gets reassigned
     myVideo.src = window.URL.createObjectURL(stream);
@@ -225,12 +227,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
       //peer stream event//
       peer.on('stream', function(stream) {
+
         peerVideo = document.getElementById('peerVideo')
+
 
         peerVideo.src = vendorUrl.createObjectURL(stream);
         peerVideo.play();
 
+
         peerCanvas = document.getElementById('peerCanvas')
+
 
         peerContext = peerCanvas.getContext('2d');
 
