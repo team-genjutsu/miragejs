@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         })
       }
 
+
       peer.on('signal', function(data) {
         document.getElementById('yourId').value = JSON.stringify(data);
         // if (window.location.href.match(/#init/)){
@@ -66,8 +67,27 @@ document.addEventListener("DOMContentLoaded", function(event) {
       })
 
       peer.on('data', function(data) {
-        document.getElementById('messages').textContent += data + '\n';
-        console.log('yo')
+        var dataObj = JSON.parse(data);
+
+        if (dataObj.message){
+
+          document.getElementById('messages').textContent += dataObj.message + '\n';
+
+        } else if (dataObj.myFilter){
+            if (dataObj.myFilter === 'yes'){
+              document.getElementById('video').style.filter = 'saturate(8)';
+            } else if (dataObj.myFilter === 'no'){
+              document.getElementById('video').removeAttribute('style');
+            }
+
+        } else if (dataObj.peerFilter){
+          if (dataObj.peerFilter === 'yes'){
+            document.getElementById('my-video').style.filter = 'saturate(8)';
+          } else if (dataObj.peerFilter === 'no'){
+            document.getElementById('my-video').removeAttribute('style');
+          }
+        }
+
       });
 
       document.getElementById('connect').addEventListener('click', function() {
@@ -90,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       });
 
       socket.on('thirdPart2', function(secondClientId) {
-         console.log(peer.initiator)
+        // console.log(peer.initiator)
         if (peer.initiator) {
           peer.signal(secondClientId);
         }
@@ -103,12 +123,42 @@ document.addEventListener("DOMContentLoaded", function(event) {
       });
 
       document.getElementById('send').addEventListener('click', function() {
-        // var yourMessage = document.getElementById('yourMessage').value;
+         var yourMessageObj = JSON.stringify({message: peer.localPort + " " + document.getElementById('yourMessage').value});
+         var yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
         // peer.send(yourMessage);
         // peer.initiator = true
         // console.log(peer)
-        peer.send('yo');
+        document.getElementById('messages').textContent += yourMessage + '\n';
+        peer.send(yourMessageObj);
+        console.log(peer);
       })
+
+      document.getElementById('myFilter').addEventListener('click', function() {
+
+        if (!document.getElementById('my-video').style.filter){
+          var filterDataObj = JSON.stringify({myFilter: 'yes'});
+          document.getElementById('my-video').style.filter = 'saturate(8)';
+        } else {
+          var filterDataObj = JSON.stringify({myFilter: 'no'});
+          document.getElementById('my-video').removeAttribute('style');
+        }
+
+        peer.send(filterDataObj);
+      })
+
+      document.getElementById('peerFilter').addEventListener('click', function() {
+
+        if (!document.getElementById('video').style.filter){
+          var filterDataObj = JSON.stringify({peerFilter: 'yes'});
+          document.getElementById('video').style.filter = 'saturate(8)';
+        } else {
+          var filterDataObj = JSON.stringify({peerFilter: 'no'});
+          document.getElementById('video').removeAttribute('style');
+        }
+          peer.send(filterDataObj);
+      })
+
+
 
       peer.on('stream', function(stream) {
         video = document.createElement('video');
@@ -117,7 +167,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         video.src = vendorUrl.createObjectURL(stream);
         video.play();
-        console.log(stream);
 
         canvas = document.createElement('canvas');
         canvas.setAttribute('id', 'canvas');
@@ -146,6 +195,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }, function(err) {
     console.error(err);
   })
+
 
 
   function draw(video, context, width, height) {
