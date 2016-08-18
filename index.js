@@ -167,41 +167,46 @@ document.addEventListener("DOMContentLoaded", function(event) {
         canvas.addEventListener('click', function(event) {
             // console.log(getCursorPosition(canvas, event), 'event: ', event);
             // tesing for getting objects to move
+            var position = getCursorPosition(canvas, event);
+
+
+            var onload = emoImg.onload;
             let emoticon = {
-              x: getCursorPosition(canvas, event).x,
-              y: getCursorPosition(canvas, event).y,
+              x: position.x,
+              y: position.y,
               vx: 5,
               vy: 2,
-              draw: function() {
-                var self = this;
-                emoImg.onload = function() {
-                  // console.log('img hi')
-                  context.drawImage(baseImg, self.x - emoImg.width / 2, self.y - emoImg.height / 2);
-                }
+              onload: function() {
+                context.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
               }
             };
 
+            // emoImg.onload = function() {
+            // context.drawImage(baseImg, emoticon.x - emoImg.width / 2, emoticon.y - emoImg.height / 2);
+            // }
+
+            emoticon.onload();
             raf = window.requestAnimationFrame(draw);
 
-            if (emoticon.y + emoticon.vy > canvas.height || emoticon.y + emoticon.vy < 0) {
-              emoticon.vy = -emoticon.vy;
-            }
-            if (emoticon.x + emoticon.vx > canvas.width || emoticon.x + emoticon.vx < 0) {
-              emoticon.vx = -emoticon.vx;
-            }
+
             // emoticon.draw()
 
             function draw() {
-              console.log(emoticon)
+              // console.log(emoticon)
               context.clearRect(0, 0, canvas.width, canvas.height);
-              emoticon.draw();
+              emoticon.onload();
               emoticon.x += emoticon.vx;
               emoticon.y += emoticon.vy;
+              if (emoticon.y + emoticon.vy > canvas.height || emoticon.y + emoticon.vy < 0) {
+                emoticon.vy = -emoticon.vy;
+              }
+              if (emoticon.x + emoticon.vx > canvas.width || emoticon.x + emoticon.vx < 0) {
+                emoticon.vx = -emoticon.vx;
+              }
               raf = window.requestAnimationFrame(draw);
             }
 
             //tesing for putting img on canvas
-            // var position = getCursorPosition(canvas, event);
             // paste(this, context, canvas.width, canvas.height, position.x, position.y)
           }, false)
           //////////////
