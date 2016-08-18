@@ -45,10 +45,16 @@
   width: 100%;
 }
 
-canvas {
+#myCanvas {
   z-index: 2147483647;
   margin: 0 auto;
   position: absolute;
-  visibility: hidden;
+  width: 100%;
+}
+
+#peerCanvas {
+  z-index: 2147483647;
+  margin: 0 auto;
+  position: absolute;
   width: 100%;
 }
