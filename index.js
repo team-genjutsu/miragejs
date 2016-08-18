@@ -126,6 +126,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         document.getElementById('innerbooth').appendChild(canvas);
 
         context = canvas.getContext('2d');
+        
 
         video.addEventListener('play', function() {
           canvas.width = 640;
