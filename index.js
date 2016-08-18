@@ -5,25 +5,31 @@ document.addEventListener("DOMContentLoaded", function(event) {
     peer,
     chattersClient = [],
     chatterThisClient,
+
+    //variables for video, canvas, and context logic
     video,
     canvas,
     context,
+
+    //variables for filter logic
     button = document.getElementById('filter'),
     current = document.getElementById('filterDisp'),
     filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', 'none'],
     i = 0,
+
+    //raf stands for requestAnimationFrame, enables drawing to occur
     raf;
 
   let emoImg = new Image();
   emoImg.src = 'assets/smLoveTongue.png';
 
-  //variable store//
+  //end variable store//
 
   //vendor media objects//
   navigator.getMedia = navigator.getUserMedia ||
     navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
     navigator.msGetUserMedia;
-  //vendor media objects//
+  //end vendor media objects//
 
 
   navigator.getMedia({
@@ -140,8 +146,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
         document.getElementById('innerbooth').appendChild(canvas);
 
         context = canvas.getContext('2d');
+
+        //width and height should eventually be translated to exact coordination
+        //with incoming video stream
         canvas.width = 640;
         canvas.height = 480;
+
+        //draws blank canvas on top of video, visibility may be unnecessary
         context.rect(0, 0, canvas.width, canvas.height);
         context.stroke();
         canvas.style.visibility = "visible";
@@ -149,28 +160,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
 
-        //leave just in case
+        //leave just in case event is needed
         video.addEventListener('play', function() {
-
-          // make_base(this, context, canvas.width, canvas.height)
-          // draw(this, context, canvas.width, canvas.height);
         }, false);
 
-        //enables overlay, may be unnecessary//
-        video.addEventListener('progress', function() {}, false);
-        //enables overlay//
-
-        //tesing MDN example//
+        video.addEventListener('progress', function() {
+        }, false);
+        /////////////////////////
 
 
-        //test to manipulate canvas insertion and coordinate extraction
+        //click listener for image insertion w/ movement, we can translate 
+        //this to data channel logic easy peasy
         canvas.addEventListener('click', function(event) {
-            // console.log(getCursorPosition(canvas, event), 'event: ', event);
-            // tesing for getting objects to move
+
+            //gets position based mouse click coordinates, restricted
+            //to canvas rectangle, see function logic in function store
             var position = getCursorPosition(canvas, event);
-
-
             var onload = emoImg.onload;
+
+            //this object keeps track of the movement, loads the images, and determines 
+            //the velocity
             let emoticon = {
               x: position.x,
               y: position.y,
@@ -181,18 +190,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
               }
             };
 
-            // emoImg.onload = function() {
-            // context.drawImage(baseImg, emoticon.x - emoImg.width / 2, emoticon.y - emoImg.height / 2);
-            // }
-
+            //initial image load on canvas
             emoticon.onload();
+
+            //start drawing movement
             raf = window.requestAnimationFrame(draw);
 
-
-            // emoticon.draw()
-
+            //draw function that clears canvas, then redraws newly positioned object
             function draw() {
-              // console.log(emoticon)
               context.clearRect(0, 0, canvas.width, canvas.height);
               emoticon.onload();
               emoticon.x += emoticon.vx;
@@ -205,11 +210,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
               }
               raf = window.requestAnimationFrame(draw);
             }
+            //end of draw function//
 
-            //tesing for putting img on canvas
+            //leave for tesing for putting random img on canvas
             // paste(this, context, canvas.width, canvas.height, position.x, position.y)
           }, false)
-          //////////////
+          //end of click listener logic//
 
         //tesing filters//
         button.addEventListener('click', function() {
@@ -222,6 +228,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
           i++;
           if (i >= filters.length) i = 0;
         }, false);
+        //end of filter test//
 
       });
     })
@@ -232,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   })
 
 
-
+  //function store//
   function paste(video, context, width, height, x, y) {
     context.drawImage(video, 0, 0, width, height);
     baseImg = new Image();
@@ -240,6 +247,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     baseImg.onload = function() {
       console.log(baseImg.width, baseImg.height);
       context.drawImage(baseImg, x - baseImg.width / 2, y - baseImg.height / 2);
+      //setTimeout for pasted images//
       // var time = window.setTimeout(function() {
       // context.clearRect(x - baseImg.width / 2, y - baseImg.height / 2, baseImg.width, baseImg.height);
       // }, 5000);
@@ -255,7 +263,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
       y: y
     };
     return pos;
-    // console.log("x: " + x + " y: " + y, pos);
   }
-
+  //end of function store//
 });
