@@ -1,3 +1,7 @@
+.logo {
+  font-size: 75px;
+}
+
 #booth {
   width: 700px;
   height: 1000px;
@@ -7,11 +11,15 @@
   position: relative;
 }
 
+#connect {
+  margin-top: 30px;
+}
+
 #innerbooth {
   margin: 0 auto;
   position: relative;
   background: #ccc;
-  width: 640px;
+  /*width: 640px;*/
   height: 965px;
 }
 
