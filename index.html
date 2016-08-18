@@ -11,6 +11,7 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link rel='stylesheet' href='css/main.css'>
 </head>
 
 	<style>
@@ -68,52 +69,71 @@
 
 			<div id='comms'>
 		    <label>Enter Message:</label><br/>
-		    <textarea class="form-group col-md-4" id='yourMessage'></textarea>
+		    <textarea class="form-group" id='yourMessage'></textarea>
 		    <button class="btn btn-secondary" id='send'>send</button>
 		  </div>
 
+			<!-- Video demo area -->
+		<section id="demo">
 
-		<div id='booth'>
-      <div id='innerbooth'></div>
-    </div>
+			<div id='booth'>
 
+				<div id='myBooth'>
+					<video id="myVideo"></video>
+		    </div>
+		    <div id='peerBooth'>
+					<video id="peerVideo"></video>
+		    </div>
+		  </div>
+
+			<div class="btn-group">
+				<button id='filter' class="btn btn-primary">filter: <span id='filterDisp'></span></button>
+				<button id='myFilter' class="btn btn-info">filter me!</button>
+				<button id='peerFilter' class="btn btn-info">filter them!</button><br/>
+			</div>
+
+		</section> <!--close section demo-->
+
+
+			<!-- call to action -->
+				<section id="subscribe">
+					<div class="well">
+						<div class="container text-center">
+							<h3>Subscribe for updates to streamAR</h3>
+							<p>Enter your name and email</p>
+
+							<form action="" class="form-inline">
+								<div class="form-group">
+									<label for="subscription">Subscribe</label>
+									<input type="text" class="form-control" id="subscription" placeholder="Your name">
+								</div>
+								<div class="form-group">
+									<label for="email">Email address</label>
+									<input type="text" class="form-control" id="email" placeholder="Enter your Email">
+								</div>
+								<button type="submit" class="btn btn-default">Subscribe</button>
+								<hr>
+							</form>
+
+
+
+						</div><!-- end Container-->
+
+					</div><!-- end well-->
+				</section><!-- Call to action -->
 
   	<!-- Feedback-->
   	<div class="container text-center" id="about">
 			<div class="row">
           <div class="col-lg-8 col-lg-offset-2">
               <h2>About StreamAR</h2>
-              <p>StreamAR is a next-generation video-chat platform built on webRTC technology where users can interact with both 2d and 3d <br/> objects in a augmented reality based interface.</p>
+              <p>StreamAR is a next-generation video-chat platform built on webRTC technology where users can interact with both 2d and 3d objects in a augmented reality based interface.</p>
               <p>Integrating applied physics and movement tracking functionalities, this is the video chat app to use in the 21st century</p>
           </div>
       </div>
   	</div><!--End Container-->
 
-<!-- call to action -->
-	<section>
-		<div class="well">
-			<div class="container text-center">
-				<h3>Subscribe for more free stuff</h3>
-				<p>Enter your name and email</p>
 
-				<form action="" class="form-inline">
-					<div class="form-group">
-						<label for="subscription">Subscribe</label>
-						<input type="text" class="form-control" id="subscription" placeholder="Your name">
-					</div>
-					<div class="form-group">
-						<label for="email">Email address</label>
-						<input type="text" class="form-control" id="email" placeholder="Enter your Email">
-					</div>
-					<button type="submit" class="btn btn-default">Subscribe</button>
-					<hr>
-				</form>
-
-
-			</div><!-- end Container-->
-
-		</div><!-- end well-->
-	</section><!-- Call to action -->
 
 
 <!-- Faq -->
@@ -129,12 +149,12 @@
             <div class="panel-heading">
               <div class="panel-title">
                 <a href="#collapse-1" data-toggle="collapse" data-parent="#accordion">
-                  Question one?
+                  Is this real Augmented Reality technology?
                 </a>
               </div><!-- End panel title -->
               <div id="collapse-1" class="panel-collapse collapse in">
                 <div class="panel-body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec egestas non urna in fringilla. Praesent consequat est at feugiat faucibus
+                  Yes
                 </div>
               </div><!-- End Panel collapse -->
             </div>
@@ -144,12 +164,12 @@
             <div class="panel-heading">
               <div class="panel-title">
                 <a href="#collapse-2" data-toggle="collapse" data-parent="#accordion">
-                  Question Two?
+                  Where can I find the source code to your product
                 </a>
               </div><!-- End panel title -->
               <div id="collapse-2" class="panel-collapse collapse">
                 <div class="panel-body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec egestas non urna in fringilla. Praesent consequat est at feugiat faucibus
+                  https://github.com/kevoutthebox/streamar
                 </div>
               </div><!-- End Panel collapse -->
             </div>
@@ -159,12 +179,12 @@
             <div class="panel-heading">
               <div class="panel-title">
                 <a href="#collapse-3" data-toggle="collapse" data-parent="#accordion">
-                  Question Three?
+                  How is everything?
                 </a>
               </div><!-- End panel title -->
               <div id="collapse-3" class="panel-collapse collapse">
                 <div class="panel-body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec egestas non urna in fringilla. Praesent consequat est at feugiat faucibus
+                  Everything is fantastic
                 </div>
               </div><!-- End Panel collapse -->
             </div>
@@ -185,21 +205,21 @@
 	        <blockquote>
 	          <img class="img-responsive" src="https://avatars3.githubusercontent.com/u/18605818?v=3&s=460"</img>
 	          <p>Hello I am Morgan Christison</p>
-	          <a href="github.com/MorganChristison">Visit my Github</a>
+	          <a href="https://www.github.com/MorganChristison">Visit my Github</a>
 	        </blockquote>
 	      </div>
 	      <div class="col-xs-4">
 	        <blockquote>
 	          <img class="img-responsive" src="https://avatars3.githubusercontent.com/u/16654839?v=3&s=460"</img>
 	          <p>Hello I am Blake Watkins</p>
-	          <a href="github.com/blkwtkns">Visit my Github</a>
+	          <a href="https://www.github.com/blkwtkns">Visit my Github</a>
 	        </blockquote>
 	      </div>
 	      <div class="col-xs-4">
 	        <blockquote>
 	          <img class="img-responsive" src="https://avatars0.githubusercontent.com/u/16319987?v=3&s=460"</img>
 	          <p>Hello I am Kevin Liu</p>
-	          <a href="github.com/kevoutthebox">Visit my Github</a>
+	          <a href="https://www.github.com/kevoutthebox">Visit my Github</a>
 	        </blockquote>
 	      </div>
 	    </div> <!-- this closes row for names -->
@@ -216,7 +236,8 @@
         </div><!-- End the row -->
 
     </section>
-  </div>
+
+
 
 <!-- Footer -->
 
