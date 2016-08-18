@@ -1,16 +1,37 @@
 document.addEventListener("DOMContentLoaded", function(event) {
 
+  //variable store//
   let vendorUrl = window.URL || window.webkitURL,
     peer,
     chattersClient = [],
     chatterThisClient,
+
+    //variables for video, canvas, and context logic
     video,
     canvas,
-    context;
+    context,
 
+    //variables for filter logic
+    current = document.getElementById('filterDisp'),
+    button = document.getElementById('filter'),
+    filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', ''],
+    i = 0,
+
+    //raf stands for requestAnimationFrame, enables drawing to occur
+    raf;
+
+  //image assignment, we can abstract this later
+  let emoImg = new Image();
+  emoImg.src = 'assets/smLoveTongue.png';
+
+  //end variable store//
+
+  //vendor media objects//
   navigator.getMedia = navigator.getUserMedia ||
     navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
     navigator.msGetUserMedia;
+  //end vendor media objects//
+
 
   navigator.getMedia({
     video: true,
@@ -27,9 +48,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     myVideo.src = window.URL.createObjectURL(stream);
     myVideo.play();
 
-    myVideo.addEventListener('play', function() {
-      draw(this, context, 400, 300);
-    }, false);
+    // myVideo.addEventListener('play', function() {
+    // draw(this, context, 400, 300);
+    // }, false);
 
     socket.emit('initiator?', JSON.stringify(stream.id));
     socket.on('initiated', (chatter) => {
@@ -67,31 +88,34 @@ document.addEventListener("DOMContentLoaded", function(event) {
       })
 
       peer.on('data', function(data) {
+
         //parse data string to get the data object
         var dataObj = JSON.parse(data);
         //check data object for keys indicating if the type of data is a message
-        if (dataObj.message){
+        if (dataObj.message) {
           //post message in the text content chat box spot
           document.getElementById('messages').textContent += dataObj.message + '\n';
           //check data object for key indicating clicked the 'filter me!' button
-        } else if (dataObj.myFilter){
+        } else if (dataObj.myFilter) {
           //checks the value of the key to see if a filter needs to be added
-            if (dataObj.myFilter === 'yes'){
+          console.log("hi I'm data for filter shit", dataObj.myFilter)
+          if (dataObj.myFilter === 'yes') {
             //applies filter to video to reflect partner's video
-              document.getElementById('video').style.filter = 'saturate(8)';
-              //checks value of key to see if filter needs to be removed
-            } else if (dataObj.myFilter === 'no'){
-              //removes filter
-              document.getElementById('video').removeAttribute('style');
-            }
+            document.getElementById('video').style.filter = 'saturate(8)';
+            //checks value of key to see if filter needs to be removed
+          } else if (dataObj.myFilter === 'no') {
+            //removes filter
+            document.getElementById('video').removeAttribute('style');
+          }
           //check data object for key indicating user clicked the "filter them" button
-        } else if (dataObj.peerFilter){
-          //checks key value to see if a filter needs to be added
-          if (dataObj.peerFilter === 'yes'){
+        } else if (dataObj.peerFilter) {
+          console.log("hi I'm data for filter shit", dataObj.peerFilter)
+            //checks key value to see if a filter needs to be added
+          if (dataObj.peerFilter === 'yes') {
             //applies filter
             document.getElementById('my-video').style.filter = 'saturate(8)';
             //checks key value to see if a filter needs to be removed
-          } else if (dataObj.peerFilter === 'no'){
+          } else if (dataObj.peerFilter === 'no') {
             //removes filter
             document.getElementById('my-video').removeAttribute('style');
           }
@@ -131,57 +155,84 @@ document.addEventListener("DOMContentLoaded", function(event) {
         console.log(chattersClient)
       });
 
-      //looks for click event on the send button
+      //looks for click event on the send button//
       document.getElementById('send').addEventListener('click', function() {
 
-        //creates a message object with a stringified object containing the local port and the message
-         var yourMessageObj = JSON.stringify({message: peer.localPort + " " + document.getElementById('yourMessage').value});
-         //creates a variable with the same information to display on your side
-         //peer.localPort is a temporary way to identify peers, should be changed
-         var yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
-        //post message in text context on your side
-        document.getElementById('messages').textContent += yourMessage + '\n';
-        //send message object to the data channel
-        peer.send(yourMessageObj);
-      })
-      //click event for the "filter me" button
+          //creates a message object with a stringified object containing the local port and the message
+          var yourMessageObj = JSON.stringify({
+            message: peer.localPort + " " + document.getElementById('yourMessage').value
+          });
+          //creates a variable with the same information to display on your side
+          //peer.localPort is a temporary way to identify peers, should be changed
+          var yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
+          //post message in text context on your side
+          document.getElementById('messages').textContent += yourMessage + '\n';
+          //send message object to the data channel
+          peer.send(yourMessageObj);
+        })
+        //end send click event//
+
+      //click event for the "filter me" button//
       document.getElementById('myFilter').addEventListener('click', function() {
 
-        //checks for filter and assigns key yes or no based on whether or not one needs to be applied
-        if (!document.getElementById('my-video').style.filter){
-          //creates and stringify object to send to the data channel with instructions to apply filter
-          var filterDataObj = JSON.stringify({myFilter: 'yes'});
-          //add filter on your side
-          document.getElementById('my-video').style.filter = 'saturate(8)';
-        } else {
-          //create and stringify object to send to the data channel with instructions to remove filter
-          var filterDataObj = JSON.stringify({myFilter: 'no'});
-          document.getElementById('my-video').removeAttribute('style');
-        }
-        //send object to data channel
-        peer.send(filterDataObj);
-      })
-      //click event for the "filter them" button
+          //checks for filter and assigns key yes or no based on whether or not one needs to be applied
+          if (!document.getElementById('my-video').style.filter) {
+            //creates and stringify object to send to the data channel with instructions to apply filter
+            var filterDataObj = JSON.stringify({
+              myFilter: 'yes'
+            });
+            //add filter on your side
+            document.getElementById('my-video').style.filter = 'saturate(8)';
+          } else {
+            //create and stringify object to send to the data channel with instructions to remove filter
+            var filterDataObj = JSON.stringify({
+              myFilter: 'no'
+            });
+            document.getElementById('my-video').removeAttribute('style');
+          }
+          //send object to data channel
+          peer.send(filterDataObj);
+        })
+        ///end filter me click event///
+
+      //click event for the "filter them" button//
       document.getElementById('peerFilter').addEventListener('click', function() {
 
-        //checks for filter and assigns key yes or no based on whether one needs to be applied
-        if (!document.getElementById('video').style.filter){
-          //creates and stringify object to send to the data channel with instructions to apply filter
-          var filterDataObj = JSON.stringify({peerFilter: 'yes'});
-          //add filter on your side
-          document.getElementById('video').style.filter = 'saturate(8)';
-        } else {
-          //creates and stringify object to send to the data channel with instructions to remove filter
-          var filterDataObj = JSON.stringify({peerFilter: 'no'});
-          //remove filter on your side
-          document.getElementById('video').removeAttribute('style');
-        }
-        //sends object to the data channel
+          //checks for filter and assigns key yes or no based on whether one needs to be applied
+          if (!document.getElementById('video').style.filter) {
+            //creates and stringify object to send to the data channel with instructions to apply filter
+            var filterDataObj = JSON.stringify({
+              peerFilter: 'yes'
+            });
+            //add filter on your side
+            document.getElementById('video').style.filter = 'saturate(8)';
+          } else {
+            //creates and stringify object to send to the data channel with instructions to remove filter
+            var filterDataObj = JSON.stringify({
+              peerFilter: 'no'
+            });
+            //remove filter on your side
+            document.getElementById('video').removeAttribute('style');
+          }
+          //sends object to the data channel
           peer.send(filterDataObj);
-      })
+        })
+        ///end filter them click event///
 
+      //tesing filters//
+      button.addEventListener('click', function() {
 
+        current.innerHTML = filters[i];
+        video.style.webkitFilter = filters[i];
+        video.style.mozFilter = filters[i];
+        video.style.filter = filters[i];
 
+        i++;
+        if (i >= filters.length) i = 0;
+      }, false);
+      //end of filter test//
+
+      //peer stream event//
       peer.on('stream', function(stream) {
         video = document.createElement('video');
         video.setAttribute('id', 'video');
@@ -196,21 +247,73 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         context = canvas.getContext('2d');
 
-        video.addEventListener('play', function() {
-          canvas.width = 640;
-          canvas.height = 480;
+        //width and height should eventually be translated to exact coordination
+        //with incoming video stream
+        canvas.width = 640;
+        canvas.height = 480;
 
-          make_base(this, context, canvas.width, canvas.height)
-          // context.drawImage(this, 0, 0, width, height);
-          // draw(this, context, canvas.width, canvas.height);
-        }, false);
+        //draws blank canvas on top of video, visibility may be unnecessary
+        context.rect(0, 0, canvas.width, canvas.height);
+        context.stroke();
+        canvas.style.visibility = "visible";
 
-        video.addEventListener('progress', function() {
-          var show = video.currentTime >= 5 && video.currentTime < 10;
-          canvas.style.visibility = "visible";
-        }, false);
+        //leave just in case event is needed
+        video.addEventListener('play', function() {}, false);
+
+        video.addEventListener('progress', function() {}, false);
+        /////////////////////////
+
+        //click listener for image insertion w/ movement, we can translate 
+        //this to data channel logic easy peasy
+        canvas.addEventListener('click', function(event) {
+
+            //gets position based mouse click coordinates, restricted
+            //to canvas rectangle, see function logic in function store
+            var position = getCursorPosition(canvas, event);
+            var onload = emoImg.onload;
+
+            //this object keeps track of the movement, loads the images, and determines 
+            //the velocity
+            let emoticon = {
+              x: position.x,
+              y: position.y,
+              vx: 5,
+              vy: 2,
+              onload: function() {
+                context.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+              }
+            };
+
+            //initial image load on canvas
+            emoticon.onload();
+
+            //start drawing movement
+            raf = window.requestAnimationFrame(draw);
+
+            //draw function that clears canvas, then redraws newly positioned object
+            function draw() {
+              context.clearRect(0, 0, canvas.width, canvas.height);
+              emoticon.onload();
+              emoticon.x += emoticon.vx;
+              emoticon.y += emoticon.vy;
+              if (emoticon.y + emoticon.vy > canvas.height || emoticon.y + emoticon.vy < 0) {
+                emoticon.vy = -emoticon.vy;
+              }
+              if (emoticon.x + emoticon.vx > canvas.width || emoticon.x + emoticon.vx < 0) {
+                emoticon.vx = -emoticon.vx;
+              }
+              raf = window.requestAnimationFrame(draw);
+            }
+            //end of draw function//
+
+            //leave for tesing for putting random img on canvas
+            // paste(this, context, canvas.width, canvas.height, position.x, position.y)
+          }, false)
+          //end of click listener logic//
+
 
       });
+      ///end peer stream event///
     })
 
 
@@ -219,39 +322,30 @@ document.addEventListener("DOMContentLoaded", function(event) {
   })
 
 
-
-  function draw(video, context, width, height) {
-    var image, data, i, r, g, b, brightness;
-
+  //function store//
+  function paste(video, context, width, height, x, y) {
     context.drawImage(video, 0, 0, width, height);
-
-    image = context.getImageData(0, 0, width, height);
-    data = image.data;
-
-    for (i = 0; i < data.length; i = i + 4) {
-      r = data[i];
-      g = data[i + 1];
-      b = data[i + 2];
-      brightness = (r + b + g);
-
-      data[i] = data[i + 1] = data[i + 2] = brightness;
-    }
-
-    image.data = data;
-
-    context.putImageData(image, 0, 0);
-
-    // make_base();
-    setTimeout(draw, 10, video, context, width, height);
-  }
-
-  function make_base(video, context, width, height) {
-    context.drawImage(video, 0, 0, width, height);
-    base_image = new Image();
-    base_image.src = 'assets/twistedFace.png';
-    base_image.onload = function() {
-      context.drawImage(base_image, 50, 50);
+    baseImg = new Image();
+    baseImg.src = 'assets/weird.png';
+    baseImg.onload = function() {
+      console.log(baseImg.width, baseImg.height);
+      context.drawImage(baseImg, x - baseImg.width / 2, y - baseImg.height / 2);
+      //setTimeout for pasted images//
+      // var time = window.setTimeout(function() {
+      // context.clearRect(x - baseImg.width / 2, y - baseImg.height / 2, baseImg.width, baseImg.height);
+      // }, 5000);
     }
   }
 
+  function getCursorPosition(canvas, event) {
+    var rect = canvas.getBoundingClientRect();
+    var x = event.clientX - rect.left;
+    var y = event.clientY - rect.top;
+    var pos = {
+      x: x,
+      y: y
+    };
+    return pos;
+  }
+  ///end of function store///
 });
