@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     chatterThisClient,
 
     //variables for video, canvas, and context logic
+
     video,
     canvas,
     context,
@@ -26,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
   emoImg.src = 'assets/smLoveTongue.png';
 
   //end variable store//
-
   //vendor media objects//
   navigator.getMedia = navigator.getUserMedia ||
     navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
@@ -48,10 +48,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     //uses the stream from the local webcam before it gets reassigned
     myVideo.src = window.URL.createObjectURL(stream);
     myVideo.play();
-
-    // myVideo.addEventListener('play', function() {
-    // draw(this, context, 400, 300);
-    // }, false);
 
     socket.emit('initiator?', JSON.stringify(stream.id));
     socket.on('initiated', (chatter) => {
@@ -102,19 +98,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
           console.log("hi I'm data for filter shit", dataObj.myFilter)
           if (dataObj.myFilter === 'yes') {
             //applies filter to video to reflect partner's video
-            document.getElementById('peerVideo').style.filter = 'saturate(8)';
-            //checks value of key to see if filter needs to be removed
-          } else if (dataObj.myFilter === 'no') {
-            //removes filter
-            document.getElementById('peerVideo').style.filter = '';
-          }
+
+              document.getElementById('peerVideo').style.filter = dataObj.filterType;
+              //checks value of key to see if filter needs to be removed
+            } else if (dataObj.myFilter === 'no'){
+              //removes filter
+              document.getElementById('peerVideo').removeAttribute('style');
+            }
+
           //check data object for key indicating user clicked the "filter them" button
         } else if (dataObj.peerFilter) {
           console.log("hi I'm data for filter shit", dataObj.peerFilter)
             //checks key value to see if a filter needs to be added
           if (dataObj.peerFilter === 'yes') {
             //applies filter
-            document.getElementById('my-video').style.filter = 'saturate(8)';
+            document.getElementById('my-video').style.filter = dataObj.filterType;
             //checks key value to see if a filter needs to be removed
           } else if (dataObj.peerFilter === 'no') {
             //removes filter
@@ -176,46 +174,36 @@ document.addEventListener("DOMContentLoaded", function(event) {
       //click event for the "filter me" button//
       document.getElementById('myFilter').addEventListener('click', function() {
 
-          //checks for filter and assigns key yes or no based on whether or not one needs to be applied
-          if (!document.getElementById('my-video').style.filter) {
-            //creates and stringify object to send to the data channel with instructions to apply filter
-            var filterDataObj = JSON.stringify({
-              myFilter: 'yes'
-            });
-            //add filter on your side
-            document.getElementById('my-video').style.filter = 'saturate(8)';
-          } else {
-            //create and stringify object to send to the data channel with instructions to remove filter
-            var filterDataObj = JSON.stringify({
-              myFilter: 'no'
-            });
-            document.getElementById('my-video').style.filter = '';
-          }
-          //send object to data channel
-          peer.send(filterDataObj);
-        })
-        ///end filter me click event///
-
-      //click event for the "filter them" button//
+        //checks for filter and assigns key yes or no based on whether or not one needs to be applied
+        if (!document.getElementById('my-video').style.filter){
+          //creates and stringify object to send to the data channel with instructions to apply filter
+          var filterDataObj = JSON.stringify({myFilter: 'yes', filterType: current.innerHTML});
+          //add filter on your side
+          document.getElementById('my-video').style.filter = current.innerHTML;
+        } else {
+          //create and stringify object to send to the data channel with instructions to remove filter
+          var filterDataObj = JSON.stringify({myFilter: 'no'});
+          document.getElementById('my-video').removeAttribute('style');
+        }
+        //send object to data channel
+        peer.send(filterDataObj);
+      })
+      //click event for the "filter them" button
       document.getElementById('peerFilter').addEventListener('click', function() {
 
-          //checks for filter and assigns key yes or no based on whether one needs to be applied
-          if (!document.getElementById('peerVideo').style.filter) {
-            //creates and stringify object to send to the data channel with instructions to apply filter
-            var filterDataObj = JSON.stringify({
-              peerFilter: 'yes'
-            });
-            //add filter on your side
-            document.getElementById('peerVideo').style.filter = 'saturate(8)';
-          } else {
-            //creates and stringify object to send to the data channel with instructions to remove filter
-            var filterDataObj = JSON.stringify({
-              peerFilter: 'no'
-            });
-            //remove filter on your side
-            document.getElementById('peerVideo').style.filter = '';
-          }
-          //sends object to the data channel
+        //checks for filter and assigns key yes or no based on whether one needs to be applied
+        if (!document.getElementById('peerVideo').style.filter){
+          //creates and stringify object to send to the data channel with instructions to apply filter
+          var filterDataObj = JSON.stringify({peerFilter: 'yes', filterType: current.innerHTML});
+          //add filter on your side
+          document.getElementById('peerVideo').style.filter = current.innerHTML;
+        } else {
+          //creates and stringify object to send to the data channel with instructions to remove filter
+          var filterDataObj = JSON.stringify({peerFilter: 'no'});
+          //remove filter on your side
+          document.getElementById('peerVideo').removeAttribute('style');
+        }
+        //sends object to the data channel
           peer.send(filterDataObj);
         })
         ///end filter them click event///
@@ -223,14 +211,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
       //tesing filters//
       button.addEventListener('click', function() {
 
-        current.innerHTML = filters[i];
-        video.style.webkitFilter = filters[i];
-        video.style.mozFilter = filters[i];
-        video.style.filter = filters[i];
+          current.innerHTML = filters[i];
+          // video.style.webkitFilter = filters[i];
+          // video.style.mozFilter = filters[i];
+          // video.style.filter = filters[i];
 
-        i++;
-        if (i >= filters.length) i = 0;
-      }, false);
+          i++;
+          if (i >= filters.length) i = 0;
+        }, false);
+
       //end of filter test//
 
       //peer stream event//
@@ -264,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         video.addEventListener('progress', function() {}, false);
         /////////////////////////
 
-        //click listener for image insertion w/ movement, we can translate 
+        //click listener for image insertion w/ movement, we can translate
         //this to data channel logic easy peasy
         canvas.addEventListener('click', function(event) {
 
@@ -273,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             var position = getCursorPosition(canvas, event);
             var onload = emoImg.onload;
 
-            //this object keeps track of the movement, loads the images, and determines 
+            //this object keeps track of the movement, loads the images, and determines
             //the velocity
             let emoticon = {
               x: position.x,
