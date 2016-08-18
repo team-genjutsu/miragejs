@@ -1,3 +1,7 @@
+.logo {
+  font-size: 75px;
+}
+
 #booth {
   width: 700px;
   height: 1000px;
@@ -7,22 +11,50 @@
   position: relative;
 }
 
-#innerbooth {
+#connect {
+  margin-top: 30px;
+}
+
+#myBooth {
   margin: 0 auto;
   position: relative;
   background: #ccc;
-  width: 640px;
-  height: 965px;
+  width: 100%;
+  height: 465px;
+}
+
+#peerBooth {
+  margin: 0 auto;
+  position: relative;
+  background: #ccc;
+  width: 100%;
+  height: 465px;
+}
+
+#myVideo {
+  position: absolute;
+  margin: 0 auto;;
+  z-index: 1;
+  width: 100%;
 }
 
 #peerVideo {
   position: absolute;
   margin: 0 auto;;
   z-index: 1;
+  width: 100%;
+}
+
+#myCanvas {
+  z-index: 2147483647;
+  margin: 0 auto;
+  position: absolute;
+  width: 100%;
 }
 
 #peerCanvas {
   z-index: 2147483647;
   margin: 0 auto;
   position: absolute;
+  width: 100%;
 }

@@ -1,45 +1,257 @@
+
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 
 <head>
-  <meta charset='UTF-8'>
-  <title>VideoTest</title>
-
-  <link rel='stylesheet' href='css/main.css'>
+	<meta charset="utf-8">
+	<title> StreamAR </title>
+	<meta name="description" content="streamAR">
+	<!-- Latest compiled and minified CSS -->
+	 <!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link rel='stylesheet' href='css/main.css'>
 </head>
 
-<body>
-  <!-- <div class='booth'> -->
-  <!-- <video id='video' width='400' height='300' autoplay></video> -->
-  <!-- <canvas id='canvas' width='400' height='300'></canvas> -->
-  <!-- </div> -->
-  <div id='identity'>
-    <label>Your ID:</label>
-    <textarea id='yourId'></textarea><br/>
-    <label>Other ID:</label><br/>
-    <textarea id='otherId'></textarea>
-    <button id='connect'>connect</button><br/>
-  </div>
+	<style>
+	body{
+		padding-top: 20px;
+	}
+	</style>
+
+<body data-spy="scroll" data-target="#my-navbar">
+
+  <!-- Navbar -->
+  	<nav class="navbar navbar-inverse navbar-fixed-top" id="my-navbar">
+  		<div class="container">
+  			<div class="navbar-header">
+  				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+  					<span class="icon-bar"></span>
+  					<span class="icon-bar"></span>
+  					<span class="icon-bar"></span>
+  					<span class="icon-bar"></span>
+  				</button>
+
+  				<a href="" class="navbar-brand">streamAR</a>
+  			</div><!-- Navbar Header-->
+  			<div class="collapse navbar-collapse" id="navbar-collapse">
 
 
-  <div id='comms'>
-    <label>Enter Message:</label><br/>
-    <textarea id='yourMessage'></textarea>
-    <button id='send'>send</button>
-    <pre id='messages'></pre>
-  </div>
+  				<ul class="nav navbar-nav navbar-right">
+						<li><a href="#demo">Demo</a></li>
+	          <li><a href="#about">About</a></li>
+	          <li><a href="#team">Team</a></li>
+						<li><a href="https://github.com/kevoutthebox/streamarb" target="_blank">Github</a></li>
+  				</ul>
+  			</div>
+  		</div><!-- End Container-->
+  	</nav><!-- End navbar -->
 
-  <div id='booth'>
-    <div id='innerbooth'>
-      <button id='filter'>filter: <span id='filterDisp'></span></button>
-      <button id='myFilter'>filter me!</button>
-      <button id='peerFilter'>filter them!</button><br/>
-    </div>
-  </div>
+  	<!-- jumbotron-->
 
-  <script src='./node_modules/socket.io-client/socket.io.js'></script>
+  	<div class="jumbotron">
+  		<div class="container text-center">
+  			<h1>streamAR</h1>
+  				<p>Augmented Reality Video Chat</p>
+		    <button class="btn btn-info btn-lg center-block" id='connect'>CONNECT</button>
+
+  			</div>
+  		</div><!-- End container -->
+  	</div><!-- End jumbotron-->
+
+		<div class="panel panel-default">
+	    <div class="panel-body">ChatBox</div>
+	      <pre id='messages'></pre>
+	    </div>
+
+ 		<textarea id='yourId'></textarea><br/>
+
+			<div id='comms'>
+		    <label>Enter Message:</label><br/>
+		    <textarea class="form-group" id='yourMessage'></textarea>
+		    <button class="btn btn-secondary" id='send'>send</button>
+		  </div>
+
+			<!-- Video demo area -->
+		<section id="demo">
+
+			<div id='booth'>
+
+				<div id='myBooth'>
+					<video id="myVideo"></video>
+					<canvas id="myCanvas"></canvas>
+		    </div>
+		    <div id='peerBooth'>
+					<video id="peerVideo"></video>
+					<canvas id="peerCanvas"></canvas>
+		    </div>
+		  </div>
+
+			<div class="btn-group">
+				<button id='filter' class="btn btn-primary">filter: <span id='filterDisp'></span></button>
+				<button id='myFilter' class="btn btn-info">filter me!</button>
+				<button id='peerFilter' class="btn btn-info">filter them!</button><br/>
+			</div>
+
+		</section> <!--close section demo-->
+
+
+			<!-- call to action -->
+				<section id="subscribe">
+					<div class="well">
+						<div class="container text-center">
+							<h3>Subscribe for updates to streamAR</h3>
+							<p>Enter your name and email</p>
+
+							<form action="" class="form-inline">
+								<div class="form-group">
+									<label for="subscription">Subscribe</label>
+									<input type="text" class="form-control" id="subscription" placeholder="Your name">
+								</div>
+								<div class="form-group">
+									<label for="email">Email address</label>
+									<input type="text" class="form-control" id="email" placeholder="Enter your Email">
+								</div>
+								<button type="submit" class="btn btn-default">Subscribe</button>
+								<hr>
+							</form>
+
+
+
+						</div><!-- end Container-->
+
+					</div><!-- end well-->
+				</section><!-- Call to action -->
+
+  	<!-- Feedback-->
+  	<div class="container text-center" id="about">
+			<div class="row">
+          <div class="col-lg-8 col-lg-offset-2">
+              <h2>About StreamAR</h2>
+              <p>StreamAR is a next-generation video-chat platform built on webRTC technology where users can interact with both 2d and 3d objects in a augmented reality based interface.</p>
+              <p>Integrating applied physics and movement tracking functionalities, this is the video chat app to use in the 21st century</p>
+          </div>
+      </div>
+  	</div><!--End Container-->
+
+
+
+
+<!-- Faq -->
+
+    <div class="container">
+      <section>
+        <div class="page-header" id="faq">
+          <h2>FAQ.<small> Engaging with consumers.</small></h2>
+        </div><!-- End Page Header -->
+
+        <div class="panel-group" id="accordion">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <a href="#collapse-1" data-toggle="collapse" data-parent="#accordion">
+                  Is this real Augmented Reality technology?
+                </a>
+              </div><!-- End panel title -->
+              <div id="collapse-1" class="panel-collapse collapse in">
+                <div class="panel-body">
+                  Yes
+                </div>
+              </div><!-- End Panel collapse -->
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <a href="#collapse-2" data-toggle="collapse" data-parent="#accordion">
+                  Where can I find the source code to your product
+                </a>
+              </div><!-- End panel title -->
+              <div id="collapse-2" class="panel-collapse collapse">
+                <div class="panel-body">
+                  https://github.com/kevoutthebox/streamar
+                </div>
+              </div><!-- End Panel collapse -->
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <a href="#collapse-3" data-toggle="collapse" data-parent="#accordion">
+                  How is everything?
+                </a>
+              </div><!-- End panel title -->
+              <div id="collapse-3" class="panel-collapse collapse">
+                <div class="panel-body">
+                  Everything is fantastic
+                </div>
+              </div><!-- End Panel collapse -->
+            </div>
+          </div>
+        </div><!-- End panel group -->
+
+      </section>
+    </div><!-- End container -->
+
+		<div class="container">
+	    <section>
+	      <div class="page-header text-center" id="team">
+	          <h1>Introducing The Team:</h1>
+	      </div>
+	    </section>
+	    <div class="row">
+	      <div class="col-xs-4">
+	        <blockquote>
+	          <img class="img-responsive" src="https://avatars3.githubusercontent.com/u/18605818?v=3&s=460"</img>
+	          <p>Hello I am Morgan Christison</p>
+	          <a href="https://www.github.com/MorganChristison">Visit my Github</a>
+	        </blockquote>
+	      </div>
+	      <div class="col-xs-4">
+	        <blockquote>
+	          <img class="img-responsive" src="https://avatars3.githubusercontent.com/u/16654839?v=3&s=460"</img>
+	          <p>Hello I am Blake Watkins</p>
+	          <a href="https://www.github.com/blkwtkns">Visit my Github</a>
+	        </blockquote>
+	      </div>
+	      <div class="col-xs-4">
+	        <blockquote>
+	          <img class="img-responsive" src="https://avatars0.githubusercontent.com/u/16319987?v=3&s=460"</img>
+	          <p>Hello I am Kevin Liu</p>
+	          <a href="https://www.github.com/kevoutthebox">Visit my Github</a>
+	        </blockquote>
+	      </div>
+	    </div> <!-- this closes row for names -->
+	  </div>
+
+<!-- Contact -->
+
+  <div class="container">
+    <section>
+      <div class="page-header text-center" id="contact">
+          <h2>Please contact us! <br/><small> Any feedback is greatly appreciated</small></h2>
+        </div><!-- End Page Header -->
+          </div>
+        </div><!-- End the row -->
+
+    </section>
+
+
+
+<!-- Footer -->
+
+    <footer>
+      <hr>
+    </footer>
+
+	<script href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></script>
+
+
+	<script src="./node_modules/socket.io-client/socket.io.js"></script>
   <script src='./node_modules/simple-peer/simplepeer.min.js'></script>
   <script src='./index.js'></script>
 </body>
-
 </html>

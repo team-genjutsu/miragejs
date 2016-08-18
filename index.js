@@ -44,9 +44,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const socket = io();
 
     //creates a video element
-    myVideo = document.createElement('video');
-    myVideo.setAttribute('id', 'myVideo');
-    document.getElementById('booth').appendChild(myVideo);
+
+    myVideo = document.getElementById('myVideo');
+
 
     //uses the stream from the local webcam before it gets reassigned
     myVideo.src = window.URL.createObjectURL(stream);
@@ -227,16 +227,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
       //peer stream event//
       peer.on('stream', function(stream) {
-        peerVideo = document.createElement('video');
-        peerVideo.setAttribute('id', 'peerVideo');
-        document.getElementById('innerbooth').appendChild(peerVideo);
+
+        peerVideo = document.getElementById('peerVideo')
+
 
         peerVideo.src = vendorUrl.createObjectURL(stream);
         peerVideo.play();
 
-        peerCanvas = document.createElement('canvas');
-        peerCanvas.setAttribute('id', 'peerCanvas');
-        document.getElementById('innerbooth').appendChild(peerCanvas);
+
+        peerCanvas = document.getElementById('peerCanvas')
+
 
         peerContext = peerCanvas.getContext('2d');
 
@@ -316,8 +316,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
   }
 
-  //gets cursor position upon mouse click that places 
-  //an object or starts object movement 
+  //gets cursor position upon mouse click that places
+  //an object or starts object movement
   function getCursorPosition(canvas, event) {
     var rect = canvas.getBoundingClientRect();
     var x = event.clientX - rect.left;
