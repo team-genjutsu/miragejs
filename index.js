@@ -18,7 +18,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     i = 0,
 
     //raf stands for requestAnimationFrame, enables drawing to occur
-    raf;
+    raf,
+    myVideo;
 
   //image assignment, we can abstract this later
   let emoImg = new Image();
@@ -40,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const socket = io();
 
     //creates a video element
-    var myVideo = document.createElement('video');
+    myVideo = document.createElement('video');
     myVideo.setAttribute('id', 'my-video');
     document.getElementById('booth').appendChild(myVideo);
 
@@ -101,11 +102,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
           console.log("hi I'm data for filter shit", dataObj.myFilter)
           if (dataObj.myFilter === 'yes') {
             //applies filter to video to reflect partner's video
-            document.getElementById('video').style.filter = 'saturate(8)';
+            document.getElementById('peerVideo').style.filter = 'saturate(8)';
             //checks value of key to see if filter needs to be removed
           } else if (dataObj.myFilter === 'no') {
             //removes filter
-            document.getElementById('video').removeAttribute('style');
+            document.getElementById('peerVideo').style.filter = '';
           }
           //check data object for key indicating user clicked the "filter them" button
         } else if (dataObj.peerFilter) {
@@ -117,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             //checks key value to see if a filter needs to be removed
           } else if (dataObj.peerFilter === 'no') {
             //removes filter
-            document.getElementById('my-video').removeAttribute('style');
+            document.getElementById('my-video').style.filter = '';
           }
         }
 
@@ -188,7 +189,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             var filterDataObj = JSON.stringify({
               myFilter: 'no'
             });
-            document.getElementById('my-video').removeAttribute('style');
+            document.getElementById('my-video').style.filter = '';
           }
           //send object to data channel
           peer.send(filterDataObj);
@@ -199,20 +200,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
       document.getElementById('peerFilter').addEventListener('click', function() {
 
           //checks for filter and assigns key yes or no based on whether one needs to be applied
-          if (!document.getElementById('video').style.filter) {
+          if (!document.getElementById('peerVideo').style.filter) {
             //creates and stringify object to send to the data channel with instructions to apply filter
             var filterDataObj = JSON.stringify({
               peerFilter: 'yes'
             });
             //add filter on your side
-            document.getElementById('video').style.filter = 'saturate(8)';
+            document.getElementById('peerVideo').style.filter = 'saturate(8)';
           } else {
             //creates and stringify object to send to the data channel with instructions to remove filter
             var filterDataObj = JSON.stringify({
               peerFilter: 'no'
             });
             //remove filter on your side
-            document.getElementById('video').removeAttribute('style');
+            document.getElementById('peerVideo').style.filter = '';
           }
           //sends object to the data channel
           peer.send(filterDataObj);
@@ -235,7 +236,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       //peer stream event//
       peer.on('stream', function(stream) {
         video = document.createElement('video');
-        video.setAttribute('id', 'video');
+        video.setAttribute('id', 'peerVideo');
         document.getElementById('innerbooth').appendChild(video);
 
         video.src = vendorUrl.createObjectURL(stream);
