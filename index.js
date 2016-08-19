@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     myCanvas,
     myVideo, //canvas
     myVidCtx,
+    myContext,
     peerVidCtx,
     peerVirtualVid,
 
@@ -44,26 +45,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }, function(stream) {
     const socket = io();
 
-    //creates a video element
-    //try not to display video, but use feed from it to map onto canvas
 
     //uses the stream from the local webcam and draws it on canvas//
     var myVirtualVid = document.createElement('video');
     myVirtualVid.src = window.URL.createObjectURL(stream);
     myVirtualVid.play();
 
+    //draw local vid on canvas//
     myVideo = document.getElementById('myVideo')
     myVidCtx = myVideo.getContext('2d');
 
     myVirtualVid.addEventListener('play', function() {
       drawVideo(this, myVidCtx, myVideo.width, myVideo.height);
     }, false);
-    //end of video to canvas process//
+    //end//
 
-
+    //draw local overlay canvas//
     myCanvas = document.getElementById('myCanvas')
-
-
     myContext = myCanvas.getContext('2d');
 
     //width and height should eventually be translated to exact coordination
@@ -71,18 +69,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
     myCanvas.width = 640;
     myCanvas.height = 480;
 
-    //draws blank canvas on top of video, visibility may be unnecessary
+    //draws blank canvas on top of video
     myContext.rect(0, 0, myCanvas.width, myCanvas.height);
     myContext.stroke();
-
-    //available listeners if needed
-    // video.addEventListener('play', function() {}, false);
-    // video.addEventListener('progress', function() {}, false);
-
-    //click listener for image insertion w/ movement, we can translate
-    //this to data channel logic easy peasy
+    //end//
 
 
+    //start socket comms
     socket.emit('initiator?', JSON.stringify(stream.id));
     socket.on('initiated', (chatter) => {
       if (chattersClient.filter(clientChatter => clientChatter.id !== chatter.id).length || !chattersClient.length) {
@@ -149,62 +142,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
           }
         } else if (dataObj.emoji) {
 
-              var onload = emoImg.onload;
+          //remote display bounce animation! actually can be abstracted to whatever action
+          //they choose
+          bounce(peerCanvas, peerContext, event, dataObj.position);
 
-              //this object keeps track of the movement, loads the images, and determines
-              //the velocity
-              let emoticon = {
-                x: dataObj.positionX,
-                y: dataObj.positionY,
-                vx: 5,
-                vy: 2,
-                onload: function() {
-                  peerContext.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
-                }
-              };
+        } else if (dataObj.peerEmoji) {
 
-              //initial image load on canvas
-              emoticon.onload();
-
-              var callBack = function() {
-                draw(emoticon, peerContext, peerCanvas, callBack);
-              }
-
-              //start drawing movement
-              raf = window.requestAnimationFrame(callBack);
-
-              //leave for tesing for putting random img on canvas
-              // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
-            }
-            else if (dataObj.peerEmoji) {
-
-                  var onload = emoImg.onload;
-
-                  //this object keeps track of the movement, loads the images, and determines
-                  //the velocity
-                  let emoticon = {
-                    x: dataObj.positionX,
-                    y: dataObj.positionY,
-                    vx: 5,
-                    vy: 2,
-                    onload: function() {
-                      myContext.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
-                    }
-                  };
-
-                  //initial image load on canvas
-                  emoticon.onload();
-
-                  var callBack = function() {
-                    draw(emoticon, myContext, myCanvas, callBack);
-                  }
-
-                  //start drawing movement
-                  raf = window.requestAnimationFrame(callBack);
-
-                  //leave for tesing for putting random img on canvas
-                  // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
-                }
+          //local display bounce animation! actually can be abstracted to whatever action
+          //they choose
+          bounce(myCanvas, myContext, event, dataObj.position);
+        }
 
 
 
@@ -305,45 +252,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
       //tesing filters//
       button.addEventListener('click', function() {
-
         current.innerHTML = filters[i];
-
         i++;
         if (i >= filters.length) i = 0;
       }, false);
-
       //end of filter test//
-      myCanvas.addEventListener('click', function(event) {
 
+      myCanvas.addEventListener('click', function(event) {
           //gets position based mouse click coordinates, restricted
           //to canvas rectangle, see function logic in function store
-          var position = getCursorPosition(myCanvas, event);
-          var onload = emoImg.onload;
-          var myCanvasObj = JSON.stringify({emoji: 'yes', positionX: position.x, positionY: position.y});
-          console.log(position);
-
-          //this object keeps track of the movement, loads the images, and determines
-          //the velocity
-          let emoticon = {
-            x: position.x,
-            y: position.y,
-            vx: 5,
-            vy: 2,
-            onload: function() {
-              myContext.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+          var myPosition = getCursorPosition(myCanvas, event);
+          var myCanvasObj = JSON.stringify({
+            emoji: 'yes',
+            position: {
+              x: myPosition.x,
+              y: myPosition.y
             }
-          };
+          });
 
-          //initial image load on canvas
-          emoticon.onload();
-
-          var callBack = function() {
-            draw(emoticon, myContext, myCanvas, callBack);
-          }
-
-          //start drawing movement
-          raf = window.requestAnimationFrame(callBack);
-
+          //animation for local display and data transmission to peer
+          bounce(myCanvas, myContext, event, myPosition);
           peer.send(myCanvasObj);
 
           //leave for tesing for putting random img on canvas
@@ -385,45 +313,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
         peerContext.rect(0, 0, peerCanvas.width, peerCanvas.height);
         peerContext.stroke();
 
-        //available listeners if needed
-        // video.addEventListener('play', function() {}, false);
-        // video.addEventListener('progress', function() {}, false);
-
-        //click listener for image insertion w/ movement, we can translate
-        //this to data channel logic easy peasy
+        //remote display animation this to data channel logic easy peasy
         peerCanvas.addEventListener('click', function(event) {
 
             //gets position based mouse click coordinates, restricted
             //to canvas rectangle, see function logic in function store
-            var position = getCursorPosition(peerCanvas, event);
-            var onload = emoImg.onload;
-            var emoji = JSON.stringify({peerEmoji: 'yes', positionX: position.x, positionY: position.y});
+            var peerPosition = getCursorPosition(peerCanvas, event);
 
-            //this object keeps track of the movement, loads the images, and determines
-            //the velocity
-            let emoticon = {
-              x: position.x,
-              y: position.y,
-              vx: 5,
-              vy: 2,
-              onload: function() {
-                peerContext.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+            bounce(peerCanvas, peerContext, event, peerPosition);
+
+            var peerCanvasObj = JSON.stringify({
+              peerEmoji: 'yes',
+              position: {
+                x: peerPosition.x,
+                y: peerPosition.y
               }
-            };
+            });
+            peer.send(peerCanvasObj);
 
-            //initial image load on canvas
-            emoticon.onload();
-
-            var callBack = function() {
-              draw(emoticon, peerContext, peerCanvas, callBack);
-            }
-
-            //start drawing movement
-            raf = window.requestAnimationFrame(callBack);
-            peer.send(emoji);
-
-            //leave for tesing for putting random img on canvas
-            // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
           }, false)
           //end of click listener logic//
 
@@ -440,6 +347,32 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
   //function store//
+
+  function bounce(cv, ctx, evt, pos) {
+    var onload = emoImg.onload;
+
+    //this object keeps track of the movement, loads the images, and determines
+    //the velocity
+    let emoticon = {
+      x: pos.x,
+      y: pos.y,
+      vx: 5,
+      vy: 2,
+      onload: function() {
+        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+      }
+    };
+
+    //initial image load on canvas
+    emoticon.onload();
+
+    var callBack = function() {
+      velocity(emoticon, ctx, cv, callBack);
+    }
+
+    //start drawing movement
+    raf = window.requestAnimationFrame(callBack);
+  }
 
   //paste object to canvas
   function paste(video, context, width, height, x, y, source) {
@@ -483,7 +416,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }
 
   //canvas draw function for velocity motion
-  function draw(obj, ctx, cv, cb) {
+  function velocity(obj, ctx, cv, cb) {
     ctx.clearRect(0, 0, cv.width, cv.height);
     obj.onload();
     obj.x += obj.vx;
