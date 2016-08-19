@@ -33,15 +33,19 @@
 
 #myVideo {
   position: absolute;
-  margin: 0 auto;;
+  margin: 0 auto;
   z-index: 1;
+  height: 460px;
+  visibility: visible;
   width: 100%;
 }
 
 #peerVideo {
   position: absolute;
-  margin: 0 auto;;
+  margin: 0 auto;
   z-index: 1;
+  visibility: visible;
+  height: 460px;
   width: 100%;
 }
 
@@ -49,6 +53,8 @@
   z-index: 2147483647;
   margin: 0 auto;
   position: absolute;
+  visibility: visible;
+  height: 460px;
   width: 100%;
 }
 
@@ -56,5 +62,7 @@
   z-index: 2147483647;
   margin: 0 auto;
   position: absolute;
+  visibility: visible;
+  height: 460px;
   width: 100%;
 }
