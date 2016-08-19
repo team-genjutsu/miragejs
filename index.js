@@ -230,13 +230,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         peerVideo = document.getElementById('peerVideo')
 
-
         peerVideo.src = vendorUrl.createObjectURL(stream);
         peerVideo.play();
 
-
         peerCanvas = document.getElementById('peerCanvas')
-
 
         peerContext = peerCanvas.getContext('2d');
 
