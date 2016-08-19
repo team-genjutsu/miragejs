@@ -7,13 +7,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
     chatterThisClient,
 
     //variables for video, peerCanvas, and context logic
-
     peerVideo,
     peerCanvas,
     peerContext,
     myCanvas,
-    myVideo,
-    myContext,
+    myVideo, //canvas
+    myVidCtx,
+    peerVidCtx,
+    peerVirtualVid,
 
     //variables for filter logic
     current = document.getElementById('filterDisp'),
@@ -44,13 +45,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const socket = io();
 
     //creates a video element
+    //try not to display video, but use feed from it to map onto canvas
 
-    myVideo = document.getElementById('myVideo');
+    //uses the stream from the local webcam and draws it on canvas//
+    var myVirtualVid = document.createElement('video');
+    myVirtualVid.src = window.URL.createObjectURL(stream);
+    myVirtualVid.play();
 
+    myVideo = document.getElementById('myVideo')
+    myVidCtx = myVideo.getContext('2d');
 
-    //uses the stream from the local webcam before it gets reassigned
-    myVideo.src = window.URL.createObjectURL(stream);
-    myVideo.play();
+    myVirtualVid.addEventListener('play', function() {
+      drawVideo(this, myVidCtx, myVideo.width, myVideo.height);
+    }, false);
+    //end of video to canvas process//
+
 
     socket.emit('initiator?', JSON.stringify(stream.id));
     socket.on('initiated', (chatter) => {
@@ -107,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
           //check data object for key indicating user clicked the "filter them" button
         } else if (dataObj.peerFilter) {
-            //checks key value to see if a filter needs to be added
+          //checks key value to see if a filter needs to be added
           if (dataObj.peerFilter === 'yes') {
             //applies filter
             setVendorCss(myVideo, dataObj.filterType);
@@ -228,22 +237,32 @@ document.addEventListener("DOMContentLoaded", function(event) {
       //peer stream event//
       peer.on('stream', function(stream) {
 
+        // peerVideo = document.getElementById('peerVideo')
+        // peerVideo.src = vendorUrl.createObjectURL(stream);
+        // peerVideo.play();
+
+        //uses the stream from the remote webcam and draws it on canvas//
+        peerVirtualVid = document.createElement('video');
+        peerVirtualVid.src = vendorUrl.createObjectURL(stream);
+        peerVirtualVid.play();
+
         peerVideo = document.getElementById('peerVideo')
+        peerVidCtx = peerVideo.getContext('2d');
 
-
-        peerVideo.src = vendorUrl.createObjectURL(stream);
-        peerVideo.play();
-
+        peerVirtualVid.addEventListener('play', function() {
+          peerVideo.width = 640;
+          peerVideo.height = 460;
+          drawVideo(this, peerVidCtx, peerVideo.width, peerVideo.height);
+        }, false);
+        //end remote draw//
 
         peerCanvas = document.getElementById('peerCanvas')
-
-
         peerContext = peerCanvas.getContext('2d');
 
         //width and height should eventually be translated to exact coordination
         //with incoming video stream
         peerCanvas.width = 640;
-        peerCanvas.height = 480;
+        peerCanvas.height = 460;
 
         //draws blank canvas on top of video, visibility may be unnecessary
         peerContext.rect(0, 0, peerCanvas.width, peerCanvas.height);
@@ -306,7 +325,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   function paste(video, context, width, height, x, y, source) {
     context.drawImage(video, 0, 0, width, height);
     baseImg = new Image();
-    baseImg.src = source // needs to be path ie --> 'assets/weird.png';
+    baseImg.src = source; // needs to be path ie --> 'assets/weird.png';
     baseImg.onload = function() {
       context.drawImage(baseImg, x - baseImg.width / 2, y - baseImg.height / 2);
       //setTimeout for pasted images//
@@ -334,6 +353,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
     element.style.webkitFilter = style;
     element.style.mozFilter = style;
     element.style.filter = style;
+  }
+
+  //draws video on canvas
+  function drawVideo(v, c, w, h) {
+    if (v.paused || v.ended) return false;
+    c.drawImage(v, 0, 0, w, h);
+    setTimeout(drawVideo, 20, v, c, w, h);
   }
 
   //canvas draw function for velocity motion
