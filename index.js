@@ -52,6 +52,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
     myVideo.src = window.URL.createObjectURL(stream);
     myVideo.play();
 
+    myCanvas = document.getElementById('myCanvas')
+
+
+    myContext = myCanvas.getContext('2d');
+
+    //width and height should eventually be translated to exact coordination
+    //with incoming video stream
+    myCanvas.width = 640;
+    myCanvas.height = 480;
+
+    //draws blank canvas on top of video, visibility may be unnecessary
+    myContext.rect(0, 0, myCanvas.width, myCanvas.height);
+    myContext.stroke();
+
+    //available listeners if needed
+    // video.addEventListener('play', function() {}, false);
+    // video.addEventListener('progress', function() {}, false);
+
+    //click listener for image insertion w/ movement, we can translate
+    //this to data channel logic easy peasy
+
+
     socket.emit('initiator?', JSON.stringify(stream.id));
     socket.on('initiated', (chatter) => {
       if (chattersClient.filter(clientChatter => clientChatter.id !== chatter.id).length || !chattersClient.length) {
@@ -116,7 +138,66 @@ document.addEventListener("DOMContentLoaded", function(event) {
             //removes filter
             myVideo.removeAttribute('style');
           }
-        }
+        } else if (dataObj.emoji) {
+
+              var onload = emoImg.onload;
+
+              //this object keeps track of the movement, loads the images, and determines
+              //the velocity
+              let emoticon = {
+                x: dataObj.positionX,
+                y: dataObj.positionY,
+                vx: 5,
+                vy: 2,
+                onload: function() {
+                  peerContext.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+                }
+              };
+
+              //initial image load on canvas
+              emoticon.onload();
+
+              var callBack = function() {
+                draw(emoticon, peerContext, peerCanvas, callBack);
+              }
+
+              //start drawing movement
+              raf = window.requestAnimationFrame(callBack);
+
+              //leave for tesing for putting random img on canvas
+              // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
+            }
+            else if (dataObj.peerEmoji) {
+
+                  var onload = emoImg.onload;
+
+                  //this object keeps track of the movement, loads the images, and determines
+                  //the velocity
+                  let emoticon = {
+                    x: dataObj.positionX,
+                    y: dataObj.positionY,
+                    vx: 5,
+                    vy: 2,
+                    onload: function() {
+                      myContext.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+                    }
+                  };
+
+                  //initial image load on canvas
+                  emoticon.onload();
+
+                  var callBack = function() {
+                    draw(emoticon, myContext, myCanvas, callBack);
+                  }
+
+                  //start drawing movement
+                  raf = window.requestAnimationFrame(callBack);
+
+                  //leave for tesing for putting random img on canvas
+                  // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
+                }
+
+
 
       });
 
@@ -223,7 +304,43 @@ document.addEventListener("DOMContentLoaded", function(event) {
       }, false);
 
       //end of filter test//
+      myCanvas.addEventListener('click', function(event) {
 
+          //gets position based mouse click coordinates, restricted
+          //to canvas rectangle, see function logic in function store
+          var position = getCursorPosition(myCanvas, event);
+          var onload = emoImg.onload;
+          var myCanvasObj = JSON.stringify({emoji: 'yes', positionX: position.x, positionY: position.y});
+          console.log(position);
+
+          //this object keeps track of the movement, loads the images, and determines
+          //the velocity
+          let emoticon = {
+            x: position.x,
+            y: position.y,
+            vx: 5,
+            vy: 2,
+            onload: function() {
+              myContext.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+            }
+          };
+
+          //initial image load on canvas
+          emoticon.onload();
+
+          var callBack = function() {
+            draw(emoticon, myContext, myCanvas, callBack);
+          }
+
+          //start drawing movement
+          raf = window.requestAnimationFrame(callBack);
+
+          peer.send(myCanvasObj);
+
+          //leave for tesing for putting random img on canvas
+          // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
+        }, false)
+        //end of click listener logic//
 
       //peer stream event//
       peer.on('stream', function(stream) {
@@ -261,6 +378,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             //to canvas rectangle, see function logic in function store
             var position = getCursorPosition(peerCanvas, event);
             var onload = emoImg.onload;
+            var emoji = JSON.stringify({peerEmoji: 'yes', positionX: position.x, positionY: position.y});
 
             //this object keeps track of the movement, loads the images, and determines
             //the velocity
@@ -283,11 +401,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             //start drawing movement
             raf = window.requestAnimationFrame(callBack);
+            peer.send(emoji);
 
             //leave for tesing for putting random img on canvas
             // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
           }, false)
           //end of click listener logic//
+
 
 
       });
