@@ -278,30 +278,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             //gets position based mouse click coordinates, restricted
             //to canvas rectangle, see function logic in function store
-            var position = getCursorPosition(peerCanvas, event);
-            var onload = emoImg.onload;
-
-            //this object keeps track of the movement, loads the images, and determines
-            //the velocity
-            let emoticon = {
-              x: position.x,
-              y: position.y,
-              vx: 5,
-              vy: 2,
-              onload: function() {
-                peerContext.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
-              }
-            };
-
-            //initial image load on canvas
-            emoticon.onload();
-
-            var callBack = function() {
-              draw(emoticon, peerContext, peerCanvas, callBack);
-            }
-
-            //start drawing movement
-            raf = window.requestAnimationFrame(callBack);
+            bounce(peerCanvas, peerContext, event);
 
             //leave for tesing for putting random img on canvas
             // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
@@ -320,6 +297,33 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
   //function store//
+
+  function bounce(cv, ctx, evt) {
+    var position = getCursorPosition(cv, evt);
+    var onload = emoImg.onload;
+
+    //this object keeps track of the movement, loads the images, and determines
+    //the velocity
+    let emoticon = {
+      x: position.x,
+      y: position.y,
+      vx: 5,
+      vy: 2,
+      onload: function() {
+        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+      }
+    };
+
+    //initial image load on canvas
+    emoticon.onload();
+
+    var callBack = function() {
+      velocity(emoticon, ctx, cv, callBack);
+    }
+
+    //start drawing movement
+    raf = window.requestAnimationFrame(callBack);
+  }
 
   //paste object to canvas
   function paste(video, context, width, height, x, y, source) {
@@ -363,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }
 
   //canvas draw function for velocity motion
-  function draw(obj, ctx, cv, cb) {
+  function velocity(obj, ctx, cv, cb) {
     ctx.clearRect(0, 0, cv.width, cv.height);
     obj.onload();
     obj.x += obj.vx;
