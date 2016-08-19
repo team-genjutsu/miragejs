@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     myCanvas,
     myVideo, //canvas
     myVidCtx,
+    myContext,
     peerVidCtx,
     peerVirtualVid,
 
@@ -44,23 +45,37 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }, function(stream) {
     const socket = io();
 
-    //creates a video element
-    //try not to display video, but use feed from it to map onto canvas
 
     //uses the stream from the local webcam and draws it on canvas//
     var myVirtualVid = document.createElement('video');
     myVirtualVid.src = window.URL.createObjectURL(stream);
     myVirtualVid.play();
 
+    //draw local vid on canvas//
     myVideo = document.getElementById('myVideo')
     myVidCtx = myVideo.getContext('2d');
 
     myVirtualVid.addEventListener('play', function() {
       drawVideo(this, myVidCtx, myVideo.width, myVideo.height);
     }, false);
-    //end of video to canvas process//
+    //end//
+
+    //draw local overlay canvas//
+    myCanvas = document.getElementById('myCanvas')
+    myContext = myCanvas.getContext('2d');
+
+    //width and height should eventually be translated to exact coordination
+    //with incoming video stream
+    myCanvas.width = 640;
+    myCanvas.height = 480;
+
+    //draws blank canvas on top of video
+    myContext.rect(0, 0, myCanvas.width, myCanvas.height);
+    myContext.stroke();
+    //end//
 
 
+    //start socket comms
     socket.emit('initiator?', JSON.stringify(stream.id));
     socket.on('initiated', (chatter) => {
       if (chattersClient.filter(clientChatter => clientChatter.id !== chatter.id).length || !chattersClient.length) {
@@ -125,7 +140,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
             //removes filter
             myVideo.removeAttribute('style');
           }
+        } else if (dataObj.emoji) {
+
+          //remote display bounce animation! actually can be abstracted to whatever action
+          //they choose
+          bounce(peerCanvas, peerContext, event, dataObj.position);
+
+        } else if (dataObj.peerEmoji) {
+
+          //local display bounce animation! actually can be abstracted to whatever action
+          //they choose
+          bounce(myCanvas, myContext, event, dataObj.position);
         }
+
+
 
       });
 
@@ -224,15 +252,32 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
       //tesing filters//
       button.addEventListener('click', function() {
-
         current.innerHTML = filters[i];
-
         i++;
         if (i >= filters.length) i = 0;
       }, false);
-
       //end of filter test//
 
+      myCanvas.addEventListener('click', function(event) {
+          //gets position based mouse click coordinates, restricted
+          //to canvas rectangle, see function logic in function store
+          var myPosition = getCursorPosition(myCanvas, event);
+          var myCanvasObj = JSON.stringify({
+            emoji: 'yes',
+            position: {
+              x: myPosition.x,
+              y: myPosition.y
+            }
+          });
+
+          //animation for local display and data transmission to peer
+          bounce(myCanvas, myContext, event, myPosition);
+          peer.send(myCanvasObj);
+
+          //leave for tesing for putting random img on canvas
+          // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
+        }, false)
+        //end of click listener logic//
 
       //peer stream event//
       peer.on('stream', function(stream) {
@@ -268,22 +313,27 @@ document.addEventListener("DOMContentLoaded", function(event) {
         peerContext.rect(0, 0, peerCanvas.width, peerCanvas.height);
         peerContext.stroke();
 
-        //available listeners if needed
-        // video.addEventListener('play', function() {}, false);
-        // video.addEventListener('progress', function() {}, false);
-
-        //click listener for image insertion w/ movement, we can translate
-        //this to data channel logic easy peasy
+        //remote display animation this to data channel logic easy peasy
         peerCanvas.addEventListener('click', function(event) {
 
             //gets position based mouse click coordinates, restricted
             //to canvas rectangle, see function logic in function store
-            bounce(peerCanvas, peerContext, event);
+            var peerPosition = getCursorPosition(peerCanvas, event);
 
-            //leave for tesing for putting random img on canvas
-            // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
+            bounce(peerCanvas, peerContext, event, peerPosition);
+
+            var peerCanvasObj = JSON.stringify({
+              peerEmoji: 'yes',
+              position: {
+                x: peerPosition.x,
+                y: peerPosition.y
+              }
+            });
+            peer.send(peerCanvasObj);
+
           }, false)
           //end of click listener logic//
+
 
 
       });
@@ -298,15 +348,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   //function store//
 
-  function bounce(cv, ctx, evt) {
-    var position = getCursorPosition(cv, evt);
+  function bounce(cv, ctx, evt, pos) {
     var onload = emoImg.onload;
 
     //this object keeps track of the movement, loads the images, and determines
     //the velocity
     let emoticon = {
-      x: position.x,
-      y: position.y,
+      x: pos.x,
+      y: pos.y,
       vx: 5,
       vy: 2,
       onload: function() {
