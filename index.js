@@ -21,6 +21,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
     filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', ''],
     i = 0,
 
+    //active animation button
+    buttonStatic = document.getElementById('static'),
+    buttonBouncing = document.getElementById('bouncing'),
+    buttonOrbit = document.getElementById('orbit'),
+    activeAnimation = drawBounce,
+
     //raf stands for requestAnimationFrame, enables drawing to occur
     raf;
 
@@ -273,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             //initial image load on canvas
             emoticon.onload();
-
+            draw = currentAnimation
             var callBack = function() {
               draw(emoticon, peerContext, peerCanvas, callBack);
             }
@@ -334,7 +340,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }
 
   //canvas draw function for velocity motion
-  function draw(obj, ctx, cv, cb) {
+  function drawBounce(obj, ctx, cv, cb) {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    obj.onload();
+    obj.x += obj.vx;
+    obj.y += obj.vy;
+    if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
+      obj.vy = -obj.vy;
+    }
+    if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
+      obj.vx = -obj.vx;
+    }
+    raf = window.requestAnimationFrame(cb);
+  }
+  //canvas draw function for static pasting
+  function drawStatic(obj, ctx, cv) {
+
+    obj.onload();
+
+
+  }
+  //canvas draw function for velocity motion
+  function drawRadius(obj, ctx, cv, cb) {
     ctx.clearRect(0, 0, cv.width, cv.height);
     obj.onload();
     obj.x += obj.vx;
