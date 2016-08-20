@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       });
 
       orbitButton.addEventListener('click', function(event) {
-        currentAnimation = drawBounce;
+        currentAnimation = orbit;
       });
 
       clearButton.addEventListener('click', function(event) {
@@ -429,18 +429,30 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var onload = emoImg.onload;
 
     //this object keeps track of the movement, loads the images, and determines
-    //the velocity
+    //the angular veloctiy. We're keeping track of frequency of refreshes to
+    //imcrement the degrees
+    let movement = .0349066;
     let emoticon = {
       x: pos.x,
       y: pos.y,
-      vx: 5,
-      vy: 2,
+      r: 5,
+      rotateCount : 1,
+      wx: movement,
+      wy: movement,
       onload: function() {
-        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+        ctx.drawImage(emoImg, this.x - emoImg.width / 2 + 5, this.y - emoImg.height / 2);
       }
     };
+
     //initial image load on canvas
     emoticon.onload();
+
+    var callBack = function() {
+      angularVelocity(emoticon, ctx, cv, callBack);
+    }
+
+    //start drawing movement
+    raf = window.requestAnimationFrame(callBack);
   }
 
   //paste object to canvas
@@ -487,17 +499,29 @@ document.addEventListener("DOMContentLoaded", function(event) {
   //canvas draw function for velocity motion
   function velocity(obj, ctx, cv, cb) {
     ctx.clearRect(obj.x - emoImg.width / 2, obj.y - emoImg.width / 2, emoImg.width, emoImg.height);
-    obj.onload();
-    obj.x += obj.vx;
-    obj.y += obj.vy;
-    if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
-      obj.vy = -obj.vy;
-    }
-    if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
-      obj.vx = -obj.vx;
-    }
-    raf = window.requestAnimationFrame(cb);
+       obj.onload();
+       obj.x += obj.vx;
+       obj.y += obj.vy;
+       if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
+         obj.vy = -obj.vy;
+       }
+       if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
+         obj.vx = -obj.vx;
+       }
+       raf = window.requestAnimationFrame(cb);
   }
+
+  function angularVelocity(obj, ctx, cv, cb) {
+   ctx.clearRect(obj.x - emoImg.width/2 +5, obj.y - emoImg.width/2, emoImg.width, emoImg.height);
+   obj.onload();
+
+   obj.x += Math.sin(obj.wx*obj.rotateCount) * obj.r;
+   obj.y += Math.cos(obj.wy*obj.rotateCount) * obj.r;
+   obj.rotateCount++;
+
+   raf = window.requestAnimationFrame(cb);
+  }
+
   ///end of function store///
 
 });
