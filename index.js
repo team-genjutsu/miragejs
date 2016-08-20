@@ -23,6 +23,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
     filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', ''],
     i = 0,
 
+    //animation variables
+    staticButton = document.getElementById('static'),
+    bounceButton = document.getElementById('bounce'),
+    orbitButton = document.getElementById('orbit'),
+    currentAnimation = bounce,
+
     //raf stands for requestAnimationFrame, enables drawing to occur
     raf;
 
@@ -73,7 +79,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     myContext.rect(0, 0, myCanvas.width, myCanvas.height);
     myContext.stroke();
     //end//
-
 
     //start socket comms
     socket.emit('initiator?', JSON.stringify(stream.id));
@@ -144,13 +149,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
           //remote display bounce animation! actually can be abstracted to whatever action
           //they choose
-          bounce(peerCanvas, peerContext, event, dataObj.position);
 
+          currentAnimation(peerCanvas, peerContext, event, dataObj.position);
         } else if (dataObj.peerEmoji) {
-
           //local display bounce animation! actually can be abstracted to whatever action
           //they choose
-          bounce(myCanvas, myContext, event, dataObj.position);
+          currentAnimation(myCanvas, myContext, event, dataObj.position);
         }
 
 
@@ -271,13 +275,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
           });
 
           //animation for local display and data transmission to peer
-          bounce(myCanvas, myContext, event, myPosition);
+          currentAnimation(myCanvas, myContext, event, myPosition);
           peer.send(myCanvasObj);
 
           //leave for tesing for putting random img on canvas
           // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
         }, false)
         //end of click listener logic//
+
+      // adding buttons to change active animations
+      staticButton.addEventListener('click', function(event) {
+        currentAnimation = staticPaste;
+        console.log(currentAnimation)
+      });
+
+      bounceButton.addEventListener('click', function(event) {
+        currentAnimation = bounce;
+        console.log(currentAnimation)
+      });
+
+      orbitButton.addEventListener('click', function(event) {
+        currentAnimation = drawBounce;
+      });
 
       //peer stream event//
       peer.on('stream', function(stream) {
@@ -320,7 +339,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             //to canvas rectangle, see function logic in function store
             var peerPosition = getCursorPosition(peerCanvas, event);
 
-            bounce(peerCanvas, peerContext, event, peerPosition);
+            currentAnimation(peerCanvas, peerContext, event, peerPosition);
 
             var peerCanvasObj = JSON.stringify({
               peerEmoji: 'yes',
@@ -374,6 +393,42 @@ document.addEventListener("DOMContentLoaded", function(event) {
     raf = window.requestAnimationFrame(callBack);
   }
 
+  function staticPaste(cv, ctx, evt, pos) {
+    var onload = emoImg.onload;
+
+    //this object keeps track of the movement, loads the images, and determines
+    //the velocity
+    let emoticon = {
+      x: pos.x,
+      y: pos.y,
+      vx: 5,
+      vy: 2,
+      onload: function() {
+        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+      }
+    };
+    //initial image load on canvas
+    emoticon.onload();
+  }
+
+  function orbit(cv, ctx, evt, pos) {
+    var onload = emoImg.onload;
+
+    //this object keeps track of the movement, loads the images, and determines
+    //the velocity
+    let emoticon = {
+      x: pos.x,
+      y: pos.y,
+      vx: 5,
+      vy: 2,
+      onload: function() {
+        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+      }
+    };
+    //initial image load on canvas
+    emoticon.onload();
+  }
+
   //paste object to canvas
   function paste(video, context, width, height, x, y, source) {
     context.drawImage(video, 0, 0, width, height);
@@ -417,7 +472,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   //canvas draw function for velocity motion
   function velocity(obj, ctx, cv, cb) {
-    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.clearRect(obj.x - emoImg.width / 2, obj.y - emoImg.width / 2, emoImg.width, emoImg.height);
     obj.onload();
     obj.x += obj.vx;
     obj.y += obj.vy;
