@@ -80,7 +80,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     myContext.stroke();
     //end//
 
-
     //start socket comms
     socket.emit('initiator?', JSON.stringify(stream.id));
     socket.on('initiated', (chatter) => {
@@ -150,10 +149,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
           //remote display bounce animation! actually can be abstracted to whatever action
           //they choose
+
           currentAnimation(peerCanvas, peerContext, event, dataObj.position);
-
         } else if (dataObj.peerEmoji) {
-
           //local display bounce animation! actually can be abstracted to whatever action
           //they choose
           currentAnimation(myCanvas, myContext, event, dataObj.position);
