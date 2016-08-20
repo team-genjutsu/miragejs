@@ -437,8 +437,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
       y: pos.y,
       r: 5,
       rotateCount : 1,
-      vx: movement,
-      vy: movement,
+      wx: movement,
+      wy: movement,
       onload: function() {
         ctx.drawImage(emoImg, this.x - emoImg.width / 2 + 5, this.y - emoImg.height / 2);
       }
@@ -515,8 +515,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
    ctx.clearRect(obj.x - emoImg.width/2 +5, obj.y - emoImg.width/2, emoImg.width, emoImg.height);
    obj.onload();
 
-   obj.x += Math.sin(obj.vx*obj.rotateCount) * obj.r;
-   obj.y += Math.cos(obj.vy*obj.rotateCount) * obj.r;
+   obj.x += Math.sin(obj.wx*obj.rotateCount) * obj.r;
+   obj.y += Math.cos(obj.wy*obj.rotateCount) * obj.r;
    obj.rotateCount++;
 
    raf = window.requestAnimationFrame(cb);
