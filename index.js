@@ -286,16 +286,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
       // adding buttons to change active animations
       staticButton.addEventListener('click', function(event) {
         currentAnimation = staticPaste;
-        console.log(currentAnimation)
+
       });
 
       bounceButton.addEventListener('click', function(event) {
         currentAnimation = bounce;
-        console.log(currentAnimation)
+
       });
 
       orbitButton.addEventListener('click', function(event) {
-        currentAnimation = drawBounce;
+        currentAnimation = orbit;
+
       });
 
       //peer stream event//
@@ -413,20 +414,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   function orbit(cv, ctx, evt, pos) {
     var onload = emoImg.onload;
-
+console.log('pos', pos);
     //this object keeps track of the movement, loads the images, and determines
     //the velocity
     let emoticon = {
       x: pos.x,
       y: pos.y,
-      vx: 5,
-      vy: 2,
+      r: 50,
+      wx:  this.r * Math.sin(0.0349066),
+      wy:  this.r * Math.cos(0.0349066),
       onload: function() {
-        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+        ctx.drawImage(emoImg, this.x + this.r - emoImg.width / 2, this.y - emoImg.height / 2);
       }
     };
+
     //initial image load on canvas
     emoticon.onload();
+    var callBack = function() {
+      angularVelocity(emoticon, ctx, cv, callBack);
+    }
+
+    //start drawing movement
+    raf = window.requestAnimationFrame(callBack);
   }
 
   //paste object to canvas
@@ -484,6 +493,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
     raf = window.requestAnimationFrame(cb);
   }
-  ///end of function store///
 
+  function angularVelocity(obj, ctx, cv, cb) {
+    ctx.clearRect(obj.x - emoImg.width/2, obj.y - emoImg.width/2, emoImg.width, emoImg.height);
+    obj.onload();
+
+    obj.x += obj.wx;
+    obj.y += obj.wy;
+
+  //console.log(obj, ctx, cv, cb);
+  //raf = window.requestAnimationFrame(cb);
+  ///end of function store///
+  }
 });
