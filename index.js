@@ -23,11 +23,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
     filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', ''],
     i = 0,
 
+    //clear canvas
+    clearButton = document.getElementById('clear'),
     //animation variables
     staticButton = document.getElementById('static'),
     bounceButton = document.getElementById('bounce'),
     orbitButton = document.getElementById('orbit'),
     currentAnimation = bounce,
+    temp,
 
     //raf stands for requestAnimationFrame, enables drawing to occur
     raf;
@@ -150,14 +153,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
           //remote display bounce animation! actually can be abstracted to whatever action
           //they choose
 
+          temp = currentAnimation;
+          currentAnimation = eval('(' + dataObj.animation + ')');
           currentAnimation(peerCanvas, peerContext, event, dataObj.position);
+          currentAnimation = temp;
         } else if (dataObj.peerEmoji) {
           //local display bounce animation! actually can be abstracted to whatever action
           //they choose
+          temp = currentAnimation;
+          currentAnimation = eval('(' + dataObj.animation + ')');
           currentAnimation(myCanvas, myContext, event, dataObj.position);
+          currentAnimation = temp;
         }
-
-
 
       });
 
@@ -267,6 +274,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
           //to canvas rectangle, see function logic in function store
           var myPosition = getCursorPosition(myCanvas, event);
           var myCanvasObj = JSON.stringify({
+            animation: currentAnimation.toString(),
             emoji: 'yes',
             position: {
               x: myPosition.x,
@@ -286,17 +294,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
       // adding buttons to change active animations
       staticButton.addEventListener('click', function(event) {
         currentAnimation = staticPaste;
-        console.log(currentAnimation)
       });
 
       bounceButton.addEventListener('click', function(event) {
         currentAnimation = bounce;
-        console.log(currentAnimation)
       });
 
       orbitButton.addEventListener('click', function(event) {
         currentAnimation = drawBounce;
       });
+
+      clearButton.addEventListener('click', function(event) {
+        cancelAnimationFrame(raf);
+        myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
+        peerContext.clearRect(0, 0, peerCanvas.width, peerCanvas.height);
+
+      });
+
+
 
       //peer stream event//
       peer.on('stream', function(stream) {
@@ -342,6 +357,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             currentAnimation(peerCanvas, peerContext, event, peerPosition);
 
             var peerCanvasObj = JSON.stringify({
+              animation: currentAnimation.toString(),
               peerEmoji: 'yes',
               position: {
                 x: peerPosition.x,
@@ -352,8 +368,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
           }, false)
           //end of click listener logic//
-
-
 
       });
       ///end peer stream event///
