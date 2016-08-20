@@ -413,6 +413,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
     emoticon.onload();
   }
 
+  function orbit(cv, ctx, evt, pos) {
+    var onload = emoImg.onload;
+
+    //this object keeps track of the movement, loads the images, and determines
+    //the velocity
+    let emoticon = {
+      x: pos.x,
+      y: pos.y,
+      vx: 5,
+      vy: 2,
+      onload: function() {
+        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+      }
+    };
+    //initial image load on canvas
+    emoticon.onload();
+  }
+
   //paste object to canvas
   function paste(video, context, width, height, x, y, source) {
     context.drawImage(video, 0, 0, width, height);
@@ -446,7 +464,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     element.style.mozFilter = style;
     element.style.filter = style;
   }
-
 
   //draws video on canvas
   function drawVideo(v, c, w, h) {
