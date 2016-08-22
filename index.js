@@ -257,7 +257,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                     //click event for the "filter me" button//
                     document.getElementById('myFilter').addEventListener('click', function() {
-
                       let filterDataObj;
                       //checks for filter and assigns key yes or no based on whether or not one needs to be applied
                       if (!myVideo.style.filter) {
