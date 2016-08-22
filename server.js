@@ -9,7 +9,8 @@ const _ = require('lodash')
 app.use(express.static(__dirname + "/public"));
 
 app.get('/favicon.ico', (req, res) => {
-  res.sendStatus(200);
+  res.status(200);
+  res.send("ok")
 })
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, './public/index.html'))
