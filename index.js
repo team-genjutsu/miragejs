@@ -53,13 +53,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
   //room selection
   joinButton.addEventListener('click', function() {
       roomID = document.getElementById('room-id-input').value;
-
+      console.log('1')
       socket.emit('joinRoom', JSON.stringify(roomID));
-
+      console.log('2')
       // socket.on('tryAgain', (payload) => alert('Try a different room!'))
 
       socket.on('process', (payload) => {
           payload = JSON.parse(payload);
+          console.log(payload)
           if (!payload) {
             alert('Try a different room!')
           } else {
