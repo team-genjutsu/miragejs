@@ -115,8 +115,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                     //width and height should eventually be translated to exact coordination
                     //with incoming video stream
-                    myCanvas.width = 500; //640;
-                    myCanvas.height = 385; //480;
+                    myCanvas.width = 640;
+                    myCanvas.height = 480;
 
                     //draws blank canvas on top of video
                     myContext.rect(0, 0, myCanvas.width, myCanvas.height);
@@ -244,14 +244,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     //looks for click event on the send button//
                     document.getElementById('send').addEventListener('click', function() {
 
-
                         //creates a message object with a stringified object containing the local port and the message
                         let yourMessageObj = JSON.stringify({
-                          message: "pal:" + " " + document.getElementById('yourMessage').value
+                          message: peer.localPort + " " + document.getElementById('yourMessage').value
                         });
                         //creates a variable with the same information to display on your side
                         //peer.localPort is a temporary way to identify peers, should be changed
-                        let yourMessage = "you:" + " " + document.getElementById('yourMessage').value;
+                        let yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
                         //post message in text context on your side
                         document.getElementById('messages').textContent += yourMessage + '\n';
                         //send message object to the data channel
@@ -384,8 +383,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       peerVidCtx = peerVideo.getContext('2d');
 
                       peerVirtualVid.addEventListener('play', function() {
-                        peerVideo.width = 500; //640;
-                        peerVideo.height = 385; //460;
+                        peerVideo.width = 640;
+                        peerVideo.height = 460;
                         drawVideo(this, peerVidCtx, peerVideo.width, peerVideo.height);
                       }, false);
                       //end remote draw//
@@ -395,8 +394,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                       //width and height should eventually be translated to exact coordination
                       //with incoming video stream
-                      peerCanvas.width = 500; //640;
-                      peerCanvas.height = 385; //460;
+                      peerCanvas.width = 640;
+                      peerCanvas.height = 460;
 
                       //draws blank canvas on top of video, visibility may be unnecessary
                       peerContext.rect(0, 0, peerCanvas.width, peerCanvas.height);
