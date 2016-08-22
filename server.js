@@ -6,10 +6,10 @@ const express = require('express');
 const app = express();
 const _ = require('lodash')
 
-app.use(express.static(__dirname));
+app.use(express.static(__dirname + "/public"));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, './index.html'))
+  res.sendFile(path.resolve(__dirname, './public/index.html'))
 })
 const PORT = process.env.PORT || 8000;
 
