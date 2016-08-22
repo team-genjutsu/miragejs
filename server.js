@@ -13,7 +13,7 @@ const options = {
   cert: fs.readFileSync('server.crt')
 };
 
-const server = https.createServer(options, app).listen(8000);
+const server = https.createServer(options, app).listen(process.env.PORT || 8000);
 
 const io = require('socket.io').listen(server);
 
