@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   //image assignment, we can abstract this later
   // let emoImg = new Image();
-  let currentImg = 'assets/smLoveTongue.png';
+  let currentImg = 'assets/emojione/small/1f4a9.png';
 
   const socket = io();
   //end variable store//
