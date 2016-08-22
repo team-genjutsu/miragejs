@@ -6,12 +6,14 @@
   display:inline;
   height: 50%;
   width: 50%;
+  border-radius: 5px;
 }
 
 #emojiButtons {
   height: 50%;
   width: 10%;
-  margin-right: 90px;
+  /* margin-right: 90px; */
+  margin: 0 auto;
 }
 
 .logo {
