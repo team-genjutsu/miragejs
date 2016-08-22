@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
           //they choose
           temp = currentAnimation;
           currentAnimation = eval('(' + dataObj.animation + ')');
-          currentAnimation(myCanvas, myContext, event, dataObj.position);
+          currentAnimation(myCanvas, myContext, event, dataObj.position, emoImg);
           currentAnimation = temp;
         }
 
