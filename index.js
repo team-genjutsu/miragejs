@@ -36,8 +36,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     raf;
 
   //image assignment, we can abstract this later
-  let emoImg = new Image();
-  emoImg.src = 'assets/smLoveTongue.png';
+  // let emoImg = new Image();
+  let currentImg = 'assets/smLoveTongue.png';
 
   //end variable store//
 
@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
           stream: stream
         })
       }
-
 
       peer.on('signal', function(data) {
         document.getElementById('yourId').value = JSON.stringify(data);
@@ -272,6 +271,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
       myCanvas.addEventListener('click', function(event) {
           //gets position based mouse click coordinates, restricted
           //to canvas rectangle, see function logic in function store
+          let emoImg = new Image();
+          emoImg.src = currentImg;
           var myPosition = getCursorPosition(myCanvas, event);
           var myCanvasObj = JSON.stringify({
             animation: currentAnimation.toString(),
@@ -283,7 +284,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
           });
 
           //animation for local display and data transmission to peer
-          currentAnimation(myCanvas, myContext, event, myPosition);
+          currentAnimation(myCanvas, myContext, event, myPosition, emoImg);
           peer.send(myCanvasObj);
 
           //leave for tesing for putting random img on canvas
@@ -308,10 +309,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
         cancelAnimationFrame(raf);
         myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
         peerContext.clearRect(0, 0, peerCanvas.width, peerCanvas.height);
-
       });
 
+      peerVirtualVid = document.createElement('button');
+      peerVirtualVid.src = vendorUrl.createObjectURL(stream);
 
+      //adding click handler for active emoji selection
+      const emojis = document.getElementsByClassName('emoji');
+      for (let i = 0; i < emojis.length; i++){
+        emojis[i].addEventListener('click', function(event) {
+          currentImg = emojis[i].querySelectorAll('img')[0].getAttribute('src');
+      })}
 
       //peer stream event//
       peer.on('stream', function(stream) {
@@ -325,7 +333,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         peerVirtualVid.src = vendorUrl.createObjectURL(stream);
         peerVirtualVid.play();
 
-        peerVideo = document.getElementById('peerVideo')
+        peerVideo = document.getElementById('peerVideo');
         peerVidCtx = peerVideo.getContext('2d');
 
         peerVirtualVid.addEventListener('play', function() {
@@ -381,7 +389,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   //function store//
 
-  function bounce(cv, ctx, evt, pos) {
+  function bounce(cv, ctx, evt, pos, emoImg) {
+
     var onload = emoImg.onload;
 
     //this object keeps track of the movement, loads the images, and determines
@@ -400,14 +409,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
     emoticon.onload();
 
     var callBack = function() {
-      velocity(emoticon, ctx, cv, callBack);
+      velocity(emoticon, ctx, cv, callBack, emoImg);
     }
 
     //start drawing movement
     raf = window.requestAnimationFrame(callBack);
   }
 
-  function staticPaste(cv, ctx, evt, pos) {
+  function staticPaste(cv, ctx, evt, pos, emoImg) {
+    console.log('staticpaste',emoImg)
     var onload = emoImg.onload;
 
     //this object keeps track of the movement, loads the images, and determines
@@ -426,7 +436,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }
 
   //orbit func//
-  function orbit(cv, ctx, evt, pos) {
+  function orbit(cv, ctx, evt, pos, emoImg) {
     var onload = emoImg.onload;
 
     //this object keeps track of the movement, loads the images, and determines
@@ -449,7 +459,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     emoticon.onload();
 
     var callBack = function() {
-      angularVelocity(emoticon, ctx, cv, callBack);
+      angularVelocity(emoticon, ctx, cv, callBack, emoImg);
     }
 
     //start drawing movement
@@ -503,8 +513,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
   //end drawVideo//
 
   //canvas draw function for velocity motion
-  function velocity(obj, ctx, cv, cb) {
-    ctx.clearRect(obj.x - emoImg.width / 2, obj.y - emoImg.height / 2, emoImg.width, emoImg.height);
+  function velocity(obj, ctx, cv, cb, emoImg) {
+    ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 8, emoImg.height + 8);
     obj.onload();
     obj.x += obj.vx;
     obj.y += obj.vy;
@@ -519,8 +529,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
   //end velocity//
 
   //angularVelocity func//
-  function angularVelocity(obj, ctx, cv, cb) {
-    ctx.clearRect(obj.x - emoImg.width / 2, obj.y - emoImg.height / 2, emoImg.width + 5, emoImg.height + 5);
+  function angularVelocity(obj, ctx, cv, cb, emoImg) {
+    ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 8, emoImg.height + 8);
     obj.onload();
 
     obj.x += Math.sin(obj.wx * obj.rotateCount) * obj.r;

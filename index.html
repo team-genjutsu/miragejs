@@ -13,12 +13,6 @@
   <link rel='stylesheet' href='css/main.css'>
 </head>
 
-<style>
-  body {
-    padding-top: 20px;
-  }
-</style>
-
 <body data-spy="scroll" data-target="#my-navbar">
 
   <!-- Navbar -->
@@ -78,9 +72,16 @@
 
   <!-- Video demo area -->
   <section id="demo">
-
+    <div id="emojiButtons" class="btn-group pull-right">
+      <div id="selectImg">Select Image</div>
+      <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f385.png"/></button>
+      <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f354.png"/></button>
+      <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f436.png"/></button>
+      <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f414.png"/></button>
+      <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f389.png"/></button>
+      <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f388.png"/></button>
+    </div>
     <div id='booth'>
-
       <div id='myBooth'>
         <canvas id="myVideo"></canvas>
         <canvas id="myCanvas"></canvas>
@@ -104,10 +105,8 @@
       <button id='bounce' class="btn btn-danger">bounce</button>
       <button id='orbit' class="btn btn-warning">orbit</button><br/>
     </div>
-
   </section>
   <!--close section demo-->
-
 
   <!-- call to action -->
   <section id="subscribe">
@@ -128,9 +127,6 @@
           <button type="submit" class="btn btn-default">Subscribe</button>
           <hr>
         </form>
-
-
-
       </div>
       <!-- end Container-->
 
@@ -214,11 +210,9 @@
             </div>
             <!-- End Panel collapse -->
           </div>
-
         </div>
       </div>
       <!-- End panel group -->
-
     </section>
   </div>
   <!-- End container -->
@@ -267,7 +261,6 @@
     </section>
   </div>
 
-
   <!-- Footer -->
 
   <footer>
@@ -275,8 +268,6 @@
   </footer>
 
   <script href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></script>
-
-
   <script src="./node_modules/socket.io-client/socket.io.js"></script>
   <script src='./node_modules/simple-peer/simplepeer.min.js'></script>
   <script src='./index.js'></script>
