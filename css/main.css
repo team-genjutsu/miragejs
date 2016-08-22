@@ -7,10 +7,10 @@
 }
 
 #booth {
-  width: 700px;
-  height: 1000px;
+  /* width: 95%; */
+  height: 80%;
   background: #ccc;
-  border: 10px solid #ddd;
+  border: 5px solid #ddd;
   margin: 0 auto;
   position: relative;
 }
@@ -20,26 +20,28 @@
 }
 
 #myBooth {
+  display: inline-block;
   margin: 0 auto;
   position: relative;
   background: #ccc;
-  width: 100%;
-  height: 465px;
+  width: 49%;
+  height: 400px;
 }
 
 #peerBooth {
+  display: inline-block;
   margin: 0 auto;
   position: relative;
   background: #ccc;
-  width: 100%;
-  height: 465px;
+  width: 49%;
+  height: 400px;
 }
 
 #myVideo {
   position: absolute;
   margin: 0 auto;
   z-index: 1;
-  height: 460px;
+  height: 385px;
   visibility: visible;
   width: 100%;
 }
@@ -49,7 +51,7 @@
   margin: 0 auto;
   z-index: 1;
   visibility: visible;
-  height: 460px;
+  height: 385px;
   width: 100%;
 }
 
@@ -58,7 +60,7 @@
   margin: 0 auto;
   position: absolute;
   visibility: visible;
-  height: 460px;
+  height: 385px;
   width: 100%;
 }
 
@@ -67,7 +69,7 @@
   margin: 0 auto;
   position: absolute;
   visibility: visible;
-  height: 460px;
+  height: 385px;
   width: 100%;
 }
 
@@ -181,3 +183,10 @@ div#room-selection {
 
 
 /*////// room selection end /////////////////////*/
+
+@media screen only and (max-width: 600px) {
+  #myBooth,
+  #peerBooth {
+    width: 100%;
+  }
+}
