@@ -9,20 +9,15 @@ const _ = require('lodash')
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
-
 const config = require('./webpack.config.js');
-
 const compiler = webpack(config);
+
 app.use(webpackDevMiddleware(compiler, {
   noInfo: true,
   publicPath: config.output.publicPath
 }));
-app.use(webpackHotMiddleware(compiler));
 
-const connections = [];
-const chatters = [];
-let initialClientId;
-let secondClientId;
+app.use(webpackHotMiddleware(compiler));
 
 
 app.use(express.static(__dirname));
@@ -36,51 +31,106 @@ const server = https.createServer(options, app).listen(8000);
 
 const io = require('socket.io').listen(server);
 
+const connections = [];
+const rooms = [];
+
+//room constructor
+function Room(obj) {
+  this.id = obj.roomId;
+  this.members = [];
+  this.addMember = function(member) {
+    this.members.push(member)
+  }
+}
+
+//member constructor
+function Member(socketId, roomId, initiator) {
+  this.id = socketId;
+  this.roomId = roomId
+  this.initiator = initiator;
+  this.signalId = null;
+}
+
 
 io.sockets.on('connection', function(socket) {
   connections.push(socket);
-  //
 
 
+  //disconnecting users
   socket.once('disconnect', function() {
-    let member = chatters.filter(chatter => chatter.id === socket.id);
+    let member,
+      room,
+      otherMem;
+
+    rooms.forEach(function(ele, idx) {
+      member = ele.members.filter(client => client.id === socket.id);
+      if (member) {
+        room = ele;
+        otherMem = ele.members.filter(client => client.id != socket.id)
+      }
+    })
+
     if (member) {
-      chatters.splice(chatters.indexOf(member),1);
-      io.sockets.emit('updateChatters', chatters);
+      room.members.splice(room.members.indexOf(member), 1);
+      io.to(otherMem.id).emit('updateChatters', member)
     }
+
     connections.splice(connections.indexOf(socket), 1);
     socket.disconnect();
 
   })
 
-  socket.on('initiator?', (payload) => {
+  socket.on('initiate', (payload) => {
 
-      let chatter = {
-        id: socket.id,
-        initiator: false
-      }
-    if (chatters.filter(chatter => chatter.initiator === true).length === 0) {
+    payload = JSON.parse(payload);
 
-        chatter.initiator = true;
-      }
-      chatters.push(chatter);
+    let existingRoom = rooms.filter(room => room.id === payload.roomId)
+    let room,
+      member;
 
-      io.to(socket.id).emit('initiated', chatter);
+    if (existingRoom.length === 0) {
+
+      room = new Room(payload);
+      member = new Member(socket.id, payload.roomId, true)
+      room.addMember(member);
+      rooms.push(room);
+
+    } else if (existingRoom[0].members.length > 1) {
+
+      io.to(socket.id).emit('tryAgain', 'Room taken already!');
+
+    } else if (existingRoom[0].members.length === 1) {
+
+      member = new Member(socket.id, payload.roomId, false)
+      existingRoom[0].addMember(member)
+
+    }
+
+    io.to(socket.id).emit('initiated', JSON.stringify(member));
 
   });
 
   socket.on('initial', function(payload) {
-    initialClientId = payload;
-    io.sockets.emit('initialConnected', payload);
+    payload = JSON.parse(payload)
+    let sharedRoom = rooms.filter(room => room.id === payload.roomId)[0];
+    sharedRoom.members[0].signalId = payload.signal
+    io.to(sharedRoom.members[0].id).emit('initialConnected', JSON.stringify(payload));
   });
 
   socket.on('second', function(payload) {
-    io.to(socket.id).emit('secondPart2', initialClientId);
+    payload = JSON.parse(payload);
+    let sharedRoom = rooms.filter(room => room.id === payload);
+    let initialClientSig = sharedRoom[0].members[0].signalId;
+    io.to(socket.id).emit('secondPart2', JSON.stringify(initialClientSig));
   });
 
   socket.on('third', function(payload) {
-    secondClientId = payload;
-    io.sockets.emit('thirdPart2', payload);
+    payload = JSON.parse(payload);
+    let sharedRoom = rooms.filter(room => room.id === payload.roomId);
+    let secondClient = sharedRoom[0].members.filter(client => !client.signalId);
+    let initialClient = sharedRoom[0].members.filter(client => client.signalId);
+    secondClient[0].signalId = payload.signal;
+    io.to(initialClient[0].id).emit('thirdPart2', JSON.stringify(secondClient[0].signalId));
   });
 
 })
