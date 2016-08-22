@@ -1,5 +1,3 @@
-var audio = require('audio-visualizer');
-
 document.addEventListener("DOMContentLoaded", function(event) {
 
   //variable store//
