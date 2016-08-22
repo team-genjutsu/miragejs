@@ -5,24 +5,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
     peer,
     chattersClient = [],
     chatterThisClient,
-
+    roomID,
     //variables for video, peerCanvas, and context logic
     peerVideo,
     peerCanvas,
     peerContext,
     myCanvas,
-    myVideo, //canvas
+    myVideo, //video canvas
     myVidCtx,
     myContext,
     peerVidCtx,
     peerVirtualVid,
-
     //variables for filter logic
     current = document.getElementById('filterDisp'),
     button = document.getElementById('filter'),
     filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', ''],
     i = 0,
-
     //clear canvas
     clearButton = document.getElementById('clear'),
     //animation variables
@@ -31,7 +29,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     orbitButton = document.getElementById('orbit'),
     currentAnimation = bounce,
     temp,
-
+    //room buttons
+    joinButton = document.getElementById('join-button'),
+    randomButton = document.getElementById('random-button'),
     //raf stands for requestAnimationFrame, enables drawing to occur
     raf;
 
@@ -47,345 +47,364 @@ document.addEventListener("DOMContentLoaded", function(event) {
     navigator.msGetUserMedia;
   //end vendor media objects//
 
+  joinButton.addEventListener('click', function() {
+    let roomId = document.getElementById('room-id-input').value;
+    roomID = roomId;
 
-  navigator.getMedia({
-    video: true,
-    audio: false
-  }, function(stream) {
-    const socket = io();
-
-
-    //uses the stream from the local webcam and draws it on canvas//
-    var myVirtualVid = document.createElement('video');
-    myVirtualVid.src = window.URL.createObjectURL(stream);
-    myVirtualVid.play();
-
-    //draw local vid on canvas//
-    myVideo = document.getElementById('myVideo')
-    myVidCtx = myVideo.getContext('2d');
-
-    myVirtualVid.addEventListener('play', function() {
-      drawVideo(this, myVidCtx, myVideo.width, myVideo.height);
-    }, false);
-    //end//
-
-    //draw local overlay canvas//
-    myCanvas = document.getElementById('myCanvas')
-    myContext = myCanvas.getContext('2d');
-
-    //width and height should eventually be translated to exact coordination
-    //with incoming video stream
-    myCanvas.width = 640;
-    myCanvas.height = 480;
-
-    //draws blank canvas on top of video
-    myContext.rect(0, 0, myCanvas.width, myCanvas.height);
-    myContext.stroke();
-    //end//
-
-    //start socket comms
-    socket.emit('initiator?', JSON.stringify(stream.id));
-    socket.on('initiated', (chatter) => {
-      if (chattersClient.filter(clientChatter => clientChatter.id !== chatter.id).length || !chattersClient.length) {
-        chattersClient.push(chatter);
-        chatterThisClient = chatter.id;
-      }
-      if (chatter.initiator) {
-        peer = new SimplePeer({
-          initiator: true,
-          trickle: false,
-          stream: stream
-        });
-      } else {
-        peer = new SimplePeer({
-          initiator: false,
-          trickle: false,
-          stream: stream
-        })
-      }
+    //begin streaming!//
+    navigator.getMedia({
+        video: true,
+        audio: false
+      }, function(stream) {
+        const socket = io();
 
 
-      peer.on('signal', function(data) {
-        document.getElementById('yourId').value = JSON.stringify(data);
-        // if (window.location.href.match(/#init/)){
-        //   initialClient = true;
-        // }
-        if (peer.initiator) {
-          socket.emit('initial', JSON.stringify(data));
-        } else if (!peer.initiator) {
-          socket.emit('third', JSON.stringify(data));
-        }
-      })
+        // console.log('roomId: ' + roomId, 'roomID: ' + roomID)
+        (function() {
+          socket.emit('initiate', JSON.stringify({
+            streamId: stream.id,
+            roomId: roomId
+          }))
+        })();
 
-      peer.on('data', function(data) {
+        socket.on('tryAgain', (payload) => alert('Try a different room!'))
+          //start socket comms
 
-        //parse data string to get the data object
-        var dataObj = JSON.parse(data);
-        //check data object for keys indicating if the type of data is a message
-        if (dataObj.message) {
-          //post message in the text content chat box spot
-          document.getElementById('messages').textContent += dataObj.message + '\n';
-          //check data object for key indicating clicked the 'filter me!' button
-        } else if (dataObj.myFilter) {
-          //checks the value of the key to see if a filter needs to be added
-          if (dataObj.myFilter === 'yes') {
-            //applies filter to video to reflect partner's video
-            setVendorCss(peerVideo, dataObj.filterType);
-            //checks value of key to see if filter needs to be removed
-          } else if (dataObj.myFilter === 'no') {
-            //removes filter
-            peerVideo.removeAttribute('style');
-          }
+        socket.on('initiated', (member) => {
+            member = JSON.parse(member);
 
-          //check data object for key indicating user clicked the "filter them" button
-        } else if (dataObj.peerFilter) {
-          //checks key value to see if a filter needs to be added
-          if (dataObj.peerFilter === 'yes') {
-            //applies filter
-            setVendorCss(myVideo, dataObj.filterType);
-            //checks key value to see if a filter needs to be removed
-          } else if (dataObj.peerFilter === 'no') {
-            //removes filter
-            myVideo.removeAttribute('style');
-          }
-        } else if (dataObj.emoji) {
+            document.getElementById('roomApp').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
 
-          //remote display bounce animation! actually can be abstracted to whatever action
-          //they choose
+            //uses the stream from the local webcam and draws it on canvas//
+            let myVirtualVid = document.createElement('video');
+            myVirtualVid.src = window.URL.createObjectURL(stream);
+            myVirtualVid.play();
 
-          temp = currentAnimation;
-          currentAnimation = eval('(' + dataObj.animation + ')');
-          currentAnimation(peerCanvas, peerContext, event, dataObj.position);
-          currentAnimation = temp;
-        } else if (dataObj.peerEmoji) {
-          //local display bounce animation! actually can be abstracted to whatever action
-          //they choose
-          temp = currentAnimation;
-          currentAnimation = eval('(' + dataObj.animation + ')');
-          currentAnimation(myCanvas, myContext, event, dataObj.position);
-          currentAnimation = temp;
-        }
+            //draw local vid on canvas//
+            myVideo = document.getElementById('myVideo')
+            myVidCtx = myVideo.getContext('2d');
 
-      });
+            myVirtualVid.addEventListener('play', function() {
+              drawVideo(this, myVidCtx, myVideo.width, myVideo.height);
+            }, false);
+            //end//
 
-      document.getElementById('connect').addEventListener('click', function() {
-        if (!peer.initiator) {
-          socket.emit('second');
-        }
-      });
+            //draw local overlay canvas//
+            myCanvas = document.getElementById('myCanvas')
+            myContext = myCanvas.getContext('2d');
 
-      socket.on('initialConnected', function() {
-        if (!peer.initiator) {
-          console.log('Initial connected good');
-        }
-      });
+            //width and height should eventually be translated to exact coordination
+            //with incoming video stream
+            myCanvas.width = 640;
+            myCanvas.height = 480;
 
-      socket.on('secondPart2', (initialClientId) => {
-        if (!peer.initiator) {
-          peer.signal(initialClientId);
-        }
-      });
+            //draws blank canvas on top of video
+            myContext.rect(0, 0, myCanvas.width, myCanvas.height);
+            myContext.stroke();
+            //end//
 
-      socket.on('thirdPart2', function(secondClientId) {
-        if (peer.initiator) {
-          peer.signal(secondClientId);
-        }
-      });
+            //set room ID shared between clients
+            roomID = member.roomId;
 
-      socket.on('updateChatters', (chatter) => {
-        chattersClient.splice(chattersClient.indexOf(chatter), 1);
-      });
-
-      //looks for click event on the send button//
-      document.getElementById('send').addEventListener('click', function() {
-
-          //creates a message object with a stringified object containing the local port and the message
-          var yourMessageObj = JSON.stringify({
-            message: peer.localPort + " " + document.getElementById('yourMessage').value
-          });
-          //creates a variable with the same information to display on your side
-          //peer.localPort is a temporary way to identify peers, should be changed
-          var yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
-          //post message in text context on your side
-          document.getElementById('messages').textContent += yourMessage + '\n';
-          //send message object to the data channel
-          peer.send(yourMessageObj);
-        })
-        //end send click event//
-
-      //click event for the "filter me" button//
-      document.getElementById('myFilter').addEventListener('click', function() {
-
-        //checks for filter and assigns key yes or no based on whether or not one needs to be applied
-        if (!myVideo.style.filter) {
-          //creates and stringify object to send to the data channel with instructions to apply filter
-          var filterDataObj = JSON.stringify({
-            myFilter: 'yes',
-            filterType: current.innerHTML
-          });
-          //add filter on your side
-          setVendorCss(myVideo, current.innerHTML);
-        } else {
-          //create and stringify object to send to the data channel with instructions to remove filter
-          var filterDataObj = JSON.stringify({
-            myFilter: 'no'
-          });
-          myVideo.removeAttribute('style');
-        }
-        //send object to data channel
-        peer.send(filterDataObj);
-      })
-
-      //click event for the "filter them" button
-      document.getElementById('peerFilter').addEventListener('click', function() {
-
-          //checks for filter and assigns key yes or no based on whether one needs to be applied
-          if (!peerVideo.style.filter) {
-            //creates and stringify object to send to the data channel with instructions to apply filter
-            var filterDataObj = JSON.stringify({
-              peerFilter: 'yes',
-              filterType: current.innerHTML
-            });
-            //add filter on your side
-            setVendorCss(peerVideo, current.innerHTML);
-          } else {
-            //creates and stringify object to send to the data channel with instructions to remove filter
-            var filterDataObj = JSON.stringify({
-              peerFilter: 'no'
-            });
-            //remove filter on your side
-            peerVideo.removeAttribute('style');
-          }
-          //sends object to the data channel
-          peer.send(filterDataObj);
-        })
-        ///end filter them click event///
-
-      //tesing filters//
-      button.addEventListener('click', function() {
-        current.innerHTML = filters[i];
-        i++;
-        if (i >= filters.length) i = 0;
-      }, false);
-      //end of filter test//
-
-      myCanvas.addEventListener('click', function(event) {
-          //gets position based mouse click coordinates, restricted
-          //to canvas rectangle, see function logic in function store
-          var myPosition = getCursorPosition(myCanvas, event);
-          var myCanvasObj = JSON.stringify({
-            animation: currentAnimation.toString(),
-            emoji: 'yes',
-            position: {
-              x: myPosition.x,
-              y: myPosition.y
+            if (chattersClient.filter(clientChatter => clientChatter.id !== member.id).length || !chattersClient.length) {
+              chattersClient.push(member);
+              chatterThisClient = member.id;
             }
-          });
 
-          //animation for local display and data transmission to peer
-          currentAnimation(myCanvas, myContext, event, myPosition);
-          peer.send(myCanvasObj);
+            //instantiate peer object
+            peer = new SimplePeer({
+                initiator: member.initiator,
+                trickle: false,
+                stream: stream
+              })
 
-          //leave for tesing for putting random img on canvas
-          // paste(this, context, peerCanvas.width, peerCanvas.height, position.x, position.y)
-        }, false)
-        //end of click listener logic//
+            peer.on('signal', function(data) {
+              document.getElementById('yourId').value = "Connected!";
+              let signalObj = JSON.stringify({
+                roomId: roomID,
+                signal: data
+              });
 
-      // adding buttons to change active animations
-      staticButton.addEventListener('click', function(event) {
-        currentAnimation = staticPaste;
+              if (peer.initiator) {
+                socket.emit('initial', signalObj);
+              } else if (!peer.initiator) {
+                socket.emit('third', signalObj);
+              }
+            })
 
-      });
-
-      bounceButton.addEventListener('click', function(event) {
-        currentAnimation = bounce;
-
-      });
-
-      orbitButton.addEventListener('click', function(event) {
-        currentAnimation = orbit;
-
-      });
-
-      clearButton.addEventListener('click', function(event) {
-        cancelAnimationFrame(raf);
-        myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
-        peerContext.clearRect(0, 0, peerCanvas.width, peerCanvas.height);
-
-      });
-
-
-
-      //peer stream event//
-      peer.on('stream', function(stream) {
-
-        // peerVideo = document.getElementById('peerVideo')
-        // peerVideo.src = vendorUrl.createObjectURL(stream);
-        // peerVideo.play();
-
-        //uses the stream from the remote webcam and draws it on canvas//
-        peerVirtualVid = document.createElement('video');
-        peerVirtualVid.src = vendorUrl.createObjectURL(stream);
-        peerVirtualVid.play();
-
-        peerVideo = document.getElementById('peerVideo')
-        peerVidCtx = peerVideo.getContext('2d');
-
-        peerVirtualVid.addEventListener('play', function() {
-          peerVideo.width = 640;
-          peerVideo.height = 460;
-          drawVideo(this, peerVidCtx, peerVideo.width, peerVideo.height);
-        }, false);
-        //end remote draw//
-
-        peerCanvas = document.getElementById('peerCanvas')
-        peerContext = peerCanvas.getContext('2d');
-
-        //width and height should eventually be translated to exact coordination
-        //with incoming video stream
-        peerCanvas.width = 640;
-        peerCanvas.height = 460;
-
-        //draws blank canvas on top of video, visibility may be unnecessary
-        peerContext.rect(0, 0, peerCanvas.width, peerCanvas.height);
-        peerContext.stroke();
-
-        //remote display animation this to data channel logic easy peasy
-        peerCanvas.addEventListener('click', function(event) {
-
-            //gets position based mouse click coordinates, restricted
-            //to canvas rectangle, see function logic in function store
-            var peerPosition = getCursorPosition(peerCanvas, event);
-
-            currentAnimation(peerCanvas, peerContext, event, peerPosition);
-
-            var peerCanvasObj = JSON.stringify({
-              animation: currentAnimation.toString(),
-              peerEmoji: 'yes',
-              position: {
-                x: peerPosition.x,
-                y: peerPosition.y
+            document.getElementById('connect').addEventListener('click', function() {
+              if (!peer.initiator) {
+                socket.emit('second', JSON.stringify(roomID));
               }
             });
-            peer.send(peerCanvasObj);
 
-          }, false)
-          //end of click listener logic//
+            socket.on('initialConnected', function() {
+              if (!peer.initiator) {
+                console.log('Initial connected good');
+              }
+            });
 
-      });
-      ///end peer stream event///
-    })
+            socket.on('secondPart2', (initialClientSig) => {
+              initialClientSig = JSON.parse(initialClientSig)
+              if (!peer.initiator) {
+                peer.signal(initialClientSig);
+              }
+            });
+
+            socket.on('thirdPart2', function(secondClientSig) {
+              secondClientSig = JSON.parse(secondClientSig);
+              if (peer.initiator) {
+                peer.signal(secondClientSig);
+              }
+            });
+
+            socket.on('updateChatters', (chatter) => {
+              chattersClient.splice(chattersClient.indexOf(chatter), 1);
+            });
 
 
-  }, function(err) {
-    console.error(err);
+            peer.on('data', function(data) {
+
+              //parse data string to get the data object
+              let dataObj = JSON.parse(data);
+              //check data object for keys indicating if the type of data is a message
+              if (dataObj.message) {
+                //post message in the text content chat box spot
+                document.getElementById('messages').textContent += dataObj.message + '\n';
+                //check data object for key indicating clicked the 'filter me!' button
+              } else if (dataObj.myFilter) {
+                //checks the value of the key to see if a filter needs to be added
+                if (dataObj.myFilter === 'yes') {
+                  //applies filter to video to reflect partner's video
+                  setVendorCss(peerVideo, dataObj.filterType);
+                  //checks value of key to see if filter needs to be removed
+                } else if (dataObj.myFilter === 'no') {
+                  //removes filter
+                  peerVideo.removeAttribute('style');
+                }
+
+                //check data object for key indicating user clicked the "filter them" button
+              } else if (dataObj.peerFilter) {
+                //checks key value to see if a filter needs to be added
+                if (dataObj.peerFilter === 'yes') {
+                  //applies filter
+                  setVendorCss(myVideo, dataObj.filterType);
+                  //checks key value to see if a filter needs to be removed
+                } else if (dataObj.peerFilter === 'no') {
+                  //removes filter
+                  myVideo.removeAttribute('style');
+                }
+              } else if (dataObj.emoji) {
+
+                //remote display bounce animation!
+                temp = currentAnimation;
+                currentAnimation = eval('(' + dataObj.animation + ')');
+                currentAnimation(peerCanvas, peerContext, event, dataObj.position);
+                currentAnimation = temp;
+                console.log('clicked', dataObj.position);
+
+              } else if (dataObj.peerEmoji) {
+
+                //local display bounce animation!
+                temp = currentAnimation;
+                currentAnimation = eval('(' + dataObj.animation + ')');
+                currentAnimation(myCanvas, myContext, event, dataObj.position);
+                currentAnimation = temp;
+                console.log('clicked', dataObj.position);
+
+              }
+
+            });
+
+
+
+            //looks for click event on the send button//
+            document.getElementById('send').addEventListener('click', function() {
+
+                //creates a message object with a stringified object containing the local port and the message
+                let yourMessageObj = JSON.stringify({
+                  message: peer.localPort + " " + document.getElementById('yourMessage').value
+                });
+                //creates a variable with the same information to display on your side
+                //peer.localPort is a temporary way to identify peers, should be changed
+                let yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
+                //post message in text context on your side
+                document.getElementById('messages').textContent += yourMessage + '\n';
+                //send message object to the data channel
+                peer.send(yourMessageObj);
+              })
+              //end send click event//
+
+            //click event for the "filter me" button//
+            document.getElementById('myFilter').addEventListener('click', function() {
+
+              //checks for filter and assigns key yes or no based on whether or not one needs to be applied
+              if (!myVideo.style.filter) {
+                //creates and stringify object to send to the data channel with instructions to apply filter
+                let filterDataObj = JSON.stringify({
+                  myFilter: 'yes',
+                  filterType: current.innerHTML
+                });
+                //add filter on your side
+                setVendorCss(myVideo, current.innerHTML);
+              } else {
+                //create and stringify object to send to the data channel with instructions to remove filter
+                let filterDataObj = JSON.stringify({
+                  myFilter: 'no'
+                });
+                myVideo.removeAttribute('style');
+              }
+              //send object to data channel
+              peer.send(filterDataObj);
+            })
+
+            //click event for the "filter them" button
+            document.getElementById('peerFilter').addEventListener('click', function() {
+
+                //checks for filter and assigns key yes or no based on whether one needs to be applied
+                if (!peerVideo.style.filter) {
+                  //creates and stringify object to send to the data channel with instructions to apply filter
+                  let filterDataObj = JSON.stringify({
+                    peerFilter: 'yes',
+                    filterType: current.innerHTML
+                  });
+                  //add filter on your side
+                  setVendorCss(peerVideo, current.innerHTML);
+                } else {
+                  //creates and stringify object to send to the data channel with instructions to remove filter
+                  let filterDataObj = JSON.stringify({
+                    peerFilter: 'no'
+                  });
+                  //remove filter on your side
+                  peerVideo.removeAttribute('style');
+                }
+                //sends object to the data channel
+                peer.send(filterDataObj);
+              })
+              ///end filter them click event///
+
+            //tesing filters//
+            button.addEventListener('click', function() {
+              current.innerHTML = filters[i];
+              i++;
+              if (i >= filters.length) i = 0;
+            }, false);
+            //end of filter test//
+
+            myCanvas.addEventListener('click', function(event) {
+                //gets position based mouse click coordinates, restricted
+                //to canvas rectangle, see function logic in function store
+                let myPosition = getCursorPosition(myCanvas, event);
+                let myCanvasObj = JSON.stringify({
+                  animation: currentAnimation.toString(),
+                  emoji: 'yes',
+                  position: {
+                    x: myPosition.x,
+                    y: myPosition.y
+                  }
+                });
+
+                //animation for local display and data transmission to peer
+                currentAnimation(myCanvas, myContext, event, myPosition);
+                peer.send(myCanvasObj);
+                console.log('clicked');
+              }, false)
+              //end of click listener logic//
+
+            // adding buttons to change active animations
+            staticButton.addEventListener('click', function(event) {
+              currentAnimation = staticPaste;
+            });
+
+            bounceButton.addEventListener('click', function(event) {
+              currentAnimation = bounce;
+            });
+
+            orbitButton.addEventListener('click', function(event) {
+              currentAnimation = orbit;
+            });
+
+            clearButton.addEventListener('click', function(event) {
+              cancelAnimationFrame(raf);
+              myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
+              peerContext.clearRect(0, 0, peerCanvas.width, peerCanvas.height);
+
+            });
+
+
+            //peer stream event//
+            peer.on('stream', function(stream) {
+
+              // peerVideo = document.getElementById('peerVideo')
+              // peerVideo.src = vendorUrl.createObjectURL(stream);
+              // peerVideo.play();
+
+              //uses the stream from the remote webcam and draws it on canvas//
+              peerVirtualVid = document.createElement('video');
+              peerVirtualVid.src = vendorUrl.createObjectURL(stream);
+              peerVirtualVid.play();
+
+              peerVideo = document.getElementById('peerVideo')
+              peerVidCtx = peerVideo.getContext('2d');
+
+              peerVirtualVid.addEventListener('play', function() {
+                peerVideo.width = 640;
+                peerVideo.height = 460;
+                drawVideo(this, peerVidCtx, peerVideo.width, peerVideo.height);
+              }, false);
+              //end remote draw//
+
+              peerCanvas = document.getElementById('peerCanvas')
+              peerContext = peerCanvas.getContext('2d');
+
+              //width and height should eventually be translated to exact coordination
+              //with incoming video stream
+              peerCanvas.width = 640;
+              peerCanvas.height = 460;
+
+              //draws blank canvas on top of video, visibility may be unnecessary
+              peerContext.rect(0, 0, peerCanvas.width, peerCanvas.height);
+              peerContext.stroke();
+
+              //remote display animation this to data channel logic easy peasy
+              peerCanvas.addEventListener('click', function(event) {
+
+                  //gets position based mouse click coordinates, restricted
+                  //to canvas rectangle, see function logic in function store
+                  let peerPosition = getCursorPosition(peerCanvas, event);
+
+                  currentAnimation(peerCanvas, peerContext, event, peerPosition);
+
+                  let peerCanvasObj = JSON.stringify({
+                    animation: currentAnimation.toString(),
+                    peerEmoji: 'yes',
+                    position: {
+                      x: peerPosition.x,
+                      y: peerPosition.y
+                    }
+                  });
+                  peer.send(peerCanvasObj);
+
+                }, false)
+                //end of click listener logic//
+
+            });
+            ///end peer stream event///
+          }) //end of socket.on('initiated')
+
+
+      },
+      function(err) {
+        console.error(err);
+      })
   })
 
 
   //function store//
 
   function bounce(cv, ctx, evt, pos) {
-    var onload = emoImg.onload;
+    let onload = emoImg.onload;
 
     //this object keeps track of the movement, loads the images, and determines
     //the velocity
@@ -402,7 +421,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     //initial image load on canvas
     emoticon.onload();
 
-    var callBack = function() {
+    let callBack = function() {
       velocity(emoticon, ctx, cv, callBack);
     }
 
@@ -411,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }
 
   function staticPaste(cv, ctx, evt, pos) {
-    var onload = emoImg.onload;
+    let onload = emoImg.onload;
 
     //this object keeps track of the movement, loads the images, and determines
     //the velocity
@@ -430,8 +449,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   //orbit func//
   function orbit(cv, ctx, evt, pos) {
-    var onload = emoImg.onload;
-console.log('pos', pos);
+    let onload = emoImg.onload;
+
     //this object keeps track of the movement, loads the images, and determines
     //the angular veloctiy. We're keeping track of frequency of refreshes to
     //imcrement the degrees
@@ -451,7 +470,7 @@ console.log('pos', pos);
     //initial image load on canvas
     emoticon.onload();
 
-    var callBack = function() {
+    let callBack = function() {
       angularVelocity(emoticon, ctx, cv, callBack);
     }
 
@@ -478,10 +497,10 @@ console.log('pos', pos);
   //gets cursor position upon mouse click that places
   //an object or starts object movement
   function getCursorPosition(canvas, event) {
-    var rect = canvas.getBoundingClientRect();
-    var x = event.clientX - rect.left;
-    var y = event.clientY - rect.top;
-    var pos = {
+    let rect = canvas.getBoundingClientRect();
+    let x = event.clientX - rect.left;
+    let y = event.clientY - rect.top;
+    let pos = {
       x: x,
       y: y
     };
@@ -523,7 +542,6 @@ console.log('pos', pos);
 
   //angularVelocity func//
   function angularVelocity(obj, ctx, cv, cb) {
-
     ctx.clearRect(obj.x - emoImg.width / 2, obj.y - emoImg.height / 2, emoImg.width + 5, emoImg.height + 5);
     obj.onload();
 
@@ -543,5 +561,7 @@ console.log('pos', pos);
     context.fill();
   }
   //end cutCircle//
+
+  ///end of function store///
 
 });
