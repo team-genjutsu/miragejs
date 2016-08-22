@@ -523,13 +523,9 @@ console.log('pos', pos);
 
   //angularVelocity func//
   function angularVelocity(obj, ctx, cv, cb) {
-<<<<<<< HEAD
-   ctx.clearRect(obj.x - emoImg.width/2 +5, obj.y - emoImg.height/2, emoImg.width, emoImg.height);
-   obj.onload();
-=======
+
     ctx.clearRect(obj.x - emoImg.width / 2, obj.y - emoImg.height / 2, emoImg.width + 5, emoImg.height + 5);
     obj.onload();
->>>>>>> 684e9aafa0decc9d88911aa709d47f182f2f871d
 
     obj.x += Math.sin(obj.wx * obj.rotateCount) * obj.r;
     obj.y += Math.cos(obj.wy * obj.rotateCount) * obj.r;
