@@ -3,7 +3,7 @@
 }
 
 .hidden {
-  display:none;
+  display: none;
 }
 
 #booth {
@@ -16,7 +16,7 @@
 }
 
 #connect {
-  margin-top: 30px;
+  /* margin-top: 30px; */
 }
 
 #myBooth {
@@ -71,7 +71,18 @@
   width: 100%;
 }
 
+#connectivity-buttons {
+  width: 100%;
+  margin: 15px;
+}
+
+.connectButton {
+  display: inline;
+}
+
+
 /*////// room selection start ///////////////////*/
+
 #recent-rooms-list {
   list-style-type: none;
   padding: 0 15px;
@@ -87,9 +98,9 @@
   width: 8em;
   height: 2.75em;
   padding: 0.5em 0.7em 0.5em 0.7em;
-  -webkit-box-shadow: 1px 1px 5px 0 rgba(0,0,0,.5);
-  -moz-box-shadow: 1px 1px 5px 0 rgba(0,0,0,.5);
-  box-shadow: 1px 1px 5px 0 rgba(0,0,0,.5);
+  -webkit-box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
+  -moz-box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
+  box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
 }
 
 .roombtn:active {
@@ -102,9 +113,9 @@
 
 .roombtn:focus {
   outline: none;
-  -webkit-box-shadow: 0 10px 15px 0 rgba(0,0,0,.5);
-  -moz-box-shadow: 0 10px 15px 0 rgba(0,0,0,.5);
-  box-shadow: 0 10px 15px 0 rgba(0,0,0,.5);
+  -webkit-box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
+  -moz-box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
+  box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
 }
 
 .roombtn[disabled] {
@@ -120,7 +131,7 @@
   font-size: 1em;
   background-color: transparent;
   color: #ccc;
-  padding:.4em 0;
+  padding: .4em 0;
   margin-right: 20px;
   width: 100%;
   display: block;
@@ -167,5 +178,6 @@ div#room-selection {
   font-weight: 300;
   line-height: 1.6em;
 }
+
 
 /*////// room selection end /////////////////////*/

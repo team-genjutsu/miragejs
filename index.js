@@ -82,6 +82,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 })();
 
 
+                socket.on('readyConnect', (payload) => {
+                  document.getElementById('connect').disabled = false; 
+                })
+
                 socket.on('initiated', (member) => {
                     member = JSON.parse(member);
 
@@ -146,9 +150,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     })
 
                     document.getElementById('connect').addEventListener('click', function() {
-                      if (!peer.initiator) {
+                      // if (!peer.initiator) {
                         socket.emit('second', JSON.stringify(roomID));
-                      }
+                      // }
                     });
 
                     socket.on('initialConnected', function() {
