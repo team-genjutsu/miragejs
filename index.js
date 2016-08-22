@@ -1,5 +1,3 @@
-var audio = require('audio-visualizer');
-
 document.addEventListener("DOMContentLoaded", function(event) {
 
   //variable store//
@@ -114,8 +112,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                     //width and height should eventually be translated to exact coordination
                     //with incoming video stream
-                    myCanvas.width = 640;
-                    myCanvas.height = 480;
+                    myCanvas.width = 500; //640;
+                    myCanvas.height = 385; //480;
 
                     //draws blank canvas on top of video
                     myContext.rect(0, 0, myCanvas.width, myCanvas.height);
@@ -382,8 +380,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       peerVidCtx = peerVideo.getContext('2d');
 
                       peerVirtualVid.addEventListener('play', function() {
-                        peerVideo.width = 640;
-                        peerVideo.height = 460;
+                        peerVideo.width = 500; //640;
+                        peerVideo.height = 385; //460;
                         drawVideo(this, peerVidCtx, peerVideo.width, peerVideo.height);
                       }, false);
                       //end remote draw//
@@ -393,8 +391,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                       //width and height should eventually be translated to exact coordination
                       //with incoming video stream
-                      peerCanvas.width = 640;
-                      peerCanvas.height = 460;
+                      peerCanvas.width = 500; //640;
+                      peerCanvas.height = 385; //460;
 
                       //draws blank canvas on top of video, visibility may be unnecessary
                       peerContext.rect(0, 0, peerCanvas.width, peerCanvas.height);
