@@ -1,3 +1,6 @@
+import SimplePeer from 'simple-peer';
+import io from 'socket.io-client';
+
 document.addEventListener("DOMContentLoaded", function(event) {
 
   //variable store//
