@@ -7,6 +7,7 @@ const app = express();
 const _ = require('lodash')
 
 app.use(express.static(__dirname));
+
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, './index.html'))
 })
