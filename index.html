@@ -13,12 +13,6 @@
   <link rel='stylesheet' href='css/main.css'>
 </head>
 
-<style>
-  body {
-    padding-top: 20px;
-  }
-</style>
-
 <body data-spy="scroll" data-target="#my-navbar">
 
   <div class="app container">
@@ -81,8 +75,10 @@
         <div class="container text-center">
           <h1>streamAR</h1>
           <p>Augmented Reality Video Chat</p>
-          <button class="btn btn-info btn-lg center-block" id='connect'>CONNECT</button>
-
+          <div id="connectivity-buttons">
+          <button class="btn btn-info btn-lg center-block connectButton" id='connect' disabled>CONNECT</button>
+          <button class="btn btn-info btn-lg center-block connectButton" id='disconnect' disabled>DISCONNECT</button>
+          </div>
         </div>
         <!-- End container -->
       </div>
@@ -101,11 +97,28 @@
         <button class="btn btn-secondary" id='send'>send</button>
       </div>
 
-      <!-- Video demo area -->
+  <!-- Video demo area -->
       <section id="demo">
-
+        <div id="emojiButtons" class="btn-group pull-right">
+          <div id="selectImg">Select Image</div>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f385.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4a9.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4af.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f354.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f436.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f414.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f389.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f60d.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4b8.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f951.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f984.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/2705.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f64a.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f382.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f602.png"/></button>
+          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f64c.png"/></button>
+        </div>
         <div id='booth'>
-
           <div id='myBooth'>
             <canvas id="myVideo"></canvas>
             <canvas id="myCanvas"></canvas>
@@ -292,7 +305,6 @@
         </section>
       </div>
 
-
       <!-- Footer -->
 
       <footer>
@@ -305,8 +317,6 @@
   </div>
   <!-- End app container -->
   <script href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></script>
-
-
   <script src="./node_modules/socket.io-client/socket.io.js"></script>
   <script src='./node_modules/simple-peer/simplepeer.min.js'></script>
   <script src='./public/bundle.js'></script>

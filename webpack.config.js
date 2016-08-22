@@ -25,7 +25,6 @@ module.exports = {
   devtool: process.env.NODE_ENV !== 'production' ? 'inline-sourcemap' : null,
   plugins: process.env.NODE_ENV !== 'production' ? [
     new webpack.optimize.OccurrenceOrderPlugin(),
-    // new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()] : [
       new webpack.optimize.DedupePlugin(),
       new webpack.optimize.Occurence.Plugin(),

@@ -105,6 +105,9 @@ io.sockets.on('connection', function(socket) {
 
       member = new Member(socket.id, payload.roomId, false)
       existingRoom[0].addMember(member)
+      existingRoom[0].members.forEach((ele, idx) => {
+        io.to(ele.id).emit('readyConnect', JSON.stringify('both connected'));
+      })
 
     }
 
@@ -123,7 +126,8 @@ io.sockets.on('connection', function(socket) {
     payload = JSON.parse(payload);
     let sharedRoom = rooms.filter(room => room.id === payload);
     let initialClientSig = sharedRoom[0].members[0].signalId;
-    io.to(socket.id).emit('secondPart2', JSON.stringify(initialClientSig));
+    let secondClientSockId = sharedRoom[0].members[1].id;
+    io.to(secondClientSockId).emit('secondPart2', JSON.stringify(initialClientSig)); //remember socket.id
   });
 
   socket.on('third', function(payload) {
