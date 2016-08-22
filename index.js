@@ -515,7 +515,7 @@ console.log('pos', pos);
   }
 
   function angularVelocity(obj, ctx, cv, cb) {
-   ctx.clearRect(obj.x - emoImg.width/2 +5, obj.y - emoImg.width/2, emoImg.width, emoImg.height);
+   ctx.clearRect(obj.x - emoImg.width/2 +5, obj.y - emoImg.height/2, emoImg.width, emoImg.height);
    obj.onload();
 
    obj.x += Math.sin(obj.wx*obj.rotateCount) * obj.r;
@@ -525,16 +525,4 @@ console.log('pos', pos);
    raf = window.requestAnimationFrame(cb);
   }
 
-
-  function angularVelocity(obj, ctx, cv, cb) {
-    ctx.clearRect(obj.x - emoImg.width/2, obj.y - emoImg.width/2, emoImg.width, emoImg.height);
-    obj.onload();
-
-    obj.x += obj.wx;
-    obj.y += obj.wy;
-
-  //console.log(obj, ctx, cv, cb);
-  //raf = window.requestAnimationFrame(cb);
-  ///end of function store///
-  }
 });
