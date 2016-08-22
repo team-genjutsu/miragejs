@@ -15,7 +15,7 @@
 
 <body data-spy="scroll" data-target="#my-navbar">
 
-  <div class="app container">
+  <div class="app">
 
     <div id="roomApp" class="room container">
       <div id="room-selection" class="">
@@ -39,7 +39,7 @@
     </div>
     <!-- End room container-->
 
-    <div id="mainApp" class="stream container hidden">
+    <div id="mainApp" class="stream hidden">
       <!-- Navbar -->
       <nav class="navbar navbar-inverse navbar-fixed-top" id="my-navbar">
         <div class="container">
@@ -51,7 +51,7 @@
   					<span class="icon-bar"></span>
   				</button>
 
-            <a href="#" class="navbar-brand">streamAR</a>
+            <a href="#" class="navbar-brand">Genjutsu</a>
           </div>
           <!-- Navbar Header-->
           <div class="collapse navbar-collapse" id="navbar-collapse">
@@ -76,8 +76,9 @@
           <h1>streamAR</h1>
           <p>Augmented Reality Video Chat</p>
           <div id="connectivity-buttons">
-          <button class="btn btn-info btn-lg center-block connectButton" id='connect' disabled>CONNECT</button>
-          <button class="btn btn-info btn-lg center-block connectButton" id='disconnect' disabled>DISCONNECT</button>
+            <button class="btn btn-info btn-lg center-block connectButton" id='connect' disabled>CONNECT</button>
+            <button class="btn btn-info btn-lg center-block connectButton" id='disconnect'
+              disabled>DISCONNECT</button>
           </div>
         </div>
         <!-- End container -->
@@ -87,10 +88,39 @@
       <textarea id='yourId'></textarea><br/>
 
 
-  <!-- Video demo area -->
+      <!-- Video demo area -->
       <section id="demo">
+
+        <div id='booth'>
+          <div id='myBooth'>
+            <canvas id="myVideo"></canvas>
+            <canvas id="myCanvas"></canvas>
+          </div>
+          <div id='peerBooth'>
+            <canvas id="peerVideo"></canvas>
+            <canvas id="peerCanvas"></canvas>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button id='filter' class="btn btn-primary">filter: <span id='filterDisp'></span></button>
+          <button id='myFilter' class="btn btn-info">filter me!</button>
+          <button id='peerFilter' class="btn btn-info">filter them!</button><br/>
+        </div>
+
+
+
+        <div class="btn-group pull-right">
+          <button id='clear' class="btn btn-primary">clear</button>
+          <button id='static' class="btn btn-success">static</button>
+          <button id='bounce' class="btn btn-danger">bounce</button>
+          <button id='orbit' class="btn btn-warning">orbit</button><br/>
+        </div>
+
+        <br>
+
         <div id="emojiButtons" class="btn-group pull-right">
-          <div id="selectImg">Select Image</div>
+          <!-- <div id="selectImg">Select Image</div> -->
           <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f385.png"/></button>
           <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4a9.png"/></button>
           <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4af.png"/></button>
@@ -107,30 +137,6 @@
           <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f382.png"/></button>
           <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f602.png"/></button>
           <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f64c.png"/></button>
-        </div>
-        <div id='booth'>
-          <div id='myBooth'>
-            <canvas id="myVideo"></canvas>
-            <canvas id="myCanvas"></canvas>
-          </div>
-          <br>
-          <div id='peerBooth'>
-            <canvas id="peerVideo"></canvas>
-            <canvas id="peerCanvas"></canvas>
-          </div>
-        </div>
-
-        <div class="btn-group">
-          <button id='filter' class="btn btn-primary">filter: <span id='filterDisp'></span></button>
-          <button id='myFilter' class="btn btn-info">filter me!</button>
-          <button id='peerFilter' class="btn btn-info">filter them!</button><br/>
-        </div>
-
-        <div class="btn-group pull-right">
-          <button id='clear' class="btn btn-primary">clear</button>
-          <button id='static' class="btn btn-success">static</button>
-          <button id='bounce' class="btn btn-danger">bounce</button>
-          <button id='orbit' class="btn btn-warning">orbit</button><br/>
         </div>
 
       </section>
