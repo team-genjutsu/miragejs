@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, './public/index.html'))
 })
 
-app.get('/favicon', (req, res) => {
+app.get('/favicon.ico', (req, res) => {
   res.sendStatus(200);
 })
 const PORT = process.env.PORT || 8000;
