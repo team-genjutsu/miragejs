@@ -1,5 +1,3 @@
-var audio = require('audio-visualizer');
-
 document.addEventListener("DOMContentLoaded", function(event) {
 
   //variable store//
@@ -85,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
                 socket.on('readyConnect', (payload) => {
-                  document.getElementById('connect').disabled = false; 
+                  document.getElementById('connect').disabled = false;
                 })
 
                 socket.on('initiated', (member) => {
