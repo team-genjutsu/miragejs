@@ -7,13 +7,14 @@ const app = express();
 const _ = require('lodash')
 
 app.use(express.static(__dirname));
+const PORT = process.env.PORT || 8000;
 
 const options = {
   key: fs.readFileSync('server.key'),
   cert: fs.readFileSync('server.crt')
 };
 
-const server = https.createServer(options, app).listen(8000);
+const server = https.createServer(options, app).listen(PORT);
 
 const io = require('socket.io').listen(server);
 
