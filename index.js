@@ -259,11 +259,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                     //click event for the "filter me" button//
                     document.getElementById('myFilter').addEventListener('click', function() {
-
+                      let filterDataObj;
                       //checks for filter and assigns key yes or no based on whether or not one needs to be applied
                       if (!myVideo.style.filter) {
                         //creates and stringify object to send to the data channel with instructions to apply filter
-                        let filterDataObj = JSON.stringify({
+                        filterDataObj = JSON.stringify({
                           myFilter: 'yes',
                           filterType: current.innerHTML
                         });
@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         setVendorCss(myVideo, current.innerHTML);
                       } else {
                         //create and stringify object to send to the data channel with instructions to remove filter
-                        let filterDataObj = JSON.stringify({
+                        filterDataObj = JSON.stringify({
                           myFilter: 'no'
                         });
                         myVideo.removeAttribute('style');
