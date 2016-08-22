@@ -6,19 +6,6 @@ const express = require('express');
 const app = express();
 const _ = require('lodash')
 
-const webpack = require('webpack');
-const webpackDevMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-hot-middleware');
-const config = require('./webpack.config.js');
-const compiler = webpack(config);
-
-app.use(webpackDevMiddleware(compiler, {
-  noInfo: true,
-  publicPath: config.output.publicPath
-}));
-
-app.use(webpackHotMiddleware(compiler));
-
 app.use(express.static(__dirname));
 
 const options = {
@@ -118,6 +105,9 @@ io.sockets.on('connection', function(socket) {
 
       member = new Member(socket.id, payload.roomId, false)
       existingRoom[0].addMember(member)
+      existingRoom[0].members.forEach((ele, idx) => {
+        io.to(ele.id).emit('readyConnect', JSON.stringify('both connected'));
+      })
 
     }
 
@@ -136,7 +126,8 @@ io.sockets.on('connection', function(socket) {
     payload = JSON.parse(payload);
     let sharedRoom = rooms.filter(room => room.id === payload);
     let initialClientSig = sharedRoom[0].members[0].signalId;
-    io.to(socket.id).emit('secondPart2', JSON.stringify(initialClientSig));
+    let secondClientSockId = sharedRoom[0].members[1].id;
+    io.to(secondClientSockId).emit('secondPart2', JSON.stringify(initialClientSig)); //remember socket.id
   });
 
   socket.on('third', function(payload) {
