@@ -19,7 +19,6 @@ app.use(webpackDevMiddleware(compiler, {
 
 app.use(webpackHotMiddleware(compiler));
 
-
 app.use(express.static(__dirname));
 
 const options = {
@@ -61,31 +60,51 @@ io.sockets.on('connection', function(socket) {
     let member,
       room,
       otherMem;
+    // index;
 
     rooms.forEach(function(ele, idx) {
-      member = ele.members.filter(client => client.id === socket.id);
+      member = ele.members.filter(client => client.id === socket.id)[0];
       if (member) {
-        room = ele;
-        otherMem = ele.members.filter(client => client.id != socket.id)
-      }
-    })
 
-    if (member) {
-      room.members.splice(room.members.indexOf(member), 1);
-      io.to(otherMem.id).emit('updateChatters', member)
-    }
+        if(rooms[idx].members.length > 0){
+          rooms[idx].members.forEach((el, id) => {
+            io.to(el.id).emit('updateChatters', member);
+          })
+        }
+
+        ele.members.splice(ele.members.indexOf(member), 1);
+        if (!rooms[idx].members.length) rooms.splice(idx, 1);
+      }
+
+    })
 
     connections.splice(connections.indexOf(socket), 1);
     socket.disconnect();
 
   })
 
+  //join room logic
+  socket.on('joinRoom', (payload) => {
+    payload = JSON.parse(payload);
+    let roomCheck = rooms.filter(room => room.id === payload);
+    if (roomCheck.length > 0) {
+      if (roomCheck[0].members > 1) {
+        io.to(socket.id).emit('process', JSON.stringify(false));
+      } else {
+        io.to(socket.id).emit('process', JSON.stringify(true));
+      }
+    } else {
+      io.to(socket.id).emit('process', JSON.stringify(true));
+    }
+  })
+
+  //initiate
   socket.on('initiate', (payload) => {
 
     payload = JSON.parse(payload);
 
-    let existingRoom = rooms.filter(room => room.id === payload.roomId)
-    let room,
+    let existingRoom = rooms.filter(room => room.id === payload.roomId),
+      room,
       member;
 
     if (existingRoom.length === 0) {
@@ -94,10 +113,6 @@ io.sockets.on('connection', function(socket) {
       member = new Member(socket.id, payload.roomId, true)
       room.addMember(member);
       rooms.push(room);
-
-    } else if (existingRoom[0].members.length > 1) {
-
-      io.to(socket.id).emit('tryAgain', 'Room taken already!');
 
     } else if (existingRoom[0].members.length === 1) {
 
