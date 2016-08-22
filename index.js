@@ -241,13 +241,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     //looks for click event on the send button//
                     document.getElementById('send').addEventListener('click', function() {
 
+
                         //creates a message object with a stringified object containing the local port and the message
                         let yourMessageObj = JSON.stringify({
-                          message: peer.localPort + " " + document.getElementById('yourMessage').value
+                          message: "pal:" + " " + document.getElementById('yourMessage').value
                         });
                         //creates a variable with the same information to display on your side
                         //peer.localPort is a temporary way to identify peers, should be changed
-                        let yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
+                        let yourMessage = "you:" + " " + document.getElementById('yourMessage').value;
                         //post message in text context on your side
                         document.getElementById('messages').textContent += yourMessage + '\n';
                         //send message object to the data channel
