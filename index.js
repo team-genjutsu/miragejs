@@ -428,6 +428,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     emoticon.onload();
   }
 
+  //orbit func//
   function orbit(cv, ctx, evt, pos) {
     var onload = emoImg.onload;
 console.log('pos', pos);
@@ -439,11 +440,11 @@ console.log('pos', pos);
       x: pos.x,
       y: pos.y,
       r: 5,
-      rotateCount : 1,
+      rotateCount: 1,
       wx: movement,
       wy: movement,
       onload: function() {
-        ctx.drawImage(emoImg, this.x - emoImg.width / 2 + 5, this.y - emoImg.height / 2);
+        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
       }
     };
 
@@ -457,6 +458,7 @@ console.log('pos', pos);
     //start drawing movement
     raf = window.requestAnimationFrame(callBack);
   }
+  //end orbit//
 
   //paste object to canvas
   function paste(video, context, width, height, x, y, source) {
@@ -471,6 +473,7 @@ console.log('pos', pos);
       // }, 5000);
     }
   }
+  //end paste//
 
   //gets cursor position upon mouse click that places
   //an object or starts object movement
@@ -484,6 +487,7 @@ console.log('pos', pos);
     };
     return pos;
   }
+  //end getCursorPosition//
 
   //streamline vendor prefixing for css filtering
   function setVendorCss(element, style) {
@@ -491,6 +495,7 @@ console.log('pos', pos);
     element.style.mozFilter = style;
     element.style.filter = style;
   }
+  //end setVendorCss //
 
   //draws video on canvas
   function drawVideo(v, c, w, h) {
@@ -498,31 +503,49 @@ console.log('pos', pos);
     c.drawImage(v, 0, 0, w, h);
     setTimeout(drawVideo, 20, v, c, w, h);
   }
+  //end drawVideo//
 
   //canvas draw function for velocity motion
   function velocity(obj, ctx, cv, cb) {
-    ctx.clearRect(obj.x - emoImg.width / 2, obj.y - emoImg.width / 2, emoImg.width, emoImg.height);
-       obj.onload();
-       obj.x += obj.vx;
-       obj.y += obj.vy;
-       if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
-         obj.vy = -obj.vy;
-       }
-       if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
-         obj.vx = -obj.vx;
-       }
-       raf = window.requestAnimationFrame(cb);
+    ctx.clearRect(obj.x - emoImg.width / 2, obj.y - emoImg.height / 2, emoImg.width, emoImg.height);
+    obj.onload();
+    obj.x += obj.vx;
+    obj.y += obj.vy;
+    if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
+      obj.vy = -obj.vy;
+    }
+    if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
+      obj.vx = -obj.vx;
+    }
+    raf = window.requestAnimationFrame(cb);
   }
+  //end velocity//
 
+  //angularVelocity func//
   function angularVelocity(obj, ctx, cv, cb) {
+<<<<<<< HEAD
    ctx.clearRect(obj.x - emoImg.width/2 +5, obj.y - emoImg.height/2, emoImg.width, emoImg.height);
    obj.onload();
+=======
+    ctx.clearRect(obj.x - emoImg.width / 2, obj.y - emoImg.height / 2, emoImg.width + 5, emoImg.height + 5);
+    obj.onload();
+>>>>>>> 684e9aafa0decc9d88911aa709d47f182f2f871d
 
-   obj.x += Math.sin(obj.wx*obj.rotateCount) * obj.r;
-   obj.y += Math.cos(obj.wy*obj.rotateCount) * obj.r;
-   obj.rotateCount++;
+    obj.x += Math.sin(obj.wx * obj.rotateCount) * obj.r;
+    obj.y += Math.cos(obj.wy * obj.rotateCount) * obj.r;
+    obj.rotateCount++;
 
-   raf = window.requestAnimationFrame(cb);
+    raf = window.requestAnimationFrame(cb);
   }
+  //end angularVelocity//
+
+  //doesnt work yet, but would provide a way to erase drawn
+  //objects in circular fashion rather than rectangular
+  function cutCircle(context, x, y, radius) {
+    context.globalCompositeOperation = 'destination-out'
+    context.arc(x, y, radius, 0, Math.PI * 2, true);
+    context.fill();
+  }
+  //end cutCircle//
 
 });
