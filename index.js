@@ -154,13 +154,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
           temp = currentAnimation;
           currentAnimation = eval('(' + dataObj.animation + ')');
-          currentAnimation(peerCanvas, peerContext, event, dataObj.position);
+          let emoImg = new Image();
+          emoImg.src = dataObj.currentImg;
+          currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg);
           currentAnimation = temp;
-        } else if (dataObj.peerEmoji) {
+        } else if ('peer',dataObj.peerEmoji) {
           //local display bounce animation! actually can be abstracted to whatever action
           //they choose
           temp = currentAnimation;
           currentAnimation = eval('(' + dataObj.animation + ')');
+          let emoImg = new Image();
+          emoImg.src = dataObj.currentImg;
           currentAnimation(myCanvas, myContext, event, dataObj.position, emoImg);
           currentAnimation = temp;
         }
@@ -277,6 +281,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
           var myCanvasObj = JSON.stringify({
             animation: currentAnimation.toString(),
             emoji: 'yes',
+            currentImg: currentImg,
             position: {
               x: myPosition.x,
               y: myPosition.y
@@ -358,15 +363,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
         //remote display animation this to data channel logic easy peasy
         peerCanvas.addEventListener('click', function(event) {
 
+            let emoImg = new Image();
+            emoImg.src = currentImg;
             //gets position based mouse click coordinates, restricted
             //to canvas rectangle, see function logic in function store
             var peerPosition = getCursorPosition(peerCanvas, event);
 
-            currentAnimation(peerCanvas, peerContext, event, peerPosition);
+            currentAnimation(peerCanvas, peerContext, event, peerPosition, emoImg);
 
             var peerCanvasObj = JSON.stringify({
               animation: currentAnimation.toString(),
               peerEmoji: 'yes',
+              currentImg: currentImg,
               position: {
                 x: peerPosition.x,
                 y: peerPosition.y
@@ -407,7 +415,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     //initial image load on canvas
     emoticon.onload();
-
+    console.log('bounce')
     var callBack = function() {
       velocity(emoticon, ctx, cv, callBack, emoImg);
     }
@@ -417,7 +425,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }
 
   function staticPaste(cv, ctx, evt, pos, emoImg) {
-    console.log('staticpaste',emoImg)
     var onload = emoImg.onload;
 
     //this object keeps track of the movement, loads the images, and determines
@@ -530,7 +537,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   //angularVelocity func//
   function angularVelocity(obj, ctx, cv, cb, emoImg) {
-    ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 8, emoImg.height + 8);
+    ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 10, emoImg.height + 10);
     obj.onload();
 
     obj.x += Math.sin(obj.wx * obj.rotateCount) * obj.r;
