@@ -3,14 +3,17 @@
 }*/
 
 .emoji {
+  display:inline;
   height: 50%;
   width: 50%;
+  border-radius: 5px;
 }
 
 #emojiButtons {
   height: 50%;
   width: 10%;
-  margin-right: 90px;
+  /* margin-right: 90px; */
+  margin: 0 auto;
 }
 
 .logo {
@@ -22,10 +25,10 @@
 }
 
 #booth {
-  width: 700px;
-  height: 1000px;
+  /* width: 95%; */
+  height: 80%;
   background: #ccc;
-  border: 10px solid #ddd;
+  border: 5px solid #ddd;
   margin: 0 auto;
   position: relative;
 }
@@ -42,26 +45,28 @@
 }
 
 #myBooth {
+  display: inline-block;
   margin: 0 auto;
   position: relative;
   background: #ccc;
-  width: 100%;
-  height: 465px;
+  width: 49%;
+  height: 400px;
 }
 
 #peerBooth {
+  display: inline-block;
   margin: 0 auto;
   position: relative;
   background: #ccc;
-  width: 100%;
-  height: 465px;
+  width: 49%;
+  height: 400px;
 }
 
 #myVideo {
   position: absolute;
   margin: 0 auto;
   z-index: 1;
-  height: 460px;
+  height: 385px;
   visibility: visible;
   width: 100%;
 }
@@ -71,7 +76,7 @@
   margin: 0 auto;
   z-index: 1;
   visibility: visible;
-  height: 460px;
+  height: 385px;
   width: 100%;
 }
 
@@ -80,7 +85,7 @@
   margin: 0 auto;
   position: absolute;
   visibility: visible;
-  height: 460px;
+  height: 385px;
   width: 100%;
 }
 
@@ -89,7 +94,8 @@
   margin: 0 auto;
   position: absolute;
   visibility: visible;
-  height: 460px;
+  height: 385px;
+  width: 100%;
 }
 
 #connectivity-buttons {
@@ -202,3 +208,14 @@ div#room-selection {
 
 
 /*////// room selection end /////////////////////*/
+
+@media screen only and (max-width: 600px) {
+  #myBooth,
+  #peerBooth {
+    width: 100%;
+  }
+}
+
+.app {
+  margin: 15px;
+}
