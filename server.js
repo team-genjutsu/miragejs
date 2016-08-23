@@ -17,19 +17,19 @@ app.get('/favicon.ico', (req, res) => {
   res.send("ok")
 })
 
-// const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000;
 
 const options = {
   key: fs.readFileSync('server.key'),
   cert: fs.readFileSync('server.crt')
 };
 
+const io = require('socket.io').listen(server);
 
-const server = https.createServer(options, app).listen(config.port, function() {
-  console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
+const server = https.createServer(options, app).listen(PORT, function(){
+  console.log('Listening on ' + PORT)
 });
 
-const io = require('socket.io').listen(server);
 
 const connections = [];
 const rooms = [];
@@ -67,7 +67,7 @@ io.sockets.on('connection', function(socket) {
       member = ele.members.filter(client => client.id === socket.id)[0];
       if (member) {
 
-        if (rooms[idx].members.length > 0) {
+        if(rooms[idx].members.length > 0){
           rooms[idx].members.forEach((el, id) => {
             io.to(el.id).emit('updateChatters', member);
           })
