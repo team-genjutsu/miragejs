@@ -9,6 +9,7 @@ const _ = require('lodash')
 app.use(express.static(__dirname + "/public"));
 
 app.get('/', (req, res) => {
+  res.status(200);
   res.sendFile(path.resolve(__dirname, './public/index.html'))
 })
 

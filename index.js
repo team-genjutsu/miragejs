@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                     document.getElementById('connect').addEventListener('click', function() {
                       // if (!peer.initiator) {
-                        socket.emit('second', JSON.stringify(roomID));
+                      socket.emit('second', JSON.stringify(roomID));
                       // }
                     });
 
@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     //click event for the "filter them" button
                     document.getElementById('peerFilter').addEventListener('click', function() {
 
-                      let filterDataObj;
+                        let filterDataObj;
                         //checks for filter and assigns key yes or no based on whether one needs to be applied
                         if (!peerVideo.style.filter) {
                           //creates and stringify object to send to the data channel with instructions to apply filter
@@ -362,10 +362,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                     //adding click handler for active emoji selection
                     const emojis = document.getElementsByClassName('emoji');
-                    for (let i = 0; i < emojis.length; i++){
+                    for (let i = 0; i < emojis.length; i++) {
                       emojis[i].addEventListener('click', function(event) {
                         currentImg = emojis[i].querySelectorAll('img')[0].getAttribute('src');
-                    })}
+                      })
+                    }
 
                     //peer stream event//
                     peer.on('stream', function(stream) {
