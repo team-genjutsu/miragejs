@@ -8,15 +8,15 @@ const _ = require('lodash')
 
 app.use(express.static(__dirname + "/public"));
 
-app.get('/', (req, res) => {
-  res.status(200);
-  res.sendFile(path.resolve(__dirname, './public/index.html'))
-})
+// app.get('/', (req, res) => {
+  // res.status(200);
+  // res.sendFile(path.resolve(__dirname, './public/index.html'))
+// })
 
-app.get('/favicon.ico', (req, res) => {
-  res.status(200);
-  res.send("ok")
-})
+// app.get('/favicon.ico', (req, res) => {
+  // res.status(200);
+  // res.send("ok")
+// })
 
 const PORT = process.env.PORT || 8000;
 
