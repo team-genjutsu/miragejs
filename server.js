@@ -5,25 +5,36 @@ const https = require('https');
 const express = require('express');
 const app = express();
 const _ = require('lodash')
+const favicon = require('serve-favicon');
+const path = require('path')
+
+// app.use(favicon(__dirname + '/public/favicon.ico'))
+
+// app.get('/', (req, res) => {
+  // res.status(200);
+  // res.send(path.resolve(__dirname, './public/index.html'))
+// })
+
+// app.get('/favicon.ico', (req, res) => {
+  // res.writeHead(200, {'Content-Type': 'image/x-icon'});
+  // res.end();
+  // return;
+// })
 
 app.use(express.static(__dirname + "/public"));
 
-app.get('/favicon.ico', (req, res) => {
-  res.status(200);
-  res.send("ok")
-})
-app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, './public/index.html'))
-})
-
-const PORT = process.env.PORT || 8000;
+var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+const port = process.env.PORT || 8000;
 
 const options = {
   key: fs.readFileSync('server.key'),
   cert: fs.readFileSync('server.crt')
 };
 
-const server = https.createServer(options, app).listen(PORT);
+
+const server = https.createServer(options, app).listen(port, function(){
+  console.log('Listening on ' + port)
+});
 
 const io = require('socket.io').listen(server);
 
@@ -53,7 +64,7 @@ io.sockets.on('connection', function(socket) {
 
 
   //disconnecting users
-  socket.once('disconnect', function() {
+  socket.on('disconnect', function() {
     let member,
       room,
       otherMem;
