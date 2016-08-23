@@ -39,8 +39,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     raf;
 
   //image assignment, we can abstract this later
-  // let emoImg = new Image();
-  let currentImg = 'assets/smLoveTongue.png';
+  let emoImg;
+  let currentImg = 'assets/emojione/small/1f436.png';
 
   const socket = io();
   //end variable store//
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       } else if (dataObj.emoji) {
 
                         //remote display bounce animation!
-                        let emoImg = new Image();
+                        emoImg = new Image();
                         emoImg.src = dataObj.currentImg;
 
                         temp = currentAnimation;
@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       } else if (dataObj.peerEmoji) {
 
                         //local display bounce animation!
-                        let emoImg = new Image();
+                        emoImg = new Image();
                         emoImg.src = dataObj.currentImg;
 
                         temp = currentAnimation;
@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         //to canvas rectangle, see function logic in function store
                         let myPosition = getCursorPosition(myCanvas, event);
 
-                        let emoImg = new Image();
+                        emoImg = new Image();
                         emoImg.src = currentImg;
 
                         let myCanvasObj = JSON.stringify({
@@ -408,7 +408,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                           //to canvas rectangle, see function logic in function store
                           let peerPosition = getCursorPosition(peerCanvas, event);
 
-                          let emoImg = new Image();
+                          emoImg = new Image();
                           emoImg.src = currentImg;
 
                           currentAnimation(peerCanvas, peerContext, event, peerPosition, emoImg);
