@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 const _ = require('lodash')
 
-// app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/public"));
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, './public/index.html'))
@@ -24,9 +24,10 @@ const options = {
   cert: fs.readFileSync('server.crt')
 };
 
+const io = require('socket.io').listen(server);
+
 const server = https.createServer(options, app).listen(PORT);
 
-const io = require('socket.io').listen(server);
 
 const connections = [];
 const rooms = [];
