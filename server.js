@@ -24,12 +24,12 @@ const options = {
   cert: fs.readFileSync('server.crt')
 };
 
-const io = require('socket.io').listen(server);
 
 const server = https.createServer(options, app).listen(PORT, function(){
   console.log('Listening on ' + PORT)
 });
 
+const io = require('socket.io').listen(server);
 
 const connections = [];
 const rooms = [];
