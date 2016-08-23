@@ -14,6 +14,7 @@
     "babel-preset-stage-1": "^6.1.18",
     "express": "^4.14.0",
     "lodash": "^4.15.0",
+    "serve-favicon": "^2.3.0",
     "simple-peer": "^6.0.5",
     "socket.io": "^1.3.6",
     "socket.io-client": "^1.4.8"
@@ -35,5 +36,8 @@
     "eslint-plugin-react": "^6.0.0",
     "react-addons-test-utils": "^0.14.7",
     "webpack": "^1.12.9"
+  },
+  "engines": {
+    "node": "6.2.2"
   }
 }
