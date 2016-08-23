@@ -64,7 +64,7 @@ io.sockets.on('connection', function(socket) {
 
 
   //disconnecting users
-  socket.once('disconnect', function() {
+  socket.on('disconnect', function() {
     let member,
       room,
       otherMem;
