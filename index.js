@@ -1,48 +1,58 @@
 import SimplePeer from 'simple-peer';
 import io from 'socket.io-client';
+import {
+  cutCircle,
+  angularVelocity,
+  velocity,
+  drawVideo,
+  setVendorCss,
+  getCursorPosition,
+  orbit,
+  staticPaste,
+  bounce
+} from './components/funcStore';
 
 document.addEventListener("DOMContentLoaded", function(event) {
 
   //variable store//
   let vendorUrl = window.URL || window.webkitURL,
-    peer,
-    chattersClient = [],
-    chatterThisClient,
-    roomID,
-    //variables for video, peerCanvas, and context logic
-    peerVideo,
-    peerCanvas,
-    peerContext,
-    myCanvas,
-    myVideo, //video canvas
-    myVidCtx,
-    myContext,
-    peerVidCtx,
-    peerVirtualVid,
-    //variables for filter logic
-    current = document.getElementById('filterDisp'),
-    button = document.getElementById('filter'),
-    filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', ''],
-    i = 0,
-    //clear canvas
-    clearButton = document.getElementById('clear'),
-    //animation variables
-    staticButton = document.getElementById('static'),
-    bounceButton = document.getElementById('bounce'),
-    orbitButton = document.getElementById('orbit'),
-    currentAnimation = bounce,
-    temp,
-    //room buttons
-    joinButton = document.getElementById('join-button'),
-    randomButton = document.getElementById('random-button'),
-    //raf stands for requestAnimationFrame, enables drawing to occur
-    raf;
+  peer,
+  chattersClient = [],
+  chatterThisClient,
+  roomID,
+  // variables for video, peerCanvas, and context logic
+  peerVideo,
+  peerCanvas,
+  peerContext,
+  myCanvas,
+  myVideo, //video canvas
+  myVidCtx,
+  myContext,
+  peerVidCtx,
+  peerVirtualVid,
+  // variables for filter logic
+  current = document.getElementById('filterDisp'),
+  button = document.getElementById('filter'),
+  filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', ''],
+  i = 0,
+  // clear canvas
+  clearButton = document.getElementById('clear'),
+  // animation variables
+  staticButton = document.getElementById('static'),
+  bounceButton = document.getElementById('bounce'),
+  orbitButton = document.getElementById('orbit'),
+  currentAnimation = bounce,
+  temp,
+  // room buttons
+  joinButton = document.getElementById('join-button'),
+  randomButton = document.getElementById('random-button'),
+  // raf stands for requestAnimationFrame, enables drawing to occur
+  raf;
 
   //image assignment, we can abstract this later
-  // let emoImg = new Image();
+  let emoImg = new Image();
   let currentImg = 'assets/smLoveTongue.png';
 
-  const socket = io();
   //end variable store//
 
   //vendor media objects//
@@ -53,14 +63,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   //room selection
   joinButton.addEventListener('click', function() {
+      const socket = io();
       roomID = document.getElementById('room-id-input').value;
       socket.emit('joinRoom', JSON.stringify(roomID));
       // socket.on('tryAgain', (payload) => alert('Try a different room!'))
 
       socket.on('process', (payload) => {
-          console.log('in process', payload)
           payload = JSON.parse(payload);
-          console.log(payload)
           if (!payload) {
             alert('Try a different room!')
           } else {
@@ -72,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             //begin streaming!//
             navigator.getMedia({
                   video: true,
-                  audio: false
+                  audio: true
                 }, function(stream) {
 
 
@@ -219,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                           temp = currentAnimation;
                           currentAnimation = eval('(' + dataObj.animation + ')');
-                          currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg);
+                          currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
                           currentAnimation = temp;
 
                         } else if (dataObj.peerEmoji) {
@@ -230,13 +239,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                           temp = currentAnimation;
                           currentAnimation = eval('(' + dataObj.animation + ')');
-                          currentAnimation(myCanvas, myContext, event, dataObj.position, emoImg);
+                          currentAnimation(myCanvas, myContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
                           currentAnimation = temp;
                         }
 
                       });
-
-
 
                       //looks for click event on the send button//
                       document.getElementById('send').addEventListener('click', function() {
@@ -331,7 +338,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                           });
 
                           //animation for local display and data transmission to peer
-                          currentAnimation(myCanvas, myContext, event, myPosition, emoImg);
+                          currentAnimation(myCanvas, myContext, event, myPosition, emoImg, raf, [velocity, angularVelocity]);
                           peer.send(myCanvasObj);
 
                         }, false)
@@ -411,7 +418,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             let emoImg = new Image();
                             emoImg.src = currentImg;
 
-                            currentAnimation(peerCanvas, peerContext, event, peerPosition, emoImg);
+                            currentAnimation(peerCanvas, peerContext, event, peerPosition, emoImg, raf, [velocity, angularVelocity]);
 
                             let peerCanvasObj = JSON.stringify({
                               animation: currentAnimation.toString(),
@@ -430,12 +437,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                       peer.on('close', function() {
 
-                        socket.emit('disconnect');
-                          // stream.getAudioTracks()[0].stop();
+                          socket.emit('disconnect');
                           location.reload();
-                          // stream.getVideoTracks()[0].stop();
-                          // document.getElementById('mainApp').classList.add('hidden');
-                          // document.getElementById('roomApp').classList.remove('hidden');
 
                         }) //end peer close event//
 
@@ -456,168 +459,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }) //end of socket 'process' event
 
     }) //end of 'join' event
-
-
-  //function store//
-
-  function bounce(cv, ctx, evt, pos, emoImg) {
-    let onload = emoImg.onload;
-
-    //this object keeps track of the movement, loads the images, and determines
-    //the velocity
-    let emoticon = {
-      x: pos.x,
-      y: pos.y,
-      vx: 5,
-      vy: 2,
-      onload: function() {
-        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
-      }
-    };
-
-    //initial image load on canvas
-    emoticon.onload();
-    let callBack = function() {
-      velocity(emoticon, ctx, cv, callBack, emoImg);
-    }
-
-    //start drawing movement
-    raf = window.requestAnimationFrame(callBack);
-  }
-
-  function staticPaste(cv, ctx, evt, pos, emoImg) {
-    let onload = emoImg.onload;
-
-    //this object keeps track of the movement, loads the images, and determines
-    //the velocity
-    let emoticon = {
-      x: pos.x,
-      y: pos.y,
-      vx: 5,
-      vy: 2,
-      onload: function() {
-        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
-      }
-    };
-    //initial image load on canvas
-    emoticon.onload();
-  }
-
-  //orbit func//
-  function orbit(cv, ctx, evt, pos, emoImg) {
-    let onload = emoImg.onload;
-
-    //this object keeps track of the movement, loads the images, and determines
-    //the angular veloctiy. We're keeping track of frequency of refreshes to
-    //imcrement the degrees
-    let movement = .0349066;
-    let emoticon = {
-      x: pos.x,
-      y: pos.y,
-      r: 5,
-      rotateCount: 1,
-      wx: movement,
-      wy: movement,
-      onload: function() {
-        ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
-      }
-    };
-
-    //initial image load on canvas
-    emoticon.onload();
-
-    let callBack = function() {
-      angularVelocity(emoticon, ctx, cv, callBack, emoImg);
-    }
-
-    //start drawing movement
-    raf = window.requestAnimationFrame(callBack);
-  }
-  //end orbit//
-
-  //paste object to canvas
-  function paste(video, context, width, height, x, y, source) {
-    context.drawImage(video, 0, 0, width, height);
-    baseImg = new Image();
-    baseImg.src = source; // needs to be path ie --> 'assets/weird.png';
-    baseImg.onload = function() {
-      context.drawImage(baseImg, x - baseImg.width / 2, y - baseImg.height / 2);
-      //setTimeout for pasted images//
-      // var time = window.setTimeout(function() {
-      // context.clearRect(x - baseImg.width / 2, y - baseImg.height / 2, baseImg.width, baseImg.height);
-      // }, 5000);
-    }
-  }
-  //end paste//
-
-  //gets cursor position upon mouse click that places
-  //an object or starts object movement
-  function getCursorPosition(canvas, event) {
-    let rect = canvas.getBoundingClientRect();
-    let x = event.clientX - rect.left;
-    let y = event.clientY - rect.top;
-    let pos = {
-      x: x,
-      y: y
-    };
-    return pos;
-  }
-  //end getCursorPosition//
-
-  //streamline vendor prefixing for css filtering
-  function setVendorCss(element, style) {
-    element.style.webkitFilter = style;
-    element.style.mozFilter = style;
-    element.style.filter = style;
-  }
-  //end setVendorCss //
-
-  //draws video on canvas
-  function drawVideo(v, c, w, h) {
-    if (v.paused || v.ended) return false;
-    c.drawImage(v, 0, 0, w, h);
-    setTimeout(drawVideo, 20, v, c, w, h);
-  }
-  //end drawVideo//
-
-  //canvas draw function for velocity motion
-  function velocity(obj, ctx, cv, cb, emoImg) {
-    ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 8, emoImg.height + 8);
-    obj.onload();
-    obj.x += obj.vx;
-    obj.y += obj.vy;
-    if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
-      obj.vy = -obj.vy;
-    }
-    if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
-      obj.vx = -obj.vx;
-    }
-    raf = window.requestAnimationFrame(cb);
-  }
-  //end velocity//
-
-  //angularVelocity func//
-  function angularVelocity(obj, ctx, cv, cb, emoImg) {
-    ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 10, emoImg.height + 10);
-    obj.onload();
-
-    obj.x += Math.sin(obj.wx * obj.rotateCount) * obj.r;
-    obj.y += Math.cos(obj.wy * obj.rotateCount) * obj.r;
-    obj.rotateCount++;
-
-    raf = window.requestAnimationFrame(cb);
-  }
-  //end angularVelocity//
-
-  //doesnt work yet, but would provide a way to erase drawn
-  //objects in circular fashion rather than rectangular
-  function cutCircle(context, x, y, radius) {
-    context.globalCompositeOperation = 'destination-out'
-    context.arc(x, y, radius, 0, Math.PI * 2, true);
-    context.fill();
-  }
-  //end cutCircle//
-
-  ///end of function store///
 
 });

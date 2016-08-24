@@ -61,6 +61,7 @@ function Member(socketId, roomId, initiator) {
 
 io.sockets.on('connection', function(socket) {
   connections.push(socket);
+  console.log(socket.id + ' joined!')
 
 
   //disconnecting users
@@ -87,6 +88,7 @@ io.sockets.on('connection', function(socket) {
     })
 
     connections.splice(connections.indexOf(socket), 1);
+    console.log(socket.id + ' left room ' + member.roomId)
     socket.disconnect();
 
   })
