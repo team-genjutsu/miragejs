@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title> StreamAR </title>
+  <title> MirageJS </title>
   <meta name="description" content="streamAR">
   <!-- Latest compiled and minified CSS -->
   <!-- Latest compiled and minified CSS -->
@@ -73,7 +73,7 @@
 
       <div class="jumbotron">
         <div class="container text-center">
-          <h1>streamAR</h1>
+          <h1>MirageJS</h1>
           <p>Augmented Reality Video Chat</p>
           <div id="connectivity-buttons">
             <button class="btn btn-info btn-lg center-block connectButton" id='connect' disabled>CONNECT</button>
@@ -85,7 +85,7 @@
       </div>
       <!-- End jumbotron-->
 
-      <textarea id='yourId'></textarea><br/>
+      <textarea id='yourId' class="hidden"></textarea><br/>
 
 
       <!-- Video demo area -->
@@ -99,8 +99,32 @@
           <div id='peerBooth'>
             <canvas id="peerVideo"></canvas>
             <canvas id="peerCanvas"></canvas>
+
           </div>
+          <div id="emojiButtons" class="btn-group pull-right">
+            <!-- <div id="selectImg">Select Image</div> -->
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f385.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4a9.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4af.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f354.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f436.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f414.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f389.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f60d.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4b8.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f951.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f984.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/2705.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f64a.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f382.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f602.png"/></button>
+            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f64c.png"/></button>
+          </div>
+
+
         </div>
+
+
 
         <div class="btn-group">
           <button id='filter' class="btn btn-primary">filter: <span id='filterDisp'></span></button>
@@ -119,25 +143,7 @@
 
         <br>
 
-        <div id="emojiButtons" class="btn-group pull-right">
-          <!-- <div id="selectImg">Select Image</div> -->
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f385.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4a9.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4af.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f354.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f436.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f414.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f389.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f60d.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4b8.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f951.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f984.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/2705.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f64a.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f382.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f602.png"/></button>
-          <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f64c.png"/></button>
-        </div>
+
 
       </section>
       <!--close section demo-->
@@ -160,7 +166,7 @@
       <section id="subscribe">
         <div class="well">
           <div class="container text-center">
-            <h3>Subscribe for updates to streamAR</h3>
+            <h3>Subscribe for updates to mirageJS</h3>
             <p>Enter your name and email</p>
 
             <form action="" class="form-inline">
@@ -190,8 +196,8 @@
       <div class="container text-center" id="about">
         <div class="row">
           <div class="col-lg-8 col-lg-offset-2">
-            <h2>About StreamAR</h2>
-            <p>StreamAR is a next-generation video-chat platform built on webRTC technology
+            <h2>About mirageJS</h2>
+            <p>MirageJS is a next-generation video-chat platform built on webRTC technology
               where users can interact with both 2d and 3d objects in a augmented
               reality based interface.</p>
             <p>Integrating applied physics and movement tracking functionalities,
@@ -216,13 +222,13 @@
               <div class="panel-heading">
                 <div class="panel-title">
                   <a href="#collapse-1" data-toggle="collapse" data-parent="#accordion">
-                  Is this real Augmented Reality technology?
+                  When will this be released? We want it now!
                 </a>
                 </div>
                 <!-- End panel title -->
                 <div id="collapse-1" class="panel-collapse collapse in">
                   <div class="panel-body">
-                    Yes
+                    We expect to launch our fully featured service in early September, but a beta version is already out on our github.
                   </div>
                 </div>
                 <!-- End Panel collapse -->
@@ -237,7 +243,7 @@
                 </a>
                 </div>
                 <!-- End panel title -->
-                <div id="collapse-2" class="panel-collapse collapse">
+                <div id="collapse-2" class="panel-collapse collapse in">
                   <div class="panel-body">
                     https://github.com/kevoutthebox/streamar
                   </div>
@@ -254,7 +260,7 @@
                 </a>
                 </div>
                 <!-- End panel title -->
-                <div id="collapse-3" class="panel-collapse collapse">
+                <div id="collapse-3" class="panel-collapse collapse in">
                   <div class="panel-body">
                     Everything is fantastic
                   </div>
