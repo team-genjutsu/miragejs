@@ -50,8 +50,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
   raf;
 
   //image assignment, we can abstract this later
-  let emoImg = new Image();
-  let currentImg = 'assets/smLoveTongue.png';
+  // let emoImg = new Image();
+  let currentImg = 'assets/emojione/small/1f4a9.png';
 
   //end variable store//
 
