@@ -84,15 +84,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                   audio: true
                 }, function(stream) {
 
-
                   //make initiate event happen automatically when streaming begins
-                  (function() {
                     socket.emit('initiate', JSON.stringify({
                       streamId: stream.id,
                       roomId: roomID
                     }))
-                  })();
-
 
                   socket.on('readyConnect', (payload) => {
                     document.getElementById('connect').disabled = false;
