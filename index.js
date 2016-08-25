@@ -50,8 +50,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
   raf;
 
   //image assignment, we can abstract this later
-  // let emoImg = new Image();
-  let currentImg = 'assets/emojione/small/1f4a9.png';
+  let emoImg;
+  let currentImg = 'assets/emojione/small/1f436.png';
 
   //end variable store//
 
@@ -301,6 +301,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             });
                             //remove filter on your side
                             peerVideo.removeAttribute('style');
+
                           }
                           //sends object to the data channel
                           peer.send(filterDataObj);
