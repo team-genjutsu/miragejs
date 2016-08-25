@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   //room selection
   joinButton.addEventListener('click', function() {
-      const socket = io();
+      const socket = io.connect('https://463505aa.ngrok.io/') //const socket = io();
       roomID = document.getElementById('room-id-input').value;
       socket.emit('joinRoom', JSON.stringify(roomID));
       // socket.on('tryAgain', (payload) => alert('Try a different room!'))

@@ -110,6 +110,7 @@ io.sockets.on('connection', function(socket) {
     if (existingRoom.length === 0) {
 
       room = new Room(payload);
+      console.log(room.id);
       member = new Member(socket.id, payload.roomId, true)
       room.addMember(member);
       rooms.push(room);
