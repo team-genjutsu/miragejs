@@ -49,6 +49,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
   // raf stands for requestAnimationFrame, enables drawing to occur
   raf;
 
+  let emojiPosObj = {
+   myCanvas: {clickCount: 0, posArr: []},
+   peerCanvas: {clickCount: 0, posArr: []}
+ };
+
   //image assignment, we can abstract this later
   let emoImg;
   let currentImg = 'assets/emojione/small/1f436.png';
@@ -124,6 +129,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       //draws blank canvas on top of video
                       myContext.rect(0, 0, myCanvas.width, myCanvas.height);
                       myContext.stroke();
+
+                      let rect = {
+                        x: 320,
+                        y: 230,
+                        width: 150,
+                        height: 150,
+                      };
+                      myContext.strokeRect(rect.x, rect.y, rect.width, rect.height);
                       //end//
 
                       //set room ID shared between clients
@@ -221,10 +234,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                           //remote display bounce animation!
                           let emoImg = new Image();
                           emoImg.src = dataObj.currentImg;
+                          emojiPosObj.peerCanvas.clickCount ++;
+                          emojiPosObj.peerCanvas.posArr.push(dataObj.position);
 
                           temp = currentAnimation;
                           currentAnimation = eval('(' + dataObj.animation + ')');
-                          currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
+                          currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity], emojiPosObj.peerCanvas);
                           currentAnimation = temp;
 
                         } else if (dataObj.peerEmoji) {
@@ -232,10 +247,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                           //local display bounce animation!
                           let emoImg = new Image();
                           emoImg.src = dataObj.currentImg;
+                          emojiPosObj.myCanvas.clickCount ++;
+                          emojiPosObj.myCanvas.posArr.push(dataObj.position);
 
                           temp = currentAnimation;
                           currentAnimation = eval('(' + dataObj.animation + ')');
-                          currentAnimation(myCanvas, myContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
+                          currentAnimation(myCanvas, myContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity], emojiPosObj.myCanvas);
                           currentAnimation = temp;
                         }
 
@@ -320,6 +337,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                           //gets position based mouse click coordinates, restricted
                           //to canvas rectangle, see function logic in function store
                           let myPosition = getCursorPosition(myCanvas, event);
+                          emojiPosObj.myCanvas.clickCount ++;
+
+                          emojiPosObj.myCanvas.posArr.push(myPosition);
+
+                          console.log(emojiPosObj);
 
                           let emoImg = new Image();
                           emoImg.src = currentImg;
@@ -335,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                           });
 
                           //animation for local display and data transmission to peer
-                          currentAnimation(myCanvas, myContext, event, myPosition, emoImg, raf, [velocity, angularVelocity]);
+                          currentAnimation(myCanvas, myContext, event, myPosition, emoImg, raf, [velocity, angularVelocity], rect);
                           peer.send(myCanvasObj);
 
                         }, false)
@@ -411,11 +433,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             //gets position based mouse click coordinates, restricted
                             //to canvas rectangle, see function logic in function store
                             let peerPosition = getCursorPosition(peerCanvas, event);
+                            emojiPosObj.peerCanvas.clickCount ++;
+
+                            emojiPosObj.peerCanvas.posArr.push(peerPosition);
 
                             let emoImg = new Image();
                             emoImg.src = currentImg;
 
-                            currentAnimation(peerCanvas, peerContext, event, peerPosition, emoImg, raf, [velocity, angularVelocity]);
+                            currentAnimation(peerCanvas, peerContext, event, peerPosition, emoImg, raf, [velocity, angularVelocity], emojiPosObj.peerCanvas);
 
                             let peerCanvasObj = JSON.stringify({
                               animation: currentAnimation.toString(),

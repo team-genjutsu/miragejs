@@ -1,6 +1,6 @@
 //function store//
 
-  function bounce(cv, ctx, evt, pos, emoImg, animate, array) {
+  function bounce(cv, ctx, evt, pos, emoImg, animate, array, rect) {
     let onload = emoImg.onload;
 
     //this object keeps track of the movement, loads the images, and determines
@@ -18,7 +18,7 @@
     //initial image load on canvas
     emoticon.onload();
     let callBack = function() {
-      array[0](emoticon, ctx, cv, callBack, emoImg, animate);
+      array[0](emoticon, ctx, cv, callBack, emoImg, animate, rect);
     }
 
     //start drawing movement
@@ -35,6 +35,7 @@
       y: pos.y,
       vx: 5,
       vy: 2,
+      id: posObj.clickCount,
       onload: function() {
         ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
       }
@@ -116,19 +117,43 @@
   }//end drawVideo//
 
   //canvas draw function for velocity motion
-  function velocity(obj, ctx, cv, cb, emoImg, animate) {
+  function velocity(obj, ctx, cv, cb, emoImg, animate, rect) {
     ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 8, emoImg.height + 8);
     obj.onload();
-    obj.x += obj.vx;
-    obj.y += obj.vy;
-    if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
-      obj.vy = -obj.vy;
-    }
-    if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
-      obj.vx = -obj.vx;
-    }
-    animate = window.requestAnimationFrame(cb);
-  }//end velocity//
+      obj.x += obj.vx;
+      obj.y += obj.vy;
+      // posObj.posArr.push(obj.x);
+      // console.log(posObj.posArr);
+      // for(let m = 0; m < posObj.posArr.length; m++){
+      //
+      //   if (posObj.clickCount > posObj.posArr.length + 1) {
+      //     posObj.posArr.pop()
+      //   }
+
+        if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
+            obj.vy = -obj.vy;
+        }
+        if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
+            obj.vx = -obj.vx;
+        }
+
+
+        if(obj.x + obj.vx < rect.x && obj.y + obj.vy > rect.y || obj.x + obj.vx < rect.x && obj.y + obj.vy < rect.y + rect.height || obj.x + obj.vx > rect.x + rect.with ){
+            obj.vx = -obj.vx
+        }
+        else if(obj.x + obj.vx > rect.x + rect.width){
+            obj.vx = -obj.vx
+        }
+        }
+        // if (obj.x === posObj.posArr[m].x) {
+        //     obj.vx = -obj.vx;
+        // }
+
+          animate = window.requestAnimationFrame(cb);
+        }
+
+
+//end velocity//
 
   //angularVelocity func//
   function angularVelocity(obj, ctx, cv, cb, emoImg, animate) {
