@@ -1,4 +1,14 @@
-import { setVendorCss } from './funcStore';
+import {
+  cutCircle,
+  angularVelocity,
+  velocity,
+  drawVideo,
+  setVendorCss,
+  getCursorPosition,
+  orbit,
+  paste,
+  bounce
+} from './funcStore';
 
 function filterListener(vid, whoisFilter, currFilter, whoisBool, peerObj) {
   document.getElementById(whoisFilter).addEventListener('click', () => {
@@ -8,7 +18,7 @@ function filterListener(vid, whoisFilter, currFilter, whoisBool, peerObj) {
       filterDataObj = JSON.stringify({
         local: whoisBool,
         addFilter: 'yes',
-        filterType: current.innerHTML
+        filterType: currFilter.innerHTML
       });
       setVendorCss(vid, currFilter.innerHTML);
     } else {
@@ -19,8 +29,36 @@ function filterListener(vid, whoisFilter, currFilter, whoisBool, peerObj) {
       });
       vid.removeAttribute('style');
     }
-    peer.send(filterDataObj);
-  })
+    peerObj.send(filterDataObj);
+  }, false)
 }
 
-export { filterListener };
+
+function animationListener(canvas, img, animation, context, reqAnim, array, peerObj, local, func) {
+
+  canvas.addEventListener('click', (event) => {
+    let position = func(canvas, event);
+
+    let emoImage = new Image();
+    emoImage.src = img;
+
+    let canvasObj = JSON.stringify({
+      animation: animation.toString(),
+      localEmoji: local,
+      currentImg: img,
+      position: {
+        x: position.x,
+        y: position.y
+      }
+    });
+
+    //animation for local display and data transmission to peer
+    animation(canvas, context, event, position, emoImage, reqAnim, array);
+    peerObj.send(canvasObj);
+  }, false)
+}
+
+export {
+  filterListener,
+  animationListener
+};

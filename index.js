@@ -14,7 +14,10 @@ import {
 import {
   mediaGenerator
 } from './components/mediaGenerator';
-import { filterListener } from './components/listenerFuncs'
+import {
+  filterListener,
+  animationListener
+} from './components/listenerFuncs';
 
 document.addEventListener("DOMContentLoaded", (event) => {
 
@@ -166,9 +169,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
                       peer.on('data', (data) => {
                         //conditionally apply or remove filter
                         let dataObj = JSON.parse(data);
+                        console.log(dataObj.localEmoji)
                         if (dataObj.message) {
                           document.getElementById('messages').textContent += dataObj.message + '\n';
-                        } else if (dataObj.local) {
+                        }
+
+                        if (dataObj.local) {
                           if (dataObj.addFilter === 'yes') {
                             setVendorCss(peerVideo, dataObj.filterType);
                           } else if (dataObj.addFilter === 'no') {
@@ -181,7 +187,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
                           } else if (dataObj.addFilter === 'no') {
                             myVideo.removeAttribute('style');
                           }
-                        } else if (dataObj.emoji) {
+                        }
+
+                        if (dataObj.localEmoji) {
+                          // console.log(dataObj);
                           //remote display bounce animation!
                           let emoImg = new Image();
                           emoImg.src = dataObj.currentImg;
@@ -191,7 +200,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
                           currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
                           currentAnimation = temp;
 
-                        } else if (dataObj.peerEmoji) {
+                        } else if (!dataObj.localEmoji) {
+                          // console.log(dataObj);
                           //local display bounce animation!
                           let emoImg = new Image();
                           emoImg.src = dataObj.currentImg;
@@ -227,30 +237,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
                         if (i >= filters.length) i = 0;
                       }, false); //end of filter test//
 
-                      myCanvas.addEventListener('click', (event) => {
-                          //gets position based mouse click coordinates, restricted
-                          //to canvas rectangle, see function logic in function store
-                          let myPosition = getCursorPosition(myCanvas, event);
-
-                          let emoImg = new Image();
-                          emoImg.src = currentImg;
-
-                          let myCanvasObj = JSON.stringify({
-                            animation: currentAnimation.toString(),
-                            emoji: 'yes',
-                            currentImg: currentImg,
-                            position: {
-                              x: myPosition.x,
-                              y: myPosition.y
-                            }
-                          });
-
-                          //animation for local display and data transmission to peer
-                          currentAnimation(myCanvas, myContext, event, myPosition, emoImg, raf, [velocity, angularVelocity]);
-                          peer.send(myCanvasObj);
-
-                        }, false)
-                        //end of click listener logic//
+                      //assigns click event to element, starts local animation, and sends
+                      //data for remote animation
+                      animationListener(myCanvas, currentImg, currentAnimation, myContext, raf, [velocity, angularVelocity], peer, true, getCursorPosition);
 
                       Object.keys(animations).forEach((ele, idx) => {
                         document.getElementById(ele).addEventListener('click', (event) => {
@@ -285,31 +274,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
                         peerCanvas = peerMedia.canvas;
                         peerContext = peerMedia.context;
 
-                        //remote display animation this to data channel logic easy peasy
-                        peerCanvas.addEventListener('click', (event) => {
-
-                            //gets position based mouse click coordinates, restricted
-                            //to canvas rectangle, see function logic in function store
-                            let peerPosition = getCursorPosition(peerCanvas, event);
-
-                            let emoImg = new Image();
-                            emoImg.src = currentImg;
-
-                            currentAnimation(peerCanvas, peerContext, event, peerPosition, emoImg, raf, [velocity, angularVelocity]);
-
-                            let peerCanvasObj = JSON.stringify({
-                              animation: currentAnimation.toString(),
-                              peerEmoji: 'yes',
-                              currentImg: currentImg,
-                              position: {
-                                x: peerPosition.x,
-                                y: peerPosition.y
-                              }
-                            });
-                            peer.send(peerCanvasObj);
-
-                          }, false) //end of click listener logic//
-
+                      //assigns click event to element, starts local animation, and sends
+                      //data for remote animation
+                      animationListener(peerCanvas, currentImg, currentAnimation, peerContext, raf, [velocity, angularVelocity], peer, false, getCursorPosition);
+                      
                       }); ///end peer stream event///
 
                       peer.on('close', () => {
