@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const http = require('http');
 const https = require('https');
 const express = require('express');
 const app = express();
@@ -9,33 +10,22 @@ const favicon = require('serve-favicon');
 const path = require('path')
 const startSockets = require('./sockLogic.js');
 
-// app.use(favicon(__dirname + '/public/favicon.ico'))
-
-// app.get('/', (req, res) => {
-  // res.status(200);
-  // res.send(path.resolve(__dirname, './public/index.html'))
-// })
-
-// app.get('/favicon.ico', (req, res) => {
-  // res.writeHead(200, {'Content-Type': 'image/x-icon'});
-  // res.end();
-  // return;
-// })
-
-app.use(express.static(__dirname + "/public"));
-
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-const port = process.env.PORT || 8000;
+
+var server = http.createServer(app).listen(8000);
 
 const options = {
   key: fs.readFileSync('server.key'),
   cert: fs.readFileSync('server.crt')
 };
 
+var port = process.env.PORT || 1337;
 
-const server = https.createServer(options, app).listen(port, function(){
-  console.log('Listening on ' + port)
-});
+app.use('/', express.static(path.join(__dirname, "public")));
+app.use(favicon(path.join(__dirname,'public','favicon.ico')));
+
+
+var httpsServer = https.createServer(options, app).listen(port);
 
 startSockets(server);
 // const io = require('socket.io').listen(server);
@@ -59,7 +49,6 @@ startSockets(server);
   // this.initiator = initiator;
   // this.signalId = null;
 // }
-
 
 // io.sockets.on('connection', function(socket) {
   // connections.push(socket);

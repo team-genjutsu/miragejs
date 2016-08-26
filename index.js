@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   //room selection
   joinButton.addEventListener('click', function() {
-      const socket = io();
+      const socket = io.connect('https://463505aa.ngrok.io/') //const socket = io();
       roomID = document.getElementById('room-id-input').value;
       socket.emit('joinRoom', JSON.stringify(roomID));
       // socket.on('tryAgain', (payload) => alert('Try a different room!'))
@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     console.log('hi', myVideo.offsetHeight)
                       //width and height should eventually be translated to exact coordination
                       //with incoming video stream
-                      myCanvas.width = 385;
+                      myCanvas.width = 533;
                       myCanvas.height = 400;
 
                       //draws blank canvas on top of video
@@ -401,7 +401,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                         //width and height should eventually be translated to exact coordination
                         //with incoming video stream
-                        peerCanvas.width = 640;
+                        peerCanvas.width = 533;
                         peerCanvas.height = 400;
 
                         //draws blank canvas on top of video, visibility may be unnecessary
