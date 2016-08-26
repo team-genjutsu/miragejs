@@ -2,7 +2,6 @@
 
   function bounce(cv, ctx, evt, pos, emoImg, animate, array) {
     let onload = emoImg.onload;
-
     //this object keeps track of the movement, loads the images, and determines
     //the velocity
     let emoticon = {
@@ -14,20 +13,17 @@
         ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
       }
     };
-
     //initial image load on canvas
     emoticon.onload();
     let callBack = function() {
       array[0](emoticon, ctx, cv, callBack, emoImg, animate);
     }
-
     //start drawing movement
     animate = window.requestAnimationFrame(callBack);
   }//end bounce//
 
   function staticPaste(cv, ctx, evt, pos, emoImg) {
     let onload = emoImg.onload;
-
     //this object keeps track of the movement, loads the images, and determines
     //the velocity
     let emoticon = {
@@ -46,7 +42,6 @@
   //orbit func//
   function orbit(cv, ctx, evt, pos, emoImg, animate, array) {
     let onload = emoImg.onload;
-
     //this object keeps track of the movement, loads the images, and determines
     //the angular veloctiy. We're keeping track of frequency of refreshes to
     //imcrement the degrees
@@ -62,14 +57,11 @@
         ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
       }
     };
-
     //initial image load on canvas
     emoticon.onload();
-
     let callBack = function() {
       array[1](emoticon, ctx, cv, callBack, emoImg, animate);
     }
-
     //start drawing movement
     animate = window.requestAnimationFrame(callBack);
   }//end orbit//
