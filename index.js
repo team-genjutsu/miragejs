@@ -204,9 +204,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                           //post message in text context on your side
                           //send message object to the data channel
                           let yourMessageObj = JSON.stringify({
-                            message: peer.localPort + " " + document.getElementById('yourMessage').value
+                            message: "them:" + " " + document.getElementById('yourMessage').value
                           });
-                          let yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
+                          //creates a variable with the same information to display on your side
+                          //peer.localPort is a temporary way to identify peers, should be changed
+                          let yourMessage = "me:" + " " + document.getElementById('yourMessage').value;
+                          //post message in text context on your side
                           document.getElementById('messages').textContent += yourMessage + '\n';
                           peer.send(yourMessageObj);
                         }) //end send click event//
