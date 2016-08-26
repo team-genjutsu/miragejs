@@ -8,14 +8,15 @@ import {
   setVendorCss,
   getCursorPosition,
   orbit,
-  staticPaste,
+  paste,
   bounce
 } from './components/funcStore';
 import {
   mediaGenerator
 } from './components/mediaGenerator';
+import { filterListener } from './components/listenerFuncs'
 
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener("DOMContentLoaded", (event) => {
 
   //variable store//
   let vendorUrl = window.URL || window.webkitURL,
@@ -43,9 +44,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
     // clear canvas
     clearButton = document.getElementById('clear'),
     // animation variables
-    staticButton = document.getElementById('static'),
-    bounceButton = document.getElementById('bounce'),
-    orbitButton = document.getElementById('orbit'),
+    animations = {
+      paste: paste,
+      bounce: bounce,
+      orbit: orbit
+    },
     currentAnimation = bounce,
     temp,
     // room buttons
@@ -65,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     navigator.msGetUserMedia; //end vendor media objects//
 
   //room selection
-  joinButton.addEventListener('click', function() {
+  joinButton.addEventListener('click', () => {
       const socket = io.connect('https://463505aa.ngrok.io/') //const socket = io();
       roomID = document.getElementById('room-id-input').value;
       socket.emit('joinRoom', JSON.stringify(roomID));
@@ -117,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         stream: stream
                       })
 
-                      peer.on('signal', function(data) {
+                      peer.on('signal', (data) => {
                         document.getElementById('yourId').value = "Connected!";
                         let signalObj = JSON.stringify({
                           roomId: roomID,
@@ -131,11 +134,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         }
                       })
 
-                      document.getElementById('connect').addEventListener('click', function() {
+                      document.getElementById('connect').addEventListener('click', () => {
                         socket.emit('second', JSON.stringify(roomID));
                       });
 
-                      socket.on('initialConnected', function() {
+                      socket.on('initialConnected', () => {
                         if (!peer.initiator) {
                           console.log('Initial connected good');
                         }
@@ -148,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         }
                       });
 
-                      socket.on('thirdPart2', function(secondClientSig) {
+                      socket.on('thirdPart2', (secondClientSig) => {
                         secondClientSig = JSON.parse(secondClientSig);
                         if (peer.initiator) {
                           peer.signal(secondClientSig);
@@ -160,22 +163,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         document.getElementById('connect').disabled = false;
                       });
 
-                      peer.on('data', function(data) {
+                      peer.on('data', (data) => {
                         //conditionally apply or remove filter
                         let dataObj = JSON.parse(data);
                         if (dataObj.message) {
                           document.getElementById('messages').textContent += dataObj.message + '\n';
-                        } else if (dataObj.myFilter) {
-                          if (dataObj.myFilter === 'yes') {
+                        } else if (dataObj.local) {
+                          if (dataObj.addFilter === 'yes') {
                             setVendorCss(peerVideo, dataObj.filterType);
-                          } else if (dataObj.myFilter === 'no') {
+                          } else if (dataObj.addFilter === 'no') {
                             peerVideo.removeAttribute('style');
                           }
                           //conditionally applies or removes filter
-                        } else if (dataObj.peerFilter) {
-                          if (dataObj.peerFilter === 'yes') {
+                        } else if (!dataObj.local) {
+                          if (dataObj.addFilter === 'yes') {
                             setVendorCss(myVideo, dataObj.filterType);
-                          } else if (dataObj.peerFilter === 'no') {
+                          } else if (dataObj.addFilter === 'no') {
                             myVideo.removeAttribute('style');
                           }
                         } else if (dataObj.emoji) {
@@ -187,6 +190,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                           currentAnimation = eval('(' + dataObj.animation + ')');
                           currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
                           currentAnimation = temp;
+
                         } else if (dataObj.peerEmoji) {
                           //local display bounce animation!
                           let emoImg = new Image();
@@ -200,69 +204,30 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       });
 
                       //looks for click event on the send button//
-                      document.getElementById('send').addEventListener('click', function() {
+                      document.getElementById('send').addEventListener('click', () => {
                           //post message in text context on your side
                           //send message object to the data channel
                           let yourMessageObj = JSON.stringify({
-                            message: "them:" + " " + document.getElementById('yourMessage').value
+                            message: peer.localPort + " " + document.getElementById('yourMessage').value
                           });
-                          //creates a variable with the same information to display on your side
-                          //peer.localPort is a temporary way to identify peers, should be changed
-                          let yourMessage = "me:" + " " + document.getElementById('yourMessage').value;
-                          //post message in text context on your side
+                          let yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
                           document.getElementById('messages').textContent += yourMessage + '\n';
                           peer.send(yourMessageObj);
                         }) //end send click event//
 
                       //click event for the "filter me" button//
-                      document.getElementById('myFilter').addEventListener('click', function() {
-                        let filterDataObj;
-                        // sends boolean data about remote filter application and adds filter on your side
-                        if (!myVideo.style.filter) {
-                          filterDataObj = JSON.stringify({
-                            myFilter: 'yes',
-                            filterType: current.innerHTML
-                          });
-                          setVendorCss(myVideo, current.innerHTML);
-                        } else {
-                          //instructions to remove filter and send object to data channel
-                          filterDataObj = JSON.stringify({
-                            myFilter: 'no'
-                          });
-                          myVideo.removeAttribute('style');
-                        }
-                        peer.send(filterDataObj);
-                      }) //end filter me event//
-
+                      filterListener(myVideo, 'myFilter', current, true, peer);
                       //click event for the "filter them" button
-                      document.getElementById('peerFilter').addEventListener('click', function() {
-
-                          let filterDataObj;
-                          //add filter on your side
-                          if (!peerVideo.style.filter) {
-                            filterDataObj = JSON.stringify({
-                              peerFilter: 'yes',
-                              filterType: current.innerHTML
-                            });
-                            setVendorCss(peerVideo, current.innerHTML);
-                          } else {
-                            //sends object to the data channel
-                            filterDataObj = JSON.stringify({
-                              peerFilter: 'no'
-                            });
-                            peerVideo.removeAttribute('style');
-                          }
-                          peer.send(filterDataObj);
-                        }) ///end filter them click event///
+                      filterListener(peerVideo, 'peerFilter', current, false, peer);
 
                       //tesing filters//
-                      button.addEventListener('click', function() {
+                      button.addEventListener('click', () => {
                         current.innerHTML = filters[i];
                         i++;
                         if (i >= filters.length) i = 0;
                       }, false); //end of filter test//
 
-                      myCanvas.addEventListener('click', function(event) {
+                      myCanvas.addEventListener('click', (event) => {
                           //gets position based mouse click coordinates, restricted
                           //to canvas rectangle, see function logic in function store
                           let myPosition = getCursorPosition(myCanvas, event);
@@ -287,36 +252,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         }, false)
                         //end of click listener logic//
 
-                      // adding buttons to change active animations
-                      staticButton.addEventListener('click', function(event) {
-                        currentAnimation = staticPaste;
-                      });
+                      Object.keys(animations).forEach((ele, idx) => {
+                        document.getElementById(ele).addEventListener('click', (event) => {
+                          currentAnimation = animations[ele];
+                        })
+                      })
 
-                      bounceButton.addEventListener('click', function(event) {
-                        currentAnimation = bounce;
-                      });
-
-                      orbitButton.addEventListener('click', function(event) {
-                        currentAnimation = orbit;
-                      });
-
-                      clearButton.addEventListener('click', function(event) {
+                      clearButton.addEventListener('click', (event) => {
                         cancelAnimationFrame(raf);
                         myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
                         peerContext.clearRect(0, 0, peerCanvas.width, peerCanvas.height);
-
                       });
 
                       //adding click handler for active emoji selection
                       const emojis = document.getElementsByClassName('emoji');
-                      for (let i = 0; i < emojis.length; i++) {
-                        emojis[i].addEventListener('click', function(event) {
-                          currentImg = emojis[i].querySelectorAll('img')[0].getAttribute('src');
+                      Array.from(emojis, (ele) => {
+                        ele.addEventListener('click', (event) => {
+                          currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
                         })
-                      }
+                      })
 
                       //peer stream event//
-                      peer.on('stream', function(stream) {
+                      peer.on('stream', (stream) => {
 
                         document.getElementById('connect').disabled = true;
                         document.getElementById('disconnect').disabled = false;
@@ -329,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         peerContext = peerMedia.context;
 
                         //remote display animation this to data channel logic easy peasy
-                        peerCanvas.addEventListener('click', function(event) {
+                        peerCanvas.addEventListener('click', (event) => {
 
                             //gets position based mouse click coordinates, restricted
                             //to canvas rectangle, see function logic in function store
@@ -355,21 +312,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                       }); ///end peer stream event///
 
-                      peer.on('close', function() {
+                      peer.on('close', () => {
 
                           socket.emit('disconnect');
                           location.reload();
 
                         }) //end peer close event//
 
-                      document.getElementById('disconnect').addEventListener('click', function(event) {
+                      document.getElementById('disconnect').addEventListener('click', (event) => {
                           peer.destroy();
                         }) //end of disconnect click event//
 
                     }) //end of socket.on('initiated')
 
                 }, //end of stream//
-                function(err) {
+                (err) => {
                   console.error(err);
                 }) //end of getMedia//
 
