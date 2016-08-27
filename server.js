@@ -4,9 +4,9 @@ const fs = require('fs');
 const https = require('https');
 const express = require('express');
 const app = express();
-const _ = require('lodash')
+const _ = require('lodash');
 const favicon = require('serve-favicon');
-const path = require('path')
+const path = require('path');
 
 // app.use(favicon(__dirname + '/public/favicon.ico'))
 
@@ -131,11 +131,29 @@ io.sockets.on('connection', function(socket) {
       existingRoom[0].members.forEach((ele, idx) => {
         io.to(ele.id).emit('readyConnect', JSON.stringify('both connected'));
       })
-
     }
 
     io.to(socket.id).emit('initiated', JSON.stringify(member));
 
+  });
+
+  socket.on('message', function(payload) {
+    // payload = JSON.parse(payload)
+
+    let sharedRoom = rooms.filter(room => room.id === payload.roomID)[0];
+    // console.log('payload data ',payload.data, 'shared room ' , sharedRoom.members)
+
+    if (payload.who === 'all') {
+      sharedRoom.members.forEach((ele, idx) => {
+        io.to(ele.id).emit('message', payload.data);
+      })
+    } else if (payload.who === 'other') {
+      sharedRoom.members.forEach((ele, idx) => {
+        if (ele.id !== socket.id){
+          io.to(ele.id).emit('message', payload.data);
+        }
+      })
+    }
   });
 
   socket.on('initial', function(payload) {
