@@ -102,6 +102,24 @@ module.exports = function (server) {
 
     });
 
+    socket.on('message', function(payload) {
+      // payload = JSON.parse(payload)
+
+      let sharedRoom = rooms.filter(room => room.id === payload.roomID)[0];
+
+      if (payload.who === 'all') {
+        sharedRoom.members.forEach((ele, idx) => {
+          io.to(ele.id).emit('message', payload.data);
+        });
+      } else if (payload.who === 'other') {
+        sharedRoom.members.forEach((ele, idx) => {
+          if (ele.id !== socket.id){
+            io.to(ele.id).emit('message', payload.data);
+          }
+        });
+      }
+    });
+
     socket.on('initial', function(payload) {
       payload = JSON.parse(payload)
       let sharedRoom = rooms.filter(room => room.id === payload.roomId)[0];
@@ -127,5 +145,4 @@ module.exports = function (server) {
     });
 
   })
-}
-
+};

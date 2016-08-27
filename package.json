@@ -13,6 +13,7 @@
   "dependencies": {
     "babel-preset-stage-1": "^6.1.18",
     "express": "^4.14.0",
+    "express-force-ssl": "^0.3.2",
     "lodash": "^4.15.0",
     "serve-favicon": "^2.3.0",
     "simple-peer": "^6.0.5",
