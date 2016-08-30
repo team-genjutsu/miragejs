@@ -21,6 +21,10 @@ const options = {
 
 var port = process.env.PORT || 1337;
 
+// const server = https.createServer(options, app).listen(port, function(){
+  // console.log('Listening on ' + port)
+// });
+
 app.use('/', express.static(path.join(__dirname, "public")));
 app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
