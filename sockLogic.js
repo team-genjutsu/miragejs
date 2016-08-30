@@ -100,7 +100,6 @@ module.exports = function (server) {
       io.to(socket.id).emit('initiated', JSON.stringify(member));
     });
 
-
     //beginning of signaling
     socket.on('message', function(payload) {
       let sharedRoom = rooms.filter(room => room.id === payload.roomID)[0];
@@ -119,7 +118,6 @@ module.exports = function (server) {
         });
       }
     }); //end of signaling
-
 
   })
 };

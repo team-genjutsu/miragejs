@@ -22,7 +22,7 @@
     animate = window.requestAnimationFrame(callBack);
   }//end bounce//
 
-  function staticPaste(cv, ctx, evt, pos, emoImg) {
+  function paste(cv, ctx, evt, pos, emoImg) {
     let onload = emoImg.onload;
     //this object keeps track of the movement, loads the images, and determines
     //the velocity
@@ -67,7 +67,7 @@
   }//end orbit//
 
   //paste object to canvas
-  function paste(video, context, width, height, x, y, source) {
+  function pasteImg(video, context, width, height, x, y, source) {
     context.drawImage(video, 0, 0, width, height);
     baseImg = new Image();
     baseImg.src = source; // needs to be path ie --> 'assets/weird.png';
@@ -144,4 +144,4 @@
 
   ///end of function store///
 
-export { cutCircle, angularVelocity, velocity, drawVideo, setVendorCss, getCursorPosition, orbit, staticPaste, bounce };
+export { cutCircle, angularVelocity, velocity, drawVideo, setVendorCss, getCursorPosition, orbit, paste, bounce };
