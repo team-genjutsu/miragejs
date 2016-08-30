@@ -10,50 +10,43 @@ import {
   bounce
 } from './funcStore';
 
-function filterListener(vid, whoisFilter, currFilter, whoisBool, peerObj) {
+function filterListener(vid, whoisFilter, currFilter, whoisBool, peerObj, func) {
   document.getElementById(whoisFilter).addEventListener('click', () => {
     let filterDataObj;
     // sends boolean data about remote filter application and adds filter on your side
-    if (!vid.style.filter) {
-      filterDataObj = JSON.stringify({
-        local: whoisBool,
-        addFilter: 'yes',
-        filterType: currFilter.innerHTML
-      });
-      setVendorCss(vid, currFilter.innerHTML);
-    } else {
-      //instructions to remove filter and send object to data channel
-      filterDataObj = JSON.stringify({
-        local: whoisBool,
-        addFilter: 'no'
-      });
-      vid.removeAttribute('style');
-    }
+    filterDataObj = JSON.stringify({
+      local: whoisBool,
+      filterType: currFilter.innerHTML
+    });
+    func(vid, currFilter.innerHTML);
     peerObj.send(filterDataObj);
   }, false)
 }
 
 
-function animationListener(canvas, img, animation, context, reqAnim, array, peerObj, local, func) {
+function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, array, peerObj, local, func) {
 
   canvas.addEventListener('click', (event) => {
     let position = func(canvas, event);
 
     let emoImage = new Image();
-    emoImage.src = img;
+    emoImage.src = img.src;
+
+    // let currImg = 
+    let animation = animeObj[animeEle.innerHTML]
+    //animation for local display and data transmission to peer
+    animation(canvas, context, event, position, emoImage, reqAnim, array);
 
     let canvasObj = JSON.stringify({
       animation: animation.toString(),
       localEmoji: local,
-      currentImg: img,
+      currentImg: emoImage.src,
       position: {
         x: position.x,
         y: position.y
       }
     });
 
-    //animation for local display and data transmission to peer
-    animation(canvas, context, event, position, emoImage, reqAnim, array);
     peerObj.send(canvasObj);
   }, false)
 }

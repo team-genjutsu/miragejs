@@ -1,6 +1,10 @@
 import SimplePeer from 'simple-peer';
 import io from 'socket.io-client';
 import {
+  filterListener,
+  animationListener
+} from './components/listenerFuncs';
+import {
   cutCircle,
   angularVelocity,
   velocity,
@@ -14,10 +18,6 @@ import {
 import {
   mediaGenerator
 } from './components/mediaGenerator';
-import {
-  filterListener,
-  animationListener
-} from './components/listenerFuncs';
 
 document.addEventListener("DOMContentLoaded", (event) => {
 
@@ -34,35 +34,35 @@ document.addEventListener("DOMContentLoaded", (event) => {
     peerContext,
     myMedia,
     myCanvas,
-    myVideo, //video canvas
-    myVidCtx,
+    myVideo,
     myContext,
-    peerVidCtx,
-    peerVirtualVid,
     // variables for filter logic
-    current = document.getElementById('filterDisp'),
-    button = document.getElementById('filter'),
-    filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', ''],
+    currFilter = document.getElementById('filterDisp'),
+    filterBtn = document.getElementById('filter'),
+    filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', 'none'],
     i = 0,
     // clear canvas
     clearButton = document.getElementById('clear'),
     // animation variables
-    animations = {
+    anime = {
       paste: paste,
       bounce: bounce,
       orbit: orbit
     },
-    currentAnimation = bounce,
+    animeKeys = ['paste', 'bounce', 'orbit'],
+    j = 1,
+    animeBtn = document.getElementById('animation'),
+    currAnime = document.getElementById('animateDisp'),
+    currentAnimation,
     temp,
     // room buttons
     joinButton = document.getElementById('join-button'),
     randomButton = document.getElementById('random-button'),
     // raf stands for requestAnimationFrame, enables drawing to occur
-    raf;
-
-  //image assignment, we can abstract this later
-  let emoImg;
-  let currentImg = 'assets/emojione/small/1f436.png';
+    raf,
+    emoImg = new Image(),
+    currentImg = 'assets/emojione/small/1f436.png',
+    emojis = document.getElementsByClassName('emoji');
   //end variable store//
 
   //vendor media objects//
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
   //room selection
   joinButton.addEventListener('click', () => {
-      const socket = io.connect('https://463505aa.ngrok.io/') //const socket = io();
+      const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/') 
       roomID = document.getElementById('room-id-input').value;
       socket.emit('joinRoom', JSON.stringify(roomID));
 
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   socket.on('initiated', (member) => {
                       member = JSON.parse(member);
 
-                      myMedia = mediaGenerator(stream, 'myBooth', 'myVideo', 'myCanvas', 533, 400);
+                      myMedia = mediaGenerator(stream, vendorUrl, 'myBooth', 'myVideo', 'myCanvas', 533, 400);
 
                       myVideo = myMedia.video;
                       myCanvas = myMedia.canvas;
@@ -174,92 +174,83 @@ document.addEventListener("DOMContentLoaded", (event) => {
                           document.getElementById('messages').textContent += dataObj.message + '\n';
                         }
 
-                        if (dataObj.local) {
-                          if (dataObj.addFilter === 'yes') {
+                        if (dataObj.hasOwnProperty('local')) {
+                          if (dataObj.local) {
                             setVendorCss(peerVideo, dataObj.filterType);
-                          } else if (dataObj.addFilter === 'no') {
-                            peerVideo.removeAttribute('style');
-                          }
-                          //conditionally applies or removes filter
-                        } else if (!dataObj.local) {
-                          if (dataObj.addFilter === 'yes') {
+                          } //conditionally applies or removes filter
+                          else if (!dataObj.local) {
                             setVendorCss(myVideo, dataObj.filterType);
-                          } else if (dataObj.addFilter === 'no') {
-                            myVideo.removeAttribute('style');
                           }
                         }
 
-                        if (dataObj.localEmoji) {
-                          // console.log(dataObj);
-                          //remote display bounce animation!
-                          let emoImg = new Image();
-                          emoImg.src = dataObj.currentImg;
+                        if (dataObj.hasOwnProperty('localEmoji')) {
+                          if (dataObj.localEmoji) {
+                            //remote display bounce animation!
+                            let emoImg = new Image();
+                            emoImg.src = dataObj.currentImg;
 
-                          temp = currentAnimation;
-                          currentAnimation = eval('(' + dataObj.animation + ')');
-                          currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
-                          currentAnimation = temp;
+                            temp = currentAnimation;
+                            currentAnimation = eval('(' + dataObj.animation + ')');
+                            currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
+                            currentAnimation = temp;
 
-                        } else if (!dataObj.localEmoji) {
-                          // console.log(dataObj);
-                          //local display bounce animation!
-                          let emoImg = new Image();
-                          emoImg.src = dataObj.currentImg;
+                          } else if (!dataObj.localEmoji) {
+                            //local display bounce animation!
+                            let emoImg = new Image();
+                            emoImg.src = dataObj.currentImg;
 
-                          temp = currentAnimation;
-                          currentAnimation = eval('(' + dataObj.animation + ')');
-                          currentAnimation(myCanvas, myContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
-                          currentAnimation = temp;
+                            temp = currentAnimation;
+                            currentAnimation = eval('(' + dataObj.animation + ')');
+                            currentAnimation(myCanvas, myContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
+                            currentAnimation = temp;
+                          }
                         }
                       });
 
                       //looks for click event on the send button//
                       document.getElementById('send').addEventListener('click', () => {
-                          //post message in text context on your side
-                          //send message object to the data channel
+                          //post message locally then send to remote 
                           let yourMessageObj = JSON.stringify({
                             message: peer.localPort + " " + document.getElementById('yourMessage').value
                           });
                           let yourMessage = peer.localPort + " " + document.getElementById('yourMessage').value;
                           document.getElementById('messages').textContent += yourMessage + '\n';
                           peer.send(yourMessageObj);
-                        }) //end send click event//
+                        }, false) //end send click event//
 
-                      //click event for the "filter me" button//
-                      filterListener(myVideo, 'myFilter', current, true, peer);
-                      //click event for the "filter them" button
-                      filterListener(peerVideo, 'peerFilter', current, false, peer);
 
-                      //tesing filters//
-                      button.addEventListener('click', () => {
-                        current.innerHTML = filters[i];
+                      //changing filters//
+                      filterBtn.addEventListener('click', () => {
+                        currFilter.innerHTML = filters[i];
                         i++;
                         if (i >= filters.length) i = 0;
                       }, false); //end of filter test//
 
-                      //assigns click event to element, starts local animation, and sends
-                      //data for remote animation
-                      animationListener(myCanvas, currentImg, currentAnimation, myContext, raf, [velocity, angularVelocity], peer, true, getCursorPosition);
+                      //changing animations//
+                      animeBtn.addEventListener('click', () => {
+                        currAnime.innerHTML = animeKeys[j];
+                        currentAnimation = anime[animeKeys[j]];
+                        console.log(currentAnimation);
+                        j++;
+                        if (j >= animeKeys.length) j = 0;
+                      }, false)
 
-                      Object.keys(animations).forEach((ele, idx) => {
-                        document.getElementById(ele).addEventListener('click', (event) => {
-                          currentAnimation = animations[ele];
-                        })
+
+                      //adding click handler for active emoji selection
+                      Array.from(emojis, (ele) => {
+                        ele.addEventListener('click', (event) => {
+                          currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
+                          console.log(currentImg)
+                          emoImg.src = currentImg;
+                        }, false)
                       })
 
                       clearButton.addEventListener('click', (event) => {
                         cancelAnimationFrame(raf);
                         myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
                         peerContext.clearRect(0, 0, peerCanvas.width, peerCanvas.height);
-                      });
+                      }, false);
 
-                      //adding click handler for active emoji selection
-                      const emojis = document.getElementsByClassName('emoji');
-                      Array.from(emojis, (ele) => {
-                        ele.addEventListener('click', (event) => {
-                          currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
-                        })
-                      })
 
                       //peer stream event//
                       peer.on('stream', (stream) => {
@@ -268,16 +259,21 @@ document.addEventListener("DOMContentLoaded", (event) => {
                         document.getElementById('disconnect').disabled = false;
 
 
-                        peerMedia = mediaGenerator(stream, 'peerBooth', 'peerVideo', 'peerCanvas', 533, 400);
+                        peerMedia = mediaGenerator(stream, vendorUrl, 'peerBooth', 'peerVideo', 'peerCanvas', 533, 400);
 
                         peerVideo = peerMedia.video;
                         peerCanvas = peerMedia.canvas;
                         peerContext = peerMedia.context;
 
-                      //assigns click event to element, starts local animation, and sends
-                      //data for remote animation
-                      animationListener(peerCanvas, currentImg, currentAnimation, peerContext, raf, [velocity, angularVelocity], peer, false, getCursorPosition);
-                      
+
+                        animationListener(myCanvas, emoImg, anime, currAnime, myContext, raf, [velocity, angularVelocity], peer, true, getCursorPosition); //local
+
+                        animationListener(peerCanvas, emoImg, anime, currAnime, peerContext, raf, [velocity, angularVelocity], peer, false, getCursorPosition); //remote
+
+                        //click event for the "filter me" button//
+                        filterListener(myVideo, 'myFilter', currFilter, true, peer, setVendorCss);
+                        //click event for the "filter them" button
+                        filterListener(peerVideo, 'peerFilter', currFilter, false, peer, setVendorCss);
                       }); ///end peer stream event///
 
                       peer.on('close', () => {
@@ -289,7 +285,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
                       document.getElementById('disconnect').addEventListener('click', (event) => {
                           peer.destroy();
-                        }) //end of disconnect click event//
+                        }, false) //end of disconnect click event//
 
                     }) //end of socket.on('initiated')
 
@@ -302,6 +298,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
         }) //end of socket 'process' event
 
-    }) //end of 'join' event
+    }, false) //end of 'join' event
 
 });
