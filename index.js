@@ -127,6 +127,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   document.getElementById('connect').disabled = false;
                 })
 
+
                 socket.on('initiated', (member) => {
 
                   member = JSON.parse(member);
@@ -147,10 +148,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     chatterThisClient = member.id;
                   }
 
-                  socket.on('updateChatters', (chatter) => {
-                    chattersClient.splice(chattersClient.indexOf(chatter), 1);
-                    document.getElementById('connect').disabled = false;
-                  });
+                  // socket.on('updateChatters', (chatter) => {
+                  // document.getElementById('messages').textContent += 'notification: ' + chatter + ' has left.' +  '\n';
+                  // chattersClient.splice(chattersClient.indexOf(chatter), 1);
+                  // document.getElementById('connect').disabled = false;
+                  // });
 
                   //instantiate peer objects and finish signaling for webRTC data and video channels
                   document.getElementById('connect').addEventListener('click', function() {
@@ -187,7 +189,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     }
                   });
 
+
+
                 }); //end of socket.on('initiated')
+
 
                 function startSetup() {
                   console.log('startSetup? ', isStarted, localStream);
@@ -206,15 +211,21 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     peerConn.onaddstream = handleRemoteStreamAdded;
                     peerConn.onremovestream = handleRemoteStreamRemoved;
 
-                    document.getElementById('disconnect').addEventListener('click', function(event) {
-                        peerConn.close();
-                      }) //end of disconnect click event//
+
+
+
+                    // document.getElementById('disconnect').addEventListener('click', function(event) {
+                    // peerConn.close();
+                    // socket.emit('disconnect')
+                    // }) //end of disconnect click event//
 
                   } catch (err) {
                     console.log('Failed to connect. Error: ' + err);
                     return;
                   }
                 }
+
+
 
                 //data channel stuff
                 function onDataChannelCreated(channel) {
@@ -283,6 +294,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     peerContext.clearRect(0, 0, peerCanvas.width, peerCanvas.height);
                   }, false);
 
+
+
                   //end of interactivity
 
                   //on data event
@@ -328,6 +341,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                       }
                     }
                   }
+
                 }
 
                 function otherDataChannel(event) {
@@ -376,13 +390,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   peerContext = peerMedia.context;
 
                   animationListener(peerCanvas, emoImg, anime, currAnime, peerContext, raf, [velocity, angularVelocity], dataChannel, false, getCursorPosition); //remote
-                  
+
+
                 } ///end on stream added event///
 
                 function handleRemoteStreamRemoved(event) {
                   console.log('Remote Stream removed, event: ', event);
-                  socket.emit('disconnect');
-                  location.reload();
+                  // socket.emit('disconnect');
+                  // location.reload();
                 }
 
                 function doCall() {
@@ -408,13 +423,41 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   sendMessage(sessionDescription, 'other');
                 } //close misc webRTC helper function
 
+                function endCall() {
+                  peerConn.close();
+                  peerConn = null;
+                  socket.disconnect()
+                  localStream.getTracks().forEach((track) => {
+                    track.stop();
+                  });
+                  myVideo.src = "";
+                  peerVideo.src = "";
+                  document.getElementById('connect').disabled = true;
+                  document.getElementById('disconnect').disabled = true;
+                  document.getElementById('roomApp').classList.remove('hidden');
+                  document.getElementById('mainApp').classList.add('hidden');
+                }
+
+                //disconnect event
+                document.getElementById('disconnect').addEventListener('click', function(event) {
+                    console.log('hi there Blake')
+                    socket.emit('severe');
+                  }) //end of disconnect click event//
+
+                socket.on('updateChatters', (chatter) => {
+                  socket.emit('severe')
+                  endCall();
+                  document.getElementById('messages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
+                  chattersClient.splice(chattersClient.indexOf(chatter), 1);
+                  // document.getElementById('connect').disabled = false;
+                });
 
               }, //end of stream//
               function(err) {
                 console.error(err);
               });
 
-            
+
           } //end of boolean in socket 'process' event
 
         }) //end of socket 'process' event

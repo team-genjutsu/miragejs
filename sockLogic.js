@@ -29,7 +29,8 @@ module.exports = function (server) {
 
 
     //disconnecting users
-    socket.on('disconnect', function() {
+    socket.on('severe', function() {
+      console.log('disconnect triggered')
       let member,
         room,
         otherMem;
