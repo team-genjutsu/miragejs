@@ -1,5 +1,4 @@
 import io from 'socket.io-client';
-import adapter from 'webrtc-adapter';
 import {
   cutCircle,
   angularVelocity,
@@ -14,6 +13,7 @@ import {
 import {
   mediaGenerator
 } from './components/mediaGenerator';
+require('webrtc-adapter');
 
 document.addEventListener("DOMContentLoaded", function(event) {
 
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   //end variable store//
 
   //vendor media objects//
-  navigator.getMedia = navigator.getUserMedia ||
+  navigator.getMedia = navigator.mediaDevices.getUserMedia ||
     navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
     navigator.msGetUserMedia; //end vendor media objects//
 
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             navigator.getMedia({
                   video: true,
                   audio: false
-                }, function(stream){
+                }).then(stream => {
 
                   //make initiate event happen automatically when streaming begins
                   socket.emit('initiate', JSON.stringify({
@@ -234,7 +234,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       document.getElementById('send').addEventListener('click', function() {
                           //post message in text context on your side
                           //send message object to the data channel
-                          console.log(peerConn);
                           let yourMessageObj = JSON.stringify({
                             message: "them:" + " " + document.getElementById('yourMessage').value
                           });
@@ -397,7 +396,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }
 
                     function otherDataChannel(event) {
-                      peerConn.ondatachannel = (event) => {
+                      peerConn.ondatachannel = event => {
                         console.log('not initiator data channel start', event.channel);
                         dataChannel = event.channel;
                         onDataChannelCreated(dataChannel);
@@ -476,18 +475,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                     function doCall() {
                       console.log('sending offer to peer');
-                      peerConn.createOffer(setLocalAndSendMessage, (err) => {
-                        console.log('create offer error: ' + err);
+                      peerConn.createOffer().then(setLocalAndSendMessage).catch(
+                        err => {console.log('create offer error: ' + err);
                       });
                     }
 
                     function doAnswer() {
                       console.log('Sending answer to peer.');
                       peerConn.createAnswer().then(
-                        setLocalAndSendMessage,
-                        (err) => {
+                        setLocalAndSendMessage.catch(
+                        err => {
                           console.log('create offer error: ' + err);
-                        }
+                        })
                       );
                     }
 
@@ -498,10 +497,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }//close misc webRTC helper function
 
 
-                }, //end of stream//
-                function(err) {
+                }).catch(err => {
                   console.error(err);
                 });
+                //end of stream//
           } //end of boolean in socket 'process' event
 
       }); //end of socket 'process' event
