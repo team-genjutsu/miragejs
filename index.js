@@ -94,13 +94,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
   //end variable store//
 
   //vendor media objects//
-  navigator.getMedia = navigator.getUserMedia ||
+  navigator.getMedia = navigator.mediaDevices.getUserMedia ||
     navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
     navigator.msGetUserMedia; //end vendor media objects//
 
   //room selection
+
   joinButton.addEventListener('click', () => {
-      const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/') 
+      const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
       roomID = document.getElementById('room-id-input').value;
       socket.emit('joinRoom', JSON.stringify(roomID));
 
@@ -115,7 +116,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             navigator.getMedia({
                 video: true,
                 audio: false
-              }, function(stream) {
+              }).then(stream => {
 
                 //make initiate event happen automatically when streaming begins
                 socket.emit('initiate', JSON.stringify({
@@ -147,12 +148,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     chattersClient.push(member);
                     chatterThisClient = member.id;
                   }
-
-                  // socket.on('updateChatters', (chatter) => {
-                  // document.getElementById('messages').textContent += 'notification: ' + chatter + ' has left.' +  '\n';
-                  // chattersClient.splice(chattersClient.indexOf(chatter), 1);
-                  // document.getElementById('connect').disabled = false;
-                  // });
 
                   //instantiate peer objects and finish signaling for webRTC data and video channels
                   document.getElementById('connect').addEventListener('click', function() {
@@ -189,8 +184,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     }
                   });
 
-
-
                 }); //end of socket.on('initiated')
 
 
@@ -211,21 +204,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     peerConn.onaddstream = handleRemoteStreamAdded;
                     peerConn.onremovestream = handleRemoteStreamRemoved;
 
-
-
-
-                    // document.getElementById('disconnect').addEventListener('click', function(event) {
-                    // peerConn.close();
-                    // socket.emit('disconnect')
-                    // }) //end of disconnect click event//
-
                   } catch (err) {
                     console.log('Failed to connect. Error: ' + err);
                     return;
                   }
                 }
-
-
 
                 //data channel stuff
                 function onDataChannelCreated(channel) {
@@ -294,8 +277,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     peerContext.clearRect(0, 0, peerCanvas.width, peerCanvas.height);
                   }, false);
 
-
-
                   //end of interactivity
 
                   //on data event
@@ -341,7 +322,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                       }
                     }
                   }
-
                 }
 
                 function otherDataChannel(event) {
@@ -391,7 +371,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
                   animationListener(peerCanvas, emoImg, anime, currAnime, peerContext, raf, [velocity, angularVelocity], dataChannel, false, getCursorPosition); //remote
 
-
                 } ///end on stream added event///
 
                 function handleRemoteStreamRemoved(event) {
@@ -402,7 +381,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
                 function doCall() {
                   console.log('sending offer to peer');
-                  peerConn.createOffer(setLocalAndSendMessage, (err) => {
+                  peerConn.createOffer().then(setLocalAndSendMessage).catch(err => {
                     console.log('create offer error: ' + err);
                   });
                 }
@@ -410,8 +389,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 function doAnswer() {
                   console.log('Sending answer to peer.');
                   peerConn.createAnswer().then(
-                    setLocalAndSendMessage,
-                    (err) => {
+                    setLocalAndSendMessage).catch(err => {
                       console.log('create offer error: ' + err);
                     }
                   );
@@ -456,7 +434,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
               function(err) {
                 console.error(err);
               });
-
 
           } //end of boolean in socket 'process' event
 
