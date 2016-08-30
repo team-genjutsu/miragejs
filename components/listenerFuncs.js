@@ -10,7 +10,7 @@ import {
   bounce
 } from './funcStore';
 
-function filterListener(vid, whoisFilter, currFilter, whoisBool, peerObj, func) {
+function filterListener(vid, whoisFilter, currFilter, whoisBool, channel, func) {
   document.getElementById(whoisFilter).addEventListener('click', () => {
     let filterDataObj;
     // sends boolean data about remote filter application and adds filter on your side
@@ -19,12 +19,12 @@ function filterListener(vid, whoisFilter, currFilter, whoisBool, peerObj, func) 
       filterType: currFilter.innerHTML
     });
     func(vid, currFilter.innerHTML);
-    peerObj.send(filterDataObj);
+    channel.send(filterDataObj);
   }, false)
 }
 
 
-function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, array, peerObj, local, func) {
+function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, array, channel, local, func) {
 
   canvas.addEventListener('click', (event) => {
     let position = func(canvas, event);
@@ -47,7 +47,7 @@ function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, ar
       }
     });
 
-    peerObj.send(canvasObj);
+    channel.send(canvasObj);
   }, false)
 }
 

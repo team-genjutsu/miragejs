@@ -4,6 +4,7 @@ function mediaGenerator(stream, url, mediaHookId, vidAttr, canAttr, width, heigh
   video.setAttribute('id', vidAttr);
   document.getElementById(mediaHookId).appendChild(video)
   video.src = url.createObjectURL(stream);
+  // video.src = window.URL.createObjectURL(stream);
   video.play();
 
   //draw local overlay canvas//
