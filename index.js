@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   //end variable store//
 
   //vendor media objects//
-  navigator.getMedia = navigator.getUserMedia ||
+  navigator.getMedia = navigator.mediaDevices.getUserMedia ||
     navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
     navigator.msGetUserMedia; //end vendor media objects//
 
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             navigator.getMedia({
                 video: true,
                 audio: false
-              }, function(stream) {
+              }).then(stream => {
 
                 //make initiate event happen automatically when streaming begins
                 socket.emit('initiate', JSON.stringify({
@@ -388,7 +388,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
                 function doCall() {
                   console.log('sending offer to peer');
-                  peerConn.createOffer(setLocalAndSendMessage, (err) => {
+                  peerConn.createOffer().then(setLocalAndSendMessage).catch(err => {
                     console.log('create offer error: ' + err);
                   });
                 }
@@ -396,8 +396,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 function doAnswer() {
                   console.log('Sending answer to peer.');
                   peerConn.createAnswer().then(
-                    setLocalAndSendMessage,
-                    (err) => {
+                    setLocalAndSendMessage).catch(err => {
                       console.log('create offer error: ' + err);
                     }
                   );
