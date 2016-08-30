@@ -94,13 +94,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
   //end variable store//
 
   //vendor media objects//
-  navigator.getMedia = navigator.getUserMedia ||
+  navigator.getMedia = navigator.mediaDevices.getUserMedia ||
     navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
     navigator.msGetUserMedia; //end vendor media objects//
 
   //room selection
+
   joinButton.addEventListener('click', () => {
-      const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/') 
+      const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
       roomID = document.getElementById('room-id-input').value;
       socket.emit('joinRoom', JSON.stringify(roomID));
 
@@ -115,7 +116,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             navigator.getMedia({
                 video: true,
                 audio: false
-              }, function(stream) {
+              }).then(stream => {
 
                 //make initiate event happen automatically when streaming begins
                 socket.emit('initiate', JSON.stringify({
@@ -376,7 +377,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   peerContext = peerMedia.context;
 
                   animationListener(peerCanvas, emoImg, anime, currAnime, peerContext, raf, [velocity, angularVelocity], dataChannel, false, getCursorPosition); //remote
-                  
+
                 } ///end on stream added event///
 
                 function handleRemoteStreamRemoved(event) {
@@ -387,7 +388,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
                 function doCall() {
                   console.log('sending offer to peer');
-                  peerConn.createOffer(setLocalAndSendMessage, (err) => {
+                  peerConn.createOffer().then(setLocalAndSendMessage).catch(err => {
                     console.log('create offer error: ' + err);
                   });
                 }
@@ -395,8 +396,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 function doAnswer() {
                   console.log('Sending answer to peer.');
                   peerConn.createAnswer().then(
-                    setLocalAndSendMessage,
-                    (err) => {
+                    setLocalAndSendMessage).catch(err => {
                       console.log('create offer error: ' + err);
                     }
                   );
@@ -414,7 +414,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 console.error(err);
               });
 
-            
+
           } //end of boolean in socket 'process' event
 
         }) //end of socket 'process' event

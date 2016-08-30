@@ -30,6 +30,6 @@ app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
 
 var httpsServer = https.createServer(options, app).listen(port);
-
 startSockets(server);
 
+// })

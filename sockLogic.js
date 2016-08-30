@@ -97,34 +97,9 @@ module.exports = function (server) {
         })
 
       }
-
       io.to(socket.id).emit('initiated', JSON.stringify(member));
-
     });
 
-    // socket.on('initial', function(payload) {
-      // payload = JSON.parse(payload)
-      // let sharedRoom = rooms.filter(room => room.id === payload.roomId)[0];
-      // sharedRoom.members[0].signalId = payload.signal
-      // io.to(sharedRoom.members[0].id).emit('initialConnected', JSON.stringify(payload));
-    // });
-
-    // socket.on('second', function(payload) {
-      // payload = JSON.parse(payload);
-      // let sharedRoom = rooms.filter(room => room.id === payload);
-      // let initialClientSig = sharedRoom[0].members[0].signalId;
-      // let secondClientSockId = sharedRoom[0].members[1].id;
-      // io.to(secondClientSockId).emit('secondPart2', JSON.stringify(initialClientSig)); //remember socket.id
-    // });
-
-    // socket.on('third', function(payload) {
-      // payload = JSON.parse(payload);
-      // let sharedRoom = rooms.filter(room => room.id === payload.roomId);
-      // let secondClient = sharedRoom[0].members.filter(client => !client.signalId);
-      // let initialClient = sharedRoom[0].members.filter(client => client.signalId);
-      // secondClient[0].signalId = payload.signal;
-      // io.to(initialClient[0].id).emit('thirdPart2', JSON.stringify(secondClient[0].signalId));
-    // });
     //beginning of signaling
     socket.on('message', function(payload) {
       let sharedRoom = rooms.filter(room => room.id === payload.roomID)[0];
@@ -145,5 +120,4 @@ module.exports = function (server) {
     }); //end of signaling
 
   })
-}
-
+};
