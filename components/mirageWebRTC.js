@@ -1,34 +1,36 @@
-function connectEvents(state, func1, func2) {
-  console.log(state);
-  startSetup(state, func1);
+'use strict';
+
+function connectEvents(rtcState, roomState, func1, func2, socket) {
+  console.log('connectEvent function: ' + rtcState);
+  startSetup(rtcState, roomState, func1, socket);
   //data channel creation
   // console.log('init creating data channel')
   //create data channel
-  state.dataChannel = state.peerConn.createDataChannel('interact');
+  rtcState.dataChannel = rtcState.peerConn.createDataChannel('interact');
   // console.log(state.dataChannel)
   // audio/video creation
-  console.log(state)
-  func2(state.dataChannel);
-  doCall(state);
+  console.log(rtcState.peerConn)
+  func2(rtcState.dataChannel);
+  doCall(rtcState, roomState, socket);
   // onDataChannelCreated(state.dataChannel)
 }
 
-function startSetup(state, func) {
-  console.log('startSetup? ', state.isStarted, state.localStream);
-  if (!state.isStarted && typeof state.localStream !== 'undefined') {
+function startSetup(rtcState, roomState, func, socket) {
+  console.log('startSetup? ', rtcState.isStarted, rtcState.localStream);
+  if (!rtcState.isStarted && typeof rtcState.localStream !== 'undefined') {
     console.log('creating peer connection')
-    createPeerConnection(state, func);
-    state.peerConn.addStream(state.localStream);
-    state.isStarted = true;
+    createPeerConnection(rtcState, roomState, func, socket);
+    rtcState.peerConn.addStream(rtcState.localStream);
+    rtcState.isStarted = true;
   }
 }
 
-function createPeerConnection(state, func) {
+function createPeerConnection(rtcState, roomState, func, socket) {
   try {
-    state.peerConn = new RTCPeerConnection(state.pcConfig)
-    state.peerConn.onicecandidate = handleIceCandidate;
-    state.peerConn.onaddstream = func //handleRemoteStreamAdded;
-    state.peerConn.onremovestream = handleRemoteStreamRemoved;
+    rtcState.peerConn = new RTCPeerConnection(rtcState.pcConfig)
+    rtcState.peerConn.onicecandidate = () => handleIceCandidate(event, roomState, socket);
+    rtcState.peerConn.onaddstream = func //handleRemoteStreamAdded;
+    rtcState.peerConn.onremovestream = handleRemoteStreamRemoved;
 
   } catch (err) {
     console.log('Failed to connect. Error: ' + err);
@@ -38,19 +40,20 @@ function createPeerConnection(state, func) {
 
 
 //big gap between functions
+//onDataChannelCreated is usually situated here, it's living in main
+//index.js file right now because it's sheer enormity
 
-
-function otherDataChannel(event, state) {
+function otherDataChannel(event, state, func) {
   state.peerConn.ondatachannel = (event) => {
     console.log('not initiator data channel start', event.channel);
     state.dataChannel = event.channel;
-    onDataChannelCreated(state.dataChannel);
+    func(state.dataChannel);
   }
 }
 
 //misc webRTC helper functions
 
-function sendMessage(data, who, state = roomState) {
+function sendMessage(data, who, state, socket) {
   let message = {
     roomID: state.roomID,
     who: who,
@@ -60,7 +63,7 @@ function sendMessage(data, who, state = roomState) {
   socket.emit('message', message);
 }
 
-function handleIceCandidate(event) {
+function handleIceCandidate(event, roomState, socket) {
   console.log('icecandidate event ', event);
   if (event.candidate) {
     sendMessage({
@@ -68,14 +71,15 @@ function handleIceCandidate(event) {
       label: event.candidate.sdpMLineIndex,
       id: event.candidate.sdpMid,
       candidate: event.candidate.candidate
-    }, 'other');
+    }, 'other', roomState, socket);
   } else {
     console.log('End of candidates.');
   }
 }
 
 
-//another gap
+//another gap, handleRemoteStreamAdded function usually lives here,
+//it has a lot of depended functions in it right now
 
 
 function handleRemoteStreamRemoved(event) {
@@ -84,27 +88,29 @@ function handleRemoteStreamRemoved(event) {
   // location.reload();
 }
 
-function doCall(state) {
-  console.log('sending offer to peer', 'state: ' + state);
-  state.peerConn.createOffer().then(setLocalAndSendMessage).
-  catch(err => {
+function doCall(rtcState, roomState, socket) {
+  console.log('sending offer to peer', 'state in doCall: ' + rtcState.peerConn);
+  rtcState.peerConn.createOffer().then( (result) => {
+    setLocalAndSendMessage(result, rtcState, roomState, socket)
+  }).catch(err => {
     console.log('create offer error: ' + err);
   });
 }
 
-function doAnswer(state) {
+function doAnswer(rtcState, roomState, socket) {
   console.log('Sending answer to peer.');
-  state.peerConn.createAnswer().then(
-    setLocalAndSendMessage).catch(err => {
+  rtcState.peerConn.createAnswer().then((result) => {
+    setLocalAndSendMessage(result, rtcState, roomState, socket)
+  }).catch(err => {
     console.log('create offer error: ' + err);
   });
 }
 
 
-function setLocalAndSendMessage(sessionDescription, state) {
-  state.peerConn.setLocalDescription(sessionDescription);
+function setLocalAndSendMessage(sessionDescription, rtcState, roomState, socket) {
+  rtcState.peerConn.setLocalDescription(sessionDescription);
   console.log('setLocalAndSendMessage. Sending Message', sessionDescription);
-  sendMessage(sessionDescription, 'other');
+  sendMessage(sessionDescription, 'other', roomState, socket);
 } //close misc webRTC helper function
 
 export {

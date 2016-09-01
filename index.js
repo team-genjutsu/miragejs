@@ -125,7 +125,7 @@ function createMirage() {
 
                     //instantiate peer objects and finish signaling for webRTC data and video channels
                     document.getElementById('connect').addEventListener('click', () => {
-                      connectEvents(rtcState, handleRemoteStreamAdded, onDataChannelCreated)
+                      connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket)
                       // onDataChannelCreated(rtcState.dataChannel)
                     });
 
@@ -134,12 +134,12 @@ function createMirage() {
                       // console.log("Client received Message", message);
                       if (message.type === 'offer') {
                         if (!rtcState.isStarted) {
-                          startSetup(rtcState);
-                          otherDataChannel(event, rtcState);
+                          startSetup(rtcState, roomState, handleRemoteStreamAdded, socket);
+                          otherDataChannel(event, rtcState, onDataChannelCreated);
                         }
 
                         rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
-                        doAnswer(rtcState);
+                        doAnswer(rtcState, roomState, socket);
                       } else if (message.type === 'answer' && rtcState.isStarted) {
                         // console.log('Got answer');
                         rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
@@ -153,43 +153,6 @@ function createMirage() {
                     });
 
                   }); //end of socket.on('initiated')
-
-                  // function connectEvents(state) {
-                    // startSetup(state);
-                    // data channel creation
-                    // console.log('init creating data channel')
-                    // create data channel
-                    // state.dataChannel = state.peerConn.createDataChannel('interact');
-                    // console.log(state.dataChannel)
-                    // audio/video creation
-                    // doCall();
-                    // onDataChannelCreated(state.dataChannel)
-                  // }
-
-                  // function startSetup(state) {
-                    // console.log('startSetup? ', state.isStarted, state.localStream);
-                    // if (!state.isStarted && typeof state.localStream !== 'undefined') {
-                      // console.log('creating peer connection')
-                      // createPeerConnection(state);
-                      // state.peerConn.addStream(state.localStream);
-                      // state.isStarted = true;
-                    // }
-                  // }
-
-                  // function createPeerConnection(state) {
-                    // try {
-                      // state.peerConn = new RTCPeerConnection(state.pcConfig)
-                      // state.peerConn.onicecandidate = handleIceCandidate;
-                      // state.peerConn.onaddstream = handleRemoteStreamAdded;
-                      // state.peerConn.onremovestream = handleRemoteStreamRemoved;
-
-                    // } catch (err) {
-                      // console.log('Failed to connect. Error: ' + err);
-                      // return;
-                    // }
-                  // }
-                  //broken at the moment, need to figure out how to abstract this function
-                  //below. could easily pull some of the functions below to make things work
 
 
                   //data channel stuff
@@ -309,39 +272,6 @@ function createMirage() {
                     }
                   }
 
-                  // function otherDataChannel(event) {
-                    // rtcState.peerConn.ondatachannel = (event) => {
-                      // console.log('not initiator data channel start', event.channel);
-                      // rtcState.dataChannel = event.channel;
-                      // onDataChannelCreated(rtcState.dataChannel);
-                    // }
-                  // }
-
-                  //misc webRTC helper functions
-
-                  // function sendMessage(data, who) {
-                    // let message = {
-                        // roomID: roomState.roomID,
-                        // who: who,
-                        // data: data
-                      // }
-                      // console.log('Client Sending Message: ', message);
-                    // socket.emit('message', message);
-                  // }
-
-                  // function handleIceCandidate(event) {
-                    // console.log('icecandidate event ', event);
-                    // if (event.candidate) {
-                      // sendMessage({
-                        // type: 'candidate',
-                        // label: event.candidate.sdpMLineIndex,
-                        // id: event.candidate.sdpMid,
-                        // candidate: event.candidate.candidate
-                      // }, 'other');
-                    // } else {
-                      // console.log('End of candidates.');
-                    // }
-                  // }
 
                   function handleRemoteStreamAdded(event) {
                     // console.log('Remote Stream Added, event: ', event);
@@ -358,33 +288,8 @@ function createMirage() {
 
                   } ///end on stream added event///
 
-                  // function handleRemoteStreamRemoved(event) {
-                    // console.log('Remote Stream removed, event: ', event);
-                    // socket.emit('disconnect');
-                    // location.reload();
-                  // }
-
-                  // function doCall() {
-                    // console.log('sending offer to peer');
-                    // rtcState.peerConn.createOffer().then(setLocalAndSendMessage).catch(err => {
-                      // console.log('create offer error: ' + err);
-                    // });
-                  // }
-
-                  // function doAnswer() {
-                    // console.log('Sending answer to peer.');
-                    // rtcState.peerConn.createAnswer().then(
-                      // setLocalAndSendMessage).catch(err => {
-                      // console.log('create offer error: ' + err);
-                    // });
-                  // }
-
-                  // function setLocalAndSendMessage(sessionDescription) {
-                    // rtcState.peerConn.setLocalDescription(sessionDescription);
-                    // console.log('setLocalAndSendMessage. Sending Message', sessionDescription);
-                    // sendMessage(sessionDescription, 'other');
-                  // } //close misc webRTC helper function
-
+                  
+                  //all this disconnect logic needs to be revamped, VERY SOON!
                   function endCall() {
                     rtcState.peerConn.close();
                     rtcState.peerConn = null;
@@ -437,41 +342,6 @@ function createMirage() {
         ele.disabled ? ele.disabled = false : ele.disabled = true;
       })
     }
-
-    // function connectEvents(state) {
-    // startSetup(state);
-    // data channel creation
-    // console.log('init creating data channel')
-    // create data channel
-    // state.dataChannel = state.peerConn.createDataChannel('interact');
-    // console.log(state.dataChannel)
-    // onDataChannelCreated(state.dataChannel)
-    // audio/video creation
-    // doCall();
-    // }
-
-    // function startSetup(state) {
-    // console.log('startSetup? ', state.isStarted, state.localStream);
-    // if (!state.isStarted && typeof state.localStream !== 'undefined') {
-    // console.log('creating peer connection')
-    // createPeerConnection(state);
-    // state.peerConn.addStream(state.localStream);
-    // state.isStarted = true;
-    // }
-    // }
-
-    // function createPeerConnection(state) {
-    // try {
-    // state.peerConn = new RTCPeerConnection(state.pcConfig)
-    // state.peerConn.onicecandidate = handleIceCandidate;
-    // state.peerConn.onaddstream = handleRemoteStreamAdded;
-    // state.peerConn.onremovestream = handleRemoteStreamRemoved;
-
-    // } catch (err) {
-    // console.log('Failed to connect. Error: ' + err);
-    // return;
-    // }
-    // }
 
   }
   return mirageComponent;
