@@ -126,7 +126,7 @@ function createMirage() {
                     //instantiate peer objects and finish signaling for webRTC data and video channels
                     document.getElementById('connect').addEventListener('click', () => {
                       connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket)
-                      // onDataChannelCreated(rtcState.dataChannel)
+                        // onDataChannelCreated(rtcState.dataChannel)
                     });
 
 
@@ -135,7 +135,7 @@ function createMirage() {
                       if (message.type === 'offer') {
                         if (!rtcState.isStarted) {
                           startSetup(rtcState, roomState, handleRemoteStreamAdded, socket);
-                          otherDataChannel(event, rtcState, onDataChannelCreated);
+                          otherDataChannel(event, rtcState, onDataChannelCreated, activateAnime);
                         }
 
                         rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
@@ -288,7 +288,11 @@ function createMirage() {
 
                   } ///end on stream added event///
 
-                  
+
+                  function activateAnime() {
+                    animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
+                  }
+
                   //all this disconnect logic needs to be revamped, VERY SOON!
                   function endCall() {
                     rtcState.peerConn.close();

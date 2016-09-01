@@ -12,7 +12,6 @@ function connectEvents(rtcState, roomState, func1, func2, socket) {
   console.log(rtcState.peerConn)
   func2(rtcState.dataChannel);
   doCall(rtcState, roomState, socket);
-  // onDataChannelCreated(state.dataChannel)
 }
 
 function startSetup(rtcState, roomState, func, socket) {
@@ -43,11 +42,12 @@ function createPeerConnection(rtcState, roomState, func, socket) {
 //onDataChannelCreated is usually situated here, it's living in main
 //index.js file right now because it's sheer enormity
 
-function otherDataChannel(event, state, func) {
+function otherDataChannel(event, state, func1, func2) {
   state.peerConn.ondatachannel = (event) => {
     console.log('not initiator data channel start', event.channel);
     state.dataChannel = event.channel;
-    func(state.dataChannel);
+    func1(state.dataChannel);
+    func2();
   }
 }
 
