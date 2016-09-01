@@ -1,48 +1,33 @@
 'use strict';
-import adapter from 'webrtc-adapter';
-import io from 'socket.io-client';
-import {
-  filterListener,
-  animationListener
-} from './components/listenerFuncs';
-import {
-  cutCircle,
-  angularVelocity,
-  velocity,
-  drawVideo,
-  setVendorCss,
-  getCursorPosition,
-  orbit,
-  paste,
-  bounce
-} from './components/funcStore';
-import {
-  mediaGenerator
-} from './components/mediaGenerator';
-import {
-  roomStore,
-  filterStore,
-  mediaStore,
-  animeStore,
-  rtcStore
-} from './components/mirageStore';
 
+import {
+  createMirage
+} from './index.js';
 
-function Mirage(){
+function initMirage() {
 
   const mirageObj = {};
 
 
-  mirageObj.stores = [
-    roomStore,
-    filterStore,
-    mediaStore,
-    animeStore,
-    rtcStore
-  ];
+
+  // mirageObj.initializeComponent = mirageComponent();
+
+  mirageObj.begin = createMirage().startApp;
+
+  // mirageObj.stores = [
+  // roomStore,
+  // filterStore,
+  // mediaStore,
+  // animeStore,
+  // rtcStore
+  // ];
+
+  //should probably make click listener arrays for each event,
+  //which can take listeners within particular rtc events/functions
+
   //initiate webRTC
   //video and canvas setup  
-  
+
   //initiate messaging
 
   //initiate room function
@@ -51,16 +36,18 @@ function Mirage(){
   //initiate filter option
 
   //initiate emojis
-  
+
   //initiate animations
-  
+
   //initiate tracking
 
+  return mirageObj;
 }
 
 
 
+const mirage = initMirage();
+mirage.begin();
 
 
-
-export default { Mirage };
+// export default { Mirage };
