@@ -18,407 +18,339 @@ import {
 import {
   mediaGenerator
 } from './components/mediaGenerator';
+import {
+  roomStore,
+  filterStore,
+  mediaStore,
+  animeStore,
+  rtcStore
+} from './components/mirageStore';
+import {
+  connectEvents,
+  startSetup,
+  createPeerConnection,
+  otherDataChannel,
+  sendMessage,
+  handleIceCandidate,
+  handleRemoteStreamRemoved,
+  doCall,
+  doAnswer,
+  setLocalAndSendMessage
+} from './components/mirageWebRTC';
 
-document.addEventListener("DOMContentLoaded", (event) => {
 
-  //variable store//
-  let vendorUrl = window.URL || window.webkitURL,
-    peer,
-    chattersClient = [],
-    chatterThisClient,
-    roomID,
-    // variables for video, peerCanvas, and context logic
-    peerMedia,
-    peerVideo,
-    peerCanvas,
-    peerContext,
-    myMedia,
-    myCanvas,
-    myVideo,
-    myContext,
-    // variables for filter logic
-    currFilter = document.getElementById('filterDisp'),
-    filterBtn = document.getElementById('filter'),
-    filters = ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', 'none'],
-    i = 0,
+function createMirage() {
+
+  const mirageComponent = {};
+
+
+  mirageComponent.startApp = () => {
+
+    //states//
+    let roomState = roomStore(window.URL);
+    let mediaState = mediaStore();
+    let filterState = filterStore(document.getElementById('filterDisp'), document.getElementById('filter'));
+
+    let animeState = animeStore(document.getElementById('animation'), document.getElementById('animateDisp'), document.getElementsByClassName('emoji'));
+
+
+    let rtcState = rtcStore();
+
     // clear canvas
-    clearButton = document.getElementById('clear'),
-    // animation variables
-    anime = {
-      paste: paste,
-      bounce: bounce,
-      orbit: orbit
-    },
-    animeKeys = ['paste', 'bounce', 'orbit'],
-    j = 1,
-    animeBtn = document.getElementById('animation'),
-    currAnime = document.getElementById('animateDisp'),
-    currentAnimation,
-    temp,
+    let clearButton = document.getElementById('clear');
     // room buttons
-    joinButton = document.getElementById('join-button'),
-    randomButton = document.getElementById('random-button'),
-    // raf stands for requestAnimationFrame, enables drawing to occur
-    raf,
-    emoImg = new Image(),
-    currentImg = 'assets/emojione/small/1f436.png',
-    emojis = document.getElementsByClassName('emoji'),
-    // video / audio configuration
-    sdpConstraints = {
-      'mandatory': {
-        'OfferToReceiveAudio': true,
-        'OfferToReceiveVideo': true
-      }
-    },
-    //peerConnection and other webRTC setup
-    peerConn,
-    isChannelReady = false,
-    isInitiator = false,
-    isStarted = false,
-    localStream,
-    remoteStream,
-    turnReady,
-    dataChannel,
-    //stun server to use
-    pcConfig = {
-      'iceServers': [{
-        'url': 'stun:stun.l.google.com:19302'
-      }]
-    };
-  //turn server to use
-  //if (location.hostname != 'localhost') {
-  //  requestTurn(
-  //    'https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913'
-  //  );
-  //}
-  //end variable store//
+    let joinButton = document.getElementById('join-button');
 
-  //vendor media objects//
-  navigator.getMedia = navigator.mediaDevices.getUserMedia ||
-    navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
-    navigator.msGetUserMedia; //end vendor media objects//
+    //turn server to use
+    //if (location.hostname != 'localhost') {
+    //  requestTurn(
+    //    'https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913'
+    //  );
+    //}
 
-  //room selection
+    // vendor media objects//
+    navigator.getMedia = navigator.mediaDevices.getUserMedia ||
+      navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia; //end vendor media objects//
 
-  joinButton.addEventListener('click', () => {
-      const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
-      roomID = document.getElementById('room-id-input').value;
-      socket.emit('joinRoom', JSON.stringify(roomID));
+    //room selection
 
-      socket.on('process', (payload) => {
-          payload = JSON.parse(payload);
-          if (!payload) {
-            alert('Try a different room!')
-          } else {
-            document.getElementById('roomApp').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            //begin streaming!//
-            navigator.getMedia({
+    joinButton.addEventListener('click', () => {
+        const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
+        roomState.roomID = document.getElementById('room-id-input').value;
+        socket.emit('joinRoom', JSON.stringify(roomState.roomID));
+
+        socket.on('process', (payload) => {
+            payload = JSON.parse(payload);
+            if (!payload) {
+              alert('Try a different room!')
+            } else {
+              hiddenToggle(document.getElementById('roomApp'), document.getElementById('mainApp'))
+                //begin streaming!//
+              navigator.getMedia({
                 video: true,
                 audio: false
               }).then(stream => {
 
-                //make initiate event happen automatically when streaming begins
-                socket.emit('initiate', JSON.stringify({
-                  streamId: stream.id,
-                  roomId: roomID
-                }))
+                  //make initiate event happen automatically when streaming begins
+                  socket.emit('initiate', JSON.stringify({
+                    streamId: stream.id,
+                    roomId: roomState.roomID
+                  }))
 
-                socket.on('readyConnect', (payload) => {
-                  document.getElementById('connect').disabled = false;
-                })
-
-                socket.on('initiated', (member) => {
-
-                  member = JSON.parse(member);
-
-                  myMedia = mediaGenerator(stream, vendorUrl, 'myBooth', 'myVideo', 'myCanvas', 533, 400);
-
-                  myVideo = myMedia.video;
-                  myCanvas = myMedia.canvas;
-                  myContext = myMedia.context;
-
-                  //sets up local stream reference
-                  localStream = stream;
-                  //set room ID shared between clients
-                  roomID = member.roomId;
-
-                  if (chattersClient.filter(clientChatter => clientChatter.id !== member.id).length || !chattersClient.length) {
-                    chattersClient.push(member);
-                    chatterThisClient = member.id;
-                  }
-
-                  socket.on('updateChatters', (chatter) => {
-                    chattersClient.splice(chattersClient.indexOf(chatter), 1);
+                  socket.on('readyConnect', (payload) => {
                     document.getElementById('connect').disabled = false;
-                  });
-
-                  //instantiate peer objects and finish signaling for webRTC data and video channels
-                  document.getElementById('connect').addEventListener('click', function() {
-                    startSetup();
-                    //data channel creation
-                    console.log('init creating data channel')
-                      //create data channel
-                    dataChannel = peerConn.createDataChannel('interact');
-                    console.log(dataChannel)
-                    onDataChannelCreated(dataChannel)
-                      //audio/ video creation
-                    doCall();
-                  });
-
-                  socket.on('message', function(message) {
-                    console.log("Client received Message", message);
-                    if (message.type === 'offer') {
-                      if (!isStarted) {
-                        startSetup();
-                        otherDataChannel();
-                      }
-
-                      peerConn.setRemoteDescription(new RTCSessionDescription(message));
-                      doAnswer();
-                    } else if (message.type === 'answer' && isStarted) {
-                      console.log('Got answer');
-                      peerConn.setRemoteDescription(new RTCSessionDescription(message));
-                    } else if (message.type === 'candidate' && isStarted) {
-                      let candidate = new RTCIceCandidate({
-                        sdpMLineIndex: message.label,
-                        candidate: message.candidate
-                      });
-                      peerConn.addIceCandidate(candidate);
-                    }
-                  });
-
-                }); //end of socket.on('initiated')
-
-                function startSetup() {
-                  console.log('startSetup? ', isStarted, localStream);
-                  if (!isStarted && typeof localStream !== 'undefined') {
-                    console.log('creating peer connection')
-                    createPeerConnection();
-                    peerConn.addStream(localStream);
-                    isStarted = true;
-                  }
-                }
-
-                function createPeerConnection() {
-                  try {
-                    peerConn = new RTCPeerConnection(pcConfig)
-                    peerConn.onicecandidate = handleIceCandidate;
-                    peerConn.onaddstream = handleRemoteStreamAdded;
-                    peerConn.onremovestream = handleRemoteStreamRemoved;
-
-                    document.getElementById('disconnect').addEventListener('click', function(event) {
-                        peerConn.close();
-                      }) //end of disconnect click event//
-
-                  } catch (err) {
-                    console.log('Failed to connect. Error: ' + err);
-                    return;
-                  }
-                }
-
-                //data channel stuff
-                function onDataChannelCreated(channel) {
-
-                  channel.onopen = function() {
-                    console.log('data channel opened');
-                  };
-
-                  //after creation of data channel switch button visilibity
-                  document.getElementById('connect').disabled = true;
-                  document.getElementById('disconnect').disabled = false;
-
-                  //beginning of interactivity
-                  //looks for click event on the send button//
-                  document.getElementById('send').addEventListener('click', function() {
-                      //post message in text context on your side
-                      //send message object to the data channel
-                      console.log(peerConn);
-                      let yourMessageObj = JSON.stringify({
-                        message: "them:" + " " + document.getElementById('yourMessage').value
-                      });
-                      //creates a variable with the same information to display on your side
-                      //peer.localPort is a temporary way to identify peers, should be changed
-                      let yourMessage = "me:" + " " + document.getElementById('yourMessage').value;
-                      //post message in text context on your side
-                      document.getElementById('messages').textContent += yourMessage + '\n';
-                      dataChannel.send(yourMessageObj);
-                    }) //end send click event//
-
-                  //click event for the "filter me" button//
-                  filterListener(myVideo, 'myFilter', currFilter, true, dataChannel, setVendorCss);
-                  //click event for the "filter them" button
-                  filterListener(peerVideo, 'peerFilter', currFilter, false, dataChannel, setVendorCss);
-
-                  animationListener(myCanvas, emoImg, anime, currAnime, myContext, raf, [velocity, angularVelocity], dataChannel, true, getCursorPosition); //local
-
-                  //changing filters//
-                  filterBtn.addEventListener('click', () => {
-                    currFilter.innerHTML = filters[i];
-                    i++;
-                    if (i >= filters.length) i = 0;
-                  }, false); //end of filter test//
-
-                  //changing animations//
-                  animeBtn.addEventListener('click', () => {
-                    currAnime.innerHTML = animeKeys[j];
-                    currentAnimation = anime[animeKeys[j]];
-                    console.log(currentAnimation);
-                    j++;
-                    if (j >= animeKeys.length) j = 0;
-                  }, false)
-
-                  //adding click handler for active emoji selection
-                  Array.from(emojis, (ele) => {
-                    ele.addEventListener('click', (event) => {
-                      currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
-                      console.log(currentImg)
-                      emoImg.src = currentImg;
-                    }, false)
                   })
 
-                  //attempts to clear canvas
-                  clearButton.addEventListener('click', (event) => {
-                    cancelAnimationFrame(raf);
-                    myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
-                    peerContext.clearRect(0, 0, peerCanvas.width, peerCanvas.height);
-                  }, false);
 
-                  //end of interactivity
+                  socket.on('initiated', (member) => {
 
-                  //on data event
-                  channel.onmessage = event => {
-                    let data = event.data;
+                    member = JSON.parse(member);
 
-                    //conditionally apply or remove filter
-                    let dataObj = JSON.parse(data);
+                    mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'myBooth', 'myVideo', 'myCanvas', 533, 400);
 
-                    if (dataObj.message) {
-                      document.getElementById('messages').textContent += dataObj.message + '\n';
+                    mediaState.myVideo = mediaState.myMedia.video;
+                    mediaState.myCanvas = mediaState.myMedia.canvas;
+                    mediaState.myContext = mediaState.myMedia.context;
+
+                    //sets up local stream reference
+                    rtcState.localStream = stream;
+                    //set room ID shared between clients
+                    roomState.roomID = member.roomId;
+
+                    if (roomState.chattersClient.filter(clientChatter => clientChatter.id !== member.id).length || !roomState.chattersClient.length) {
+                      roomState.chattersClient.push(member);
+                      roomState.chatterThisClient = member.id;
                     }
 
-                    if (dataObj.hasOwnProperty('local')) {
-                      if (dataObj.local) {
-                        setVendorCss(peerVideo, dataObj.filterType);
-                      } //conditionally applies or removes filter
-                      else if (!dataObj.local) {
-                        setVendorCss(myVideo, dataObj.filterType);
+                    //instantiate peer objects and finish signaling for webRTC data and video channels
+                    document.getElementById('connect').addEventListener('click', () => {
+                      connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket)
+                        // onDataChannelCreated(rtcState.dataChannel)
+                    });
+
+
+                    socket.on('message', function(message) {
+                      // console.log("Client received Message", message);
+                      if (message.type === 'offer') {
+                        if (!rtcState.isStarted) {
+                          startSetup(rtcState, roomState, handleRemoteStreamAdded, socket);
+                          otherDataChannel(event, rtcState, onDataChannelCreated, activateAnime);
+                        }
+
+                        rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
+                        doAnswer(rtcState, roomState, socket);
+                      } else if (message.type === 'answer' && rtcState.isStarted) {
+                        // console.log('Got answer');
+                        rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
+                      } else if (message.type === 'candidate' && rtcState.isStarted) {
+                        let candidate = new RTCIceCandidate({
+                          sdpMLineIndex: message.label,
+                          candidate: message.candidate
+                        });
+                        rtcState.peerConn.addIceCandidate(candidate);
+                      }
+                    });
+
+                  }); //end of socket.on('initiated')
+
+
+                  //data channel stuff
+                  function onDataChannelCreated(channel) {
+
+                    channel.onopen = function() {
+                      // console.log('data channel opened');
+                    };
+
+                    //after creation of data channel switch button visilibity
+                    disableToggle(document.getElementById('connect'), document.getElementById('disconnect'))
+
+                    //beginning of interactivity
+                    //looks for click event on the send button//
+                    document.getElementById('send').addEventListener('click', function() {
+                        //post message in text context on your side
+                        //send message object to the data channel
+                        // console.log(rtcState.peerConn);
+                        let yourMessageObj = JSON.stringify({
+                          message: "them:" + " " + document.getElementById('yourMessage').value
+                        });
+                        //creates a variable with the same information to display on your side
+                        //peer.localPort is a temporary way to identify peers, should be changed
+                        let yourMessage = "me:" + " " + document.getElementById('yourMessage').value;
+                        //post message in text context on your side
+                        document.getElementById('messages').textContent += yourMessage + '\n';
+                        // rtcState.dataChannel.send(yourMessageObj);
+                        channel.send(yourMessageObj)
+                      }) //end send click event//
+
+                    //click event for the "filter me" button//
+                    // filterListener(mediaState.myVideo, 'myFilter', mediaState.currFilter, true, rtcState.dataChannel, setVendorCss);
+                    filterListener(mediaState.myVideo, 'myFilter', mediaState.currFilter, true, channel, setVendorCss);
+                    //click event for the "filter them" button
+                    // filterListener(mediaState.peerVideo, 'peerFilter', mediaState.currFilter, false, rtcState.dataChannel, setVendorCss);
+                    filterListener(mediaState.peerVideo, 'peerFilter', mediaState.currFilter, false, channel, setVendorCss);
+
+                    // animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, true, getCursorPosition); //local
+                    animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition); //local
+
+                    //changing filters//
+                    filterState.filterBtn.addEventListener('click', () => {
+                      filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
+                      // i++;
+                      if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
+                    }, false); //end of filter test//
+
+                    //changing animations//
+                    animeState.animeBtn.addEventListener('click', () => {
+                      animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
+                      animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
+                      // console.log(animeState.currentAnimation);
+                      // j++;
+                      if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
+                    }, false)
+
+                    //adding click handler for active emoji selection
+                    Array.from(animeState.emojis, (ele) => {
+                      ele.addEventListener('click', (event) => {
+                        animeState.currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
+                        // console.log(animeState.currentImg)
+                        animeState.emoImg.src = animeState.currentImg;
+                      }, false)
+                    })
+
+                    //attempts to clear canvas
+                    clearButton.addEventListener('click', (event) => {
+                      cancelAnimationFrame(animeState.raf);
+                      mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
+                      mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
+                    }, false);
+
+                    //end of interactivity
+
+                    //on data event
+                    channel.onmessage = event => {
+                      let data = event.data;
+
+                      //conditionally apply or remove filter
+                      let dataObj = JSON.parse(data);
+
+                      if (dataObj.message) {
+                        document.getElementById('messages').textContent += dataObj.message + '\n';
+                      }
+
+                      if (dataObj.hasOwnProperty('local')) {
+                        if (dataObj.local) {
+                          setVendorCss(mediaState.peerVideo, dataObj.filterType);
+                        } //conditionally applies or removes filter
+                        else if (!dataObj.local) {
+                          setVendorCss(mediaState.myVideo, dataObj.filterType);
+                        }
+                      }
+
+                      if (dataObj.hasOwnProperty('localEmoji')) {
+                        if (dataObj.localEmoji) {
+                          //remote display bounce animation!
+                          let emoImg = new Image();
+                          emoImg.src = dataObj.currentImg;
+
+                          animeState.temp = animeState.currentAnimation;
+                          animeState.currentAnimation = eval('(' + dataObj.animation + ')');
+                          animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
+                          animeState.currentAnimation = animeState.temp;
+
+                        } else if (!dataObj.localEmoji) {
+                          //local display bounce animation!
+                          let emoImg = new Image();
+                          emoImg.src = dataObj.currentImg;
+
+                          animeState.temp = animeState.currentAnimation;
+                          animeState.currentAnimation = eval('(' + dataObj.animation + ')');
+                          animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
+                          animeState.currentAnimation = animeState.temp;
+                        }
                       }
                     }
-
-                    if (dataObj.hasOwnProperty('localEmoji')) {
-                      if (dataObj.localEmoji) {
-                        //remote display bounce animation!
-                        let emoImg = new Image();
-                        emoImg.src = dataObj.currentImg;
-
-                        temp = currentAnimation;
-                        currentAnimation = eval('(' + dataObj.animation + ')');
-                        currentAnimation(peerCanvas, peerContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
-                        currentAnimation = temp;
-
-                      } else if (!dataObj.localEmoji) {
-                        //local display bounce animation!
-                        let emoImg = new Image();
-                        emoImg.src = dataObj.currentImg;
-
-                        temp = currentAnimation;
-                        currentAnimation = eval('(' + dataObj.animation + ')');
-                        currentAnimation(myCanvas, myContext, event, dataObj.position, emoImg, raf, [velocity, angularVelocity]);
-                        currentAnimation = temp;
-                      }
-                    }
                   }
-                }
 
-                function otherDataChannel(event) {
-                  peerConn.ondatachannel = (event) => {
-                    console.log('not initiator data channel start', event.channel);
-                    dataChannel = event.channel;
-                    onDataChannelCreated(dataChannel);
+
+                  function handleRemoteStreamAdded(event) {
+                    // console.log('Remote Stream Added, event: ', event);
+                    rtcState.remoteStream = event.stream;
+                    // console.log('local', rtcState.localStream, 'remote', rtcState.remoteStream)
+
+                    mediaState.peerMedia = mediaGenerator(event.stream, roomState.vendorUrl, 'peerBooth', 'peerVideo', 'peerCanvas', 533, 400);
+
+                    mediaState.peerVideo = mediaState.peerMedia.video;
+                    mediaState.peerCanvas = mediaState.peerMedia.canvas;
+                    mediaState.peerContext = mediaState.peerMedia.context;
+
+                    animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
+
+                  } ///end on stream added event///
+
+
+                  function activateAnime() {
+                    animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
                   }
-                }
 
-                //misc webRTC helper functions
-
-                function sendMessage(data, who) {
-                  let message = {
-                    roomID: roomID,
-                    who: who,
-                    data: data
+                  //all this disconnect logic needs to be revamped, VERY SOON!
+                  function endCall() {
+                    rtcState.peerConn.close();
+                    rtcState.peerConn = null;
+                    socket.disconnect()
+                    rtcState.localStream.getTracks().forEach((track) => {
+                      track.stop();
+                    });
+                    mediaState.myVideo.src = "";
+                    mediaState.peerVideo.src = "";
+                    hiddenToggle(document.getElementById('roomApp'), document.getElementById('mainApp'));
+                    disableToggle(document.getElementById('connect'), document.getElementById('disconnect'));
                   }
-                  console.log('Client Sending Message: ', message);
-                  socket.emit('message', message);
-                }
 
-                function handleIceCandidate(event) {
-                  console.log('icecandidate event ', event);
-                  if (event.candidate) {
-                    sendMessage({
-                      type: 'candidate',
-                      label: event.candidate.sdpMLineIndex,
-                      id: event.candidate.sdpMid,
-                      candidate: event.candidate.candidate
-                    }, 'other');
-                  } else {
-                    console.log('End of candidates.');
-                  }
-                }
+                  //disconnect event
+                  document.getElementById('disconnect').addEventListener('click', function(event) {
+                      // console.log('hi there Blake')
+                      socket.emit('severe');
+                    }) //end of disconnect click event//
 
-                function handleRemoteStreamAdded(event) {
-                  console.log('Remote Stream Added, event: ', event);
-                  remoteStream = event.stream;
-                  console.log('local', localStream, 'remote', remoteStream)
-
-                  peerMedia = mediaGenerator(event.stream, vendorUrl, 'peerBooth', 'peerVideo', 'peerCanvas', 533, 400);
-
-                  peerVideo = peerMedia.video;
-                  peerCanvas = peerMedia.canvas;
-                  peerContext = peerMedia.context;
-
-                  animationListener(peerCanvas, emoImg, anime, currAnime, peerContext, raf, [velocity, angularVelocity], dataChannel, false, getCursorPosition); //remote
-
-                } ///end on stream added event///
-
-                function handleRemoteStreamRemoved(event) {
-                  console.log('Remote Stream removed, event: ', event);
-                  socket.emit('disconnect');
-                  location.reload();
-                }
-
-                function doCall() {
-                  console.log('sending offer to peer');
-                  peerConn.createOffer().then(setLocalAndSendMessage).catch(err => {
-                    console.log('create offer error: ' + err);
+                  socket.on('updateChatters', (chatter) => {
+                    socket.emit('severe')
+                    endCall();
+                    document.getElementById('messages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
+                    roomState.chattersClient.splice(roomState.chattersClient.indexOf(chatter), 1);
+                    // document.getElementById('connect').disabled = false;
                   });
-                }
 
-                function doAnswer() {
-                  console.log('Sending answer to peer.');
-                  peerConn.createAnswer().then(
-                    setLocalAndSendMessage).catch(err => {
-                      console.log('create offer error: ' + err);
-                    }
-                  );
-                }
+                }, //end of stream//
+                function(err) {
+                  console.error(err);
+                });
 
-                function setLocalAndSendMessage(sessionDescription) {
-                  peerConn.setLocalDescription(sessionDescription);
-                  console.log('setLocalAndSendMessage. Sending Message', sessionDescription);
-                  sendMessage(sessionDescription, 'other');
-                } //close misc webRTC helper function
+            } //end of boolean in socket 'process' event
+
+          }) //end of socket 'process' event
+
+      }, false) //end of 'join' event
 
 
-              }, //end of stream//
-              function(err) {
-                console.error(err);
-              });
+    function hiddenToggle(ele1, ele2) {
+      let args = [...arguments];
+      args.forEach((ele, idx) => {
+        ele.classList.toggle('hidden');
+      })
+    }
 
+    function disableToggle(ele1, ele2) {
+      let args = [...arguments];
+      args.forEach((ele, idx) => {
+        ele.disabled ? ele.disabled = false : ele.disabled = true;
+      })
+    }
 
-          } //end of boolean in socket 'process' event
+  }
+  return mirageComponent;
+}
 
-        }) //end of socket 'process' event
-
-    }, false) //end of 'join' event
-
-});
+export {
+  createMirage
+};
