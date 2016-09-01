@@ -35,7 +35,6 @@
       y: pos.y,
       vx: 5,
       vy: 2,
-      id: posObj.clickCount,
       onload: function() {
         ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
       }
@@ -122,13 +121,6 @@
     obj.onload();
       obj.x += obj.vx;
       obj.y += obj.vy;
-      // posObj.posArr.push(obj.x);
-      // console.log(posObj.posArr);
-      // for(let m = 0; m < posObj.posArr.length; m++){
-      //
-      //   if (posObj.clickCount > posObj.posArr.length + 1) {
-      //     posObj.posArr.pop()
-      //   }
 
         if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
             obj.vy = -obj.vy;
@@ -136,18 +128,22 @@
         if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
             obj.vx = -obj.vx;
         }
+        if (rect.intersects(obj.x + obj.vx, obj.y + obj.vy)) {
 
+          if(obj.x + obj.vx + 2 > rect.x){
+            obj.vx = -obj.vx;
+          }
+          if (obj.x + obj.vx - 2 < rect.x){
+            obj.vx = -obj.vx;
+          }
+          if (obj.y + obj.vy - 2 < rect.y){
+            obj.vy = -obj.vy;
+          }
+          if (obj.y + obj.vy + 2 > rect.y){
+            obj.vy = -obj.vy;
+          }
+        }
 
-        if(obj.x + obj.vx < rect.x && obj.y + obj.vy > rect.y || obj.x + obj.vx < rect.x && obj.y + obj.vy < rect.y + rect.height || obj.x + obj.vx > rect.x + rect.with ){
-            obj.vx = -obj.vx
-        }
-        else if(obj.x + obj.vx > rect.x + rect.width){
-            obj.vx = -obj.vx
-        }
-        }
-        // if (obj.x === posObj.posArr[m].x) {
-        //     obj.vx = -obj.vx;
-        // }
 
           animate = window.requestAnimationFrame(cb);
         }
