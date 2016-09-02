@@ -5,7 +5,6 @@ const http = require('http');
 const https = require('https');
 const express = require('express');
 const app = express();
-const _ = require('lodash')
 const favicon = require('serve-favicon');
 const path = require('path')
 const startSockets = require('./sockLogic.js');
@@ -37,4 +36,3 @@ let httpsServer = https.createServer(options, app).listen(httpsPort, function(){
 });
 
 startSockets(server);
-
