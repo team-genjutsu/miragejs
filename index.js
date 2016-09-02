@@ -9,7 +9,8 @@ import {
   getCursorPosition,
   orbit,
   staticPaste,
-  bounce
+  bounce,
+  intersects
 } from './components/funcStore';
 require("tracking/src/tracking");
 //let ObjectTracker = require("tracking/src/trackers/ObjectTracker");
@@ -56,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   //image assignment, we can abstract this later
   let emoImg;
   let currentImg = 'assets/emojione/small/1f436.png';
-  let faceRect = {};
+
 
   //end variable store//
 
@@ -104,8 +105,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       member = JSON.parse(member);
 
                       var myVideo = document.getElementById('myVideo');
+                      myVideo.src = window.URL.createObjectURL(stream);
                       var myCanvas = document.getElementById('myCanvas');
                       var myContext = myCanvas.getContext('2d');
+                      console.log(myVideo, "my video when instantiated");
+
+                      var myFaceRect = {width: 100, height: 100};
+
 
                       var tracker = new tracking.ObjectTracker('face');
                       console.log("tracker", tracker);
@@ -114,17 +120,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       tracker.setStepSize(2);
                       tracker.setEdgesDensity(0.1);
                       tracker.canvasOverlay = myCanvas;
-                      tracking.track('#myVideo', tracker, { camera: true }, stream);
+                      tracking.track(myVideo, tracker, { camera: true }, stream);
 
                       tracker.on('track', function(event) {
-                        //console.log(event, "event");
-                        myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
+                        //myContext.clearRect(myFaceRect.x - 1, myFaceRect.y - 1, myFaceRect.width + 2, myFaceRect.height + 2);
+                        //myContext.clearRect(event.data[0].x - 1, event.data[0].y -1, event.data[0].width + 1, event.data[0].height + 1);
                         event.data.forEach(function(rect) {
-
-                          myContext.strokeStyle = '#EB4C4C';
-                          myContext.strokeRect(rect.x, rect.y, rect.width, rect.height);
-                          faceRect = {x: rect.x, y: rect.y, width: rect.width, height: rect.height};
-                          console.log(faceRect);
+                          // myContext.strokeStyle = '#EB4C4C';
+                          // myContext.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                          // // console.log("Drawing the rectangle on the face");
+                          myFaceRect.x = rect.x;
+                          myFaceRect.y = rect.y;
+                          console.log(myFaceRect);
+                          //console.log(myFaceRect.x);
 
                         });
                       });
@@ -327,6 +335,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                           let emoImg = new Image();
                           emoImg.src = currentImg;
+                          console.log(myPosition);
 
                           let myCanvasObj = JSON.stringify({
                             animation: currentAnimation.toString(),
@@ -339,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                           });
 
                           //animation for local display and data transmission to peer
-                          currentAnimation(myCanvas, myContext, event, myPosition, emoImg, raf, [velocity, angularVelocity]);
+                          currentAnimation(myCanvas, myContext, event, myPosition, emoImg, raf, [velocity, angularVelocity], myFaceRect);
                           peer.send(myCanvasObj);
 
                         }, false)

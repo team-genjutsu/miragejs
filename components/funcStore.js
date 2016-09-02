@@ -115,6 +115,11 @@
     setTimeout(drawVideo, 20, v, c, w, h);
   }//end drawVideo//
 
+  function intersects(obj, rect){
+    return (obj.x > rect.x && obj.x < rect.x + rect.width && obj.y > rect.y && obj.y < rect.y + rect.height)
+
+  }
+
   //canvas draw function for velocity motion
   function velocity(obj, ctx, cv, cb, emoImg, animate, rect) {
     ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 8, emoImg.height + 8);
@@ -128,9 +133,9 @@
         if (obj.x + obj.vx > cv.width || obj.x + obj.vx < 0) {
             obj.vx = -obj.vx;
         }
-        if (rect.intersects(obj.x + obj.vx, obj.y + obj.vy)) {
+        if (intersects(obj, rect)) {
 
-          if(obj.x + obj.vx + 2 > rect.x){
+          if(obj.x + obj.vx + 2 > rect.x + rect.width){
             obj.vx = -obj.vx;
           }
           if (obj.x + obj.vx - 2 < rect.x){
@@ -139,7 +144,7 @@
           if (obj.y + obj.vy - 2 < rect.y){
             obj.vy = -obj.vy;
           }
-          if (obj.y + obj.vy + 2 > rect.y){
+          if (obj.y + obj.vy - 2 > rect.y + rect.height){
             obj.vy = -obj.vy;
           }
         }
