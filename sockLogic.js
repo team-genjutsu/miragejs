@@ -1,5 +1,5 @@
-module.exports = function (server) {
-'use strict';
+module.exports = function(server) {
+  'use strict';
   const io = require('socket.io').listen(server);
 
   const connections = [];
@@ -29,7 +29,8 @@ module.exports = function (server) {
 
 
     //disconnecting users
-    socket.on('disconnect', function() {
+    socket.on('severe', function() {
+      console.log('disconnect triggered')
       let member,
         room,
         otherMem;
@@ -42,6 +43,8 @@ module.exports = function (server) {
           if (rooms[idx].members.length > 0) {
             rooms[idx].members.forEach((el, id) => {
               io.to(el.id).emit('updateChatters', member);
+              socket.disconnect();
+
             })
           }
 
@@ -53,7 +56,6 @@ module.exports = function (server) {
 
       connections.splice(connections.indexOf(socket), 1);
       console.log(socket.id + ' left room ' + member.roomId)
-      socket.disconnect();
 
     })
 
@@ -112,7 +114,7 @@ module.exports = function (server) {
       // } else
       if (payload.who === 'other') {
         sharedRoom.members.forEach((ele, idx) => {
-          if (ele.id !== socket.id){
+          if (ele.id !== socket.id) {
             io.to(ele.id).emit('message', payload.data);
           }
         });
