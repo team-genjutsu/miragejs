@@ -77,7 +77,8 @@ function createMirage() {
       var demo = document.getElementById('demo');
       var matBtn = document.getElementById('materialBtn');
 
-      // matBtn.classList.add('hidden')
+      //need to parse through stylesheets and set z-indexes of elements to -1 with
+      //each toggle
       demo.classList.toggle('hidden');
       // demo.style.display = 'block';
     })
