@@ -13,10 +13,10 @@ import {
   bounce
 } from './funcStore';
 
-function filterStore(btnEle, dispEle){
+function filterStore(filterDispId, filterBtnId){
   return {
-    currFilter: dispEle,
-    filterBtn: btnEle,
+    currFilter: document.getElementById(filterDispId),
+    filterBtn: document.getElementById(filterBtnId),
     filters: ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', 'none'],
     idx: 0
   }
@@ -35,8 +35,8 @@ function mediaStore(){
   return {
     peerMedia: null,
     peerVideo: null,
-    peerCanva: null,
-    peerContex: null,
+    peerCanvas: null,
+    peerContext: null,
     myMedia: null,
     myCanvas: null,
     myVideo: null,
@@ -44,7 +44,7 @@ function mediaStore(){
   }
 }
 
-function animeStore(animeBtn, animeDisp, emojiEls){
+function animeStore(animeBtnId, animeDispId, emojiClass){
   return {
     anime: {
       paste: paste,
@@ -53,14 +53,14 @@ function animeStore(animeBtn, animeDisp, emojiEls){
     },
     animeKeys: ['paste', 'bounce', 'orbit'],
     idx: 1,
-    animeBtn: animeBtn,
-    currAnime: animeDisp,
+    animeBtn: document.getElementById(animeBtnId),
+    currAnime: document.getElementById(animeDispId),
     currentAnimation: null,
     temp: null,
     raf: null,
     emoImg: new Image(),
     currentImg: null,
-    emojis: emojiEls
+    emojis: document.getElementsByClassName(emojiClass)
   }
 }
 

@@ -10,8 +10,8 @@
 }
 
 .elementToFadeInAndOut {
-    -webkit-animation: fadeinout 4s linear forwards infinite;
-    animation: fadeinout 4s linear forwards infinite;
+    -webkit-animation: fadeinout 1s linear forwards infinite;
+    animation: fadeinout 1s linear forwards infinite;
     opacity: 0;
 }
 

@@ -1,21 +1,10 @@
-import {
-  cutCircle,
-  angularVelocity,
-  velocity,
-  drawVideo,
-  setVendorCss,
-  getCursorPosition,
-  orbit,
-  paste,
-  bounce
-} from './funcStore';
 
 function filterListener(vid, whoisFilter, currFilter, whoisBool, channel, func) {
   document.getElementById(whoisFilter).addEventListener('click', () => {
     let filterDataObj;
     // sends boolean data about remote filter application and adds filter on your side
     filterDataObj = JSON.stringify({
-      local: whoisBool,
+      filter: whoisBool,
       filterType: currFilter.innerHTML
     });
     func(vid, currFilter.innerHTML);
@@ -38,7 +27,7 @@ function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, ar
     animation(canvas, context, event, position, emoImage, reqAnim, array);
 
     let canvasObj = JSON.stringify({
-      animation: animation.toString(),
+      animation: animeEle.innerHTML,
       localEmoji: local,
       currentImg: emoImage.src,
       position: {
