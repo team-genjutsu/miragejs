@@ -85,7 +85,7 @@ function createMirage() {
             if (!payload) {
               alert('Try a different room!')
             } else {
-              hiddenToggle(document.getElementById('roomApp'), document.getElementById('mainApp'))
+              hiddenToggle(document.getElementById('roomApp'), document.getElementById('boothApp'))
                 //begin streaming!//
               navigator.getMedia({
                 video: true,
@@ -107,7 +107,7 @@ function createMirage() {
 
                     member = JSON.parse(member);
 
-                    mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'myBooth', 'myVideo', 'myCanvas', 533, 400);
+                    mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'myBooth', 'myVideo', 'myCanvas');
 
                     mediaState.myVideo = mediaState.myMedia.video;
                     mediaState.myCanvas = mediaState.myMedia.canvas;
@@ -225,7 +225,11 @@ function createMirage() {
                       mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
                     }, false);
 
-                    //end of interactivity
+                    document.getElementById('videoToggle').addEventListener('click', () => {
+                        hiddenToggle(document.getElementById('myBooth'), document.getElementById('peerBooth'));
+                        blinkerOff('videoToggle');
+                      })
+                      //end of interactivity
 
                     //on data event
                     channel.onmessage = event => {
@@ -241,9 +245,13 @@ function createMirage() {
                       if (dataObj.hasOwnProperty('local')) {
                         if (dataObj.local) {
                           setVendorCss(mediaState.peerVideo, dataObj.filterType);
+                          blinkerOn('peerBooth', 'videoToggle');
                         } //conditionally applies or removes filter
                         else if (!dataObj.local) {
                           setVendorCss(mediaState.myVideo, dataObj.filterType);
+                          blinkerOn('myBooth', 'videoToggle');
+
+                          //add function to make toggle button blink
                         }
                       }
 
@@ -257,6 +265,7 @@ function createMirage() {
                           animeState.currentAnimation = eval('(' + dataObj.animation + ')');
                           animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
                           animeState.currentAnimation = animeState.temp;
+                          blinkerOn('peerBooth', 'videoToggle')
 
                         } else if (!dataObj.localEmoji) {
                           //local display bounce animation!
@@ -267,6 +276,8 @@ function createMirage() {
                           animeState.currentAnimation = eval('(' + dataObj.animation + ')');
                           animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
                           animeState.currentAnimation = animeState.temp;
+                          blinkerOn('myBooth', 'videoToggle')
+
                         }
                       }
                     }
@@ -278,14 +289,19 @@ function createMirage() {
                     rtcState.remoteStream = event.stream;
                     // console.log('local', rtcState.localStream, 'remote', rtcState.remoteStream)
 
-                    mediaState.peerMedia = mediaGenerator(event.stream, roomState.vendorUrl, 'peerBooth', 'peerVideo', 'peerCanvas', 533, 400);
+                    mediaState.peerMedia = mediaGenerator(event.stream, roomState.vendorUrl, 'peerBooth', 'peerVideo', 'peerCanvas');
 
                     mediaState.peerVideo = mediaState.peerMedia.video;
                     mediaState.peerCanvas = mediaState.peerMedia.canvas;
                     mediaState.peerContext = mediaState.peerMedia.context;
 
+                    hiddenToggle(document.getElementById('myBooth'), document.getElementById('peerBooth'));
+
                     animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
 
+                    window.onresize = () => {
+                      resize(window, myVideo, peerVideo, myCanvas, peerCanvas, myContext, peerContext, document.getElementById('vidContainer'), generateDims);
+                    }
                   } ///end on stream added event///
 
 
@@ -303,7 +319,8 @@ function createMirage() {
                     });
                     mediaState.myVideo.src = "";
                     mediaState.peerVideo.src = "";
-                    hiddenToggle(document.getElementById('roomApp'), document.getElementById('mainApp'));
+
+                    hiddenToggle(document.getElementById('roomApp'), document.getElementById('boothApp'));
                     disableToggle(document.getElementById('connect'), document.getElementById('disconnect'));
                   }
 
@@ -333,6 +350,7 @@ function createMirage() {
       }, false) //end of 'join' event
 
 
+    //these functions need to be ported to proper file
     function hiddenToggle(ele1, ele2) {
       let args = [...arguments];
       args.forEach((ele, idx) => {
@@ -345,6 +363,67 @@ function createMirage() {
       args.forEach((ele, idx) => {
         ele.disabled ? ele.disabled = false : ele.disabled = true;
       })
+    }
+
+    function resize(win, locVideo, remVideo, locCanvas, remCanvas, locContext, remContext, container, func) {
+
+      let dims = func(container, win);
+      //resize local elements
+      locVideo.setAttribute('width', '' + dims.vidWidth);
+      locVideo.setAttribute('height', '' + dims.vidHeight);
+
+      locCanvas.setAttribute('width', '' + dims.vidWidth);
+      locCanvas.setAttribute('height', '' + dims.vidHeight);
+
+      //resize remote elements
+      remVideo.setAttribute('width', '' + dims.vidWidth);
+      remVideo.setAttribute('height', '' + dims.vidHeight);
+
+      remCanvas.setAttribute('width', '' + dims.vidWidth);
+      remCanvas.setAttribute('height', '' + dims.vidHeight);
+    }
+
+    function generateDims(container, win) {
+      let containerStyle = win.getComputedStyle(container);
+      let styleWidth = containerStyle.getPropertyValue('width');
+      let videoWidth = Math.round(+styleWidth.substring(0, styleWidth.length - 2));
+      let videoHeight = Math.round((videoWidth / 4) * 3);
+
+      return {
+        vidWidth: videoWidth,
+        vidHeight: videoHeight
+      }
+    }
+
+    function scaleToFill(videoTag, height, width) {
+      let video = videoTag,
+        videoRatio = 4 / 3,
+        tagRatio = width / height;
+      if (videoRatio < tagRatio) {
+        video.setAttribute('style', '-webkit-transform: scaleX(' + tagRatio / videoRatio + ')')
+      } else if (tagRatio < videoRatio) {
+        video.setAttribute('style', '-webkit-transform: scaleY(' + videoRatio / tagRatio + ')')
+      }
+    }
+
+    function scaleElement(vid, height, width) {
+      let video = vid;
+      let actualRatio = 4 / 3;
+      let targetRatio = width / height;
+      let adjustmentRatio = targetRatio / actualRatio;
+      let scale = actualRatio < targetRatio ? targetRatio / actualRatio : actualRatio / targetRatio;
+      console.log(scale);
+      video.setAttribute('style', '-webkit-transform: scale(' + scale + ')');
+    };
+
+    function blinkerOn(boothEleId, btnEleId) {
+      if (document.getElementById(boothEleId).classList.contains('hidden')) {
+        document.getElementById(btnEleId).classList.toggle('elementToFadeInAndOut');
+      }
+    }
+
+    function blinkerOff(btnId) {
+      document.getElementById(btnId).classList.remove('elementToFadeInAndOut');
     }
 
   }
