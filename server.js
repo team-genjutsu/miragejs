@@ -27,6 +27,7 @@ let server = http.createServer(app).listen(httpPort, function(){
   // console.log('Listening on ' + port)
 // });
 
+// redirects all incoming requests from http protocol to https equivalent
 app.use((req, res, next) => {
   if (req.headers['x-forwarded-proto'] === 'http') {
     res.redirect('https://' + req.hostname + req.url);
