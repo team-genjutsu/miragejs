@@ -73,6 +73,15 @@ function createMirage() {
     //  );
     //}
 
+    document.getElementById('materialBtn').addEventListener('click', () => {
+      var demo = document.getElementById('demo');
+      var matBtn = document.getElementById('materialBtn');
+
+      // matBtn.classList.add('hidden')
+      demo.classList.toggle('hidden');
+      // demo.style.display = 'block';
+    })
+
     // vendor media objects//
     navigator.getMedia = navigator.mediaDevices.getUserMedia ||
       navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
