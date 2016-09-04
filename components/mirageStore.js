@@ -1,17 +1,17 @@
 //allows inputs for client to hook DOM elements
 //concerning filters. Preset filters for now, will be dynamic
 //in future
-import {
-  cutCircle,
-  angularVelocity,
-  velocity,
-  drawVideo,
-  setVendorCss,
-  getCursorPosition,
-  orbit,
-  paste,
-  bounce
-} from './funcStore';
+// import {
+  // cutCircle,
+  // angularVelocity,
+  // velocity,
+  // drawVideo,
+  // setVendorCss,
+  // getCursorPosition,
+  // orbit,
+  // paste,
+  // bounce
+// } from './funcStore';
 
 function filterStore(filterDispId, filterBtnId){
   return {
@@ -44,12 +44,12 @@ function mediaStore(){
   }
 }
 
-function animeStore(animeBtnId, animeDispId, emojiClass){
+function animeStore(animeBtnId, animeDispId, emojiClass, functionArray){
   return {
     anime: {
-      paste: paste,
-      bounce: bounce,
-      orbit: orbit
+      paste: functionArray[0], //paste,
+      bounce: functionArray[1], //bounce,
+      orbit: functionArray[2] //orbit
     },
     animeKeys: ['paste', 'bounce', 'orbit'],
     idx: 1,

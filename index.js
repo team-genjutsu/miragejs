@@ -45,12 +45,20 @@ import {
   doAnswer,
   setLocalAndSendMessage
 } from './components/mirageWebRTC';
+import {
+  mirageChunk
+} from './components/chunk';
 
 
 function createMirage() {
 
   const mirageComponent = {};
 
+  mirageComponent.blowChunks = () => {
+  
+    // console.log(mirageChunk);
+    document.body.insertAdjacentHTML('afterbegin', mirageChunk);
+  }
 
   mirageComponent.startApp = () => {
 
@@ -58,7 +66,7 @@ function createMirage() {
     let roomState = roomStore(window.URL);
     let mediaState = mediaStore();
     let filterState = filterStore('filterDisp', 'filter');
-    let animeState = animeStore('animation', 'animateDisp', 'emoji');
+    let animeState = animeStore('animation', 'animateDisp', 'emoji', [paste, bounce, orbit]);
     let rtcState = rtcStore();
 
     // clear canvas
@@ -72,6 +80,9 @@ function createMirage() {
     //    'https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913'
     //  );
     //}
+
+    // console.log(mirageChunk);
+    // document.body.insertAdjacentHTML('afterbegin', mirageChunk);
 
     document.getElementById('materialBtn').addEventListener('click', () => {
       var demo = document.getElementById('demo');
