@@ -70,12 +70,15 @@ function createMirage() {
 
     // vendor media objects//
     navigator.getMedia = navigator.mediaDevices.getUserMedia ||
-      navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia; //end vendor media objects//
+    navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia; //end vendor media objects//
 
-    //room selection
 
     joinButton.addEventListener('click', () => {
+
+
+      //room selection
+
         const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
         roomState.roomID = document.getElementById('room-id-input').value;
         socket.emit('joinRoom', JSON.stringify(roomState.roomID));
@@ -327,11 +330,12 @@ function createMirage() {
                   //disconnect event
                   document.getElementById('disconnect').addEventListener('click', function(event) {
                       // console.log('hi there Blake')
-                      socket.emit('severe');
+                      socket.emit('disconnect');
+                      endCall();
                     }) //end of disconnect click event//
 
                   socket.on('updateChatters', (chatter) => {
-                    socket.emit('severe')
+                    socket.emit('disconnect')
                     endCall();
                     document.getElementById('messages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
                     roomState.chattersClient.splice(roomState.chattersClient.indexOf(chatter), 1);

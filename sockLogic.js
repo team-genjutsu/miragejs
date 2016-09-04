@@ -27,10 +27,12 @@ module.exports = function(server) {
     connections.push(socket);
     console.log(socket.id + ' joined!')
 
-
     //disconnecting users
-    socket.on('severe', function() {
+    socket.once('disconnect', function() {
       console.log('disconnect triggered')
+
+      // console.log('room:  ', rooms[0])
+
       let member,
         room,
         otherMem;
@@ -44,7 +46,6 @@ module.exports = function(server) {
             rooms[idx].members.forEach((el, id) => {
               io.to(el.id).emit('updateChatters', member);
               socket.disconnect();
-
             })
           }
 
@@ -54,9 +55,11 @@ module.exports = function(server) {
 
       })
 
+      console.log('after going through and disconnecting sockets',rooms)
       connections.splice(connections.indexOf(socket), 1);
       console.log(socket.id + ' left room ' + member.roomId)
 
+      // console.log('room:  ', rooms[0])
     })
 
     //join room logic
@@ -97,9 +100,9 @@ module.exports = function(server) {
         existingRoom[0].members.forEach((ele, idx) => {
           io.to(ele.id).emit('readyConnect', JSON.stringify('both connected'));
         })
-
       }
       io.to(socket.id).emit('initiated', JSON.stringify(member));
+
     });
 
     //beginning of signaling
@@ -119,6 +122,7 @@ module.exports = function(server) {
           }
         });
       }
+
     }); //end of signaling
 
   })
