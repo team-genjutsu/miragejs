@@ -5,6 +5,14 @@ import {
   animationListener
 } from './components/listenerFuncs';
 import {
+  hiddenToggle,
+  disableToggle,
+  resize,
+  generateDims,
+  scaleToFill,
+  scaleElement,
+  blinkerOn,
+  blinkerOff,
   cutCircle,
   angularVelocity,
   velocity,
@@ -37,23 +45,28 @@ import {
   doAnswer,
   setLocalAndSendMessage
 } from './components/mirageWebRTC';
+import {
+  mirageChunk
+} from './components/chunk';
 
 
 function createMirage() {
 
   const mirageComponent = {};
 
+  mirageComponent.blowChunks = () => {
+
+    // console.log(mirageChunk);
+    document.body.insertAdjacentHTML('afterbegin', mirageChunk);
+  }
 
   mirageComponent.startApp = () => {
 
     //states//
     let roomState = roomStore(window.URL);
     let mediaState = mediaStore();
-    let filterState = filterStore(document.getElementById('filterDisp'), document.getElementById('filter'));
-
-    let animeState = animeStore(document.getElementById('animation'), document.getElementById('animateDisp'), document.getElementsByClassName('emoji'));
-
-
+    let filterState = filterStore('filterDisp', 'filter');
+    let animeState = animeStore('animation', 'animateDisp', 'emoji', [paste, bounce, orbit]);
     let rtcState = rtcStore();
 
     // clear canvas
@@ -67,6 +80,19 @@ function createMirage() {
     //    'https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913'
     //  );
     //}
+
+    // console.log(mirageChunk);
+    // document.body.insertAdjacentHTML('afterbegin', mirageChunk);
+
+    document.getElementById('materialBtn').addEventListener('click', () => {
+      var demo = document.getElementById('demo');
+      var matBtn = document.getElementById('materialBtn');
+
+      //need to parse through stylesheets and set z-indexes of elements to -1 with
+      //each toggle
+      demo.classList.toggle('hidden');
+      // demo.style.display = 'block';
+    })
 
     // vendor media objects//
     navigator.getMedia = navigator.mediaDevices.getUserMedia ||
@@ -88,7 +114,8 @@ function createMirage() {
             if (!payload) {
               alert('Try a different room!')
             } else {
-              hiddenToggle(document.getElementById('roomApp'), document.getElementById('boothApp'))
+              // hiddenToggle(document.getElementById('roomApp'), document.getElementById('boothApp'))
+              hiddenToggle('roomApp', 'boothApp')
                 //begin streaming!//
               navigator.getMedia({
                 video: true,
@@ -102,6 +129,7 @@ function createMirage() {
                   }))
 
                   socket.on('readyConnect', (payload) => {
+                    console.log('in readykiss', document.getElementById('connect'))
                     document.getElementById('connect').disabled = false;
                   })
 
@@ -133,14 +161,13 @@ function createMirage() {
                     });
 
 
-                    socket.on('message', function(message) {
+                    socket.on('message', (message) => {
                       // console.log("Client received Message", message);
                       if (message.type === 'offer') {
                         if (!rtcState.isStarted) {
                           startSetup(rtcState, roomState, handleRemoteStreamAdded, socket);
                           otherDataChannel(event, rtcState, onDataChannelCreated, activateAnime);
                         }
-
                         rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
                         doAnswer(rtcState, roomState, socket);
                       } else if (message.type === 'answer' && rtcState.isStarted) {
@@ -161,81 +188,77 @@ function createMirage() {
                   //data channel stuff
                   function onDataChannelCreated(channel) {
 
-                    channel.onopen = function() {
-                      // console.log('data channel opened');
-                    };
+                    channel.onopen = () => {
+                      console.log('data channel onopen method triggered');
+                      animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
 
-                    //after creation of data channel switch button visilibity
-                    disableToggle(document.getElementById('connect'), document.getElementById('disconnect'))
+                      animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition); //local
+
+                      filterListener(mediaState.myVideo, 'myFilter', filterState.currFilter, true, channel, setVendorCss);
+
+                      filterListener(mediaState.peerVideo, 'peerFilter', filterState.currFilter, false, channel, setVendorCss);
+
+                      document.getElementById('videoToggle').addEventListener('click', () => {
+                        hiddenToggle('myBooth', 'peerBooth');
+                        blinkerOff('videoToggle');
+                      })
+
+                      disableToggle('connect', 'disconnect')
+
+                      window.onresize = () => {
+                        resize(window, mediaState.myVideo, mediaState.peerVideo, mediaState.myCanvas, mediaState.peerCanvas, mediaState.myContext, mediaState.peerContext, document.getElementById('vidContainer'), generateDims);
+                      }
+
+                      //changing filters//
+                      filterState.filterBtn.addEventListener('click', () => {
+                        filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
+                        console.log(filterState.currFilter.innerHTML)
+                        if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
+                      }, false); //end of filter test//
+
+                      //changing animations//
+                      animeState.animeBtn.addEventListener('click', () => {
+                        animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
+                        animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
+                        if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
+                      }, false)
+
+                      //adding click handler for active emoji selection
+                      Array.from(animeState.emojis, (ele) => {
+                        ele.addEventListener('click', (event) => {
+                          animeState.currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
+                          animeState.emoImg.src = animeState.currentImg;
+                        }, false)
+                      })
+
+                      //attempts to clear canvas
+                      clearButton.addEventListener('click', (event) => {
+                        cancelAnimationFrame(animeState.raf);
+                        mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
+                        mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
+                      }, false);
+
+                    }; //end onopen method
 
                     //beginning of interactivity
                     //looks for click event on the send button//
-                    document.getElementById('send').addEventListener('click', function() {
+                    document.getElementById('send').addEventListener('click', () => {
                         //post message in text context on your side
                         //send message object to the data channel
-                        // console.log(rtcState.peerConn);
                         let yourMessageObj = JSON.stringify({
                           message: "them:" + " " + document.getElementById('yourMessage').value
                         });
                         //creates a variable with the same information to display on your side
-                        //peer.localPort is a temporary way to identify peers, should be changed
                         let yourMessage = "me:" + " " + document.getElementById('yourMessage').value;
                         //post message in text context on your side
                         document.getElementById('messages').textContent += yourMessage + '\n';
-                        // rtcState.dataChannel.send(yourMessageObj);
                         channel.send(yourMessageObj)
                       }) //end send click event//
 
-                    //click event for the "filter me" button//
-                    // filterListener(mediaState.myVideo, 'myFilter', mediaState.currFilter, true, rtcState.dataChannel, setVendorCss);
-                    filterListener(mediaState.myVideo, 'myFilter', mediaState.currFilter, true, channel, setVendorCss);
-                    //click event for the "filter them" button
-                    // filterListener(mediaState.peerVideo, 'peerFilter', mediaState.currFilter, false, rtcState.dataChannel, setVendorCss);
-                    filterListener(mediaState.peerVideo, 'peerFilter', mediaState.currFilter, false, channel, setVendorCss);
-
-                    // animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, true, getCursorPosition); //local
-                    animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition); //local
-
-                    //changing filters//
-                    filterState.filterBtn.addEventListener('click', () => {
-                      filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
-                      // i++;
-                      if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
-                    }, false); //end of filter test//
-
-                    //changing animations//
-                    animeState.animeBtn.addEventListener('click', () => {
-                      animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
-                      animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
-                      // console.log(animeState.currentAnimation);
-                      // j++;
-                      if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
-                    }, false)
-
-                    //adding click handler for active emoji selection
-                    Array.from(animeState.emojis, (ele) => {
-                      ele.addEventListener('click', (event) => {
-                        animeState.currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
-                        // console.log(animeState.currentImg)
-                        animeState.emoImg.src = animeState.currentImg;
-                      }, false)
-                    })
-
-                    //attempts to clear canvas
-                    clearButton.addEventListener('click', (event) => {
-                      cancelAnimationFrame(animeState.raf);
-                      mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
-                      mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
-                    }, false);
-
-                    document.getElementById('videoToggle').addEventListener('click', () => {
-                        hiddenToggle(document.getElementById('myBooth'), document.getElementById('peerBooth'));
-                        blinkerOff('videoToggle');
-                      })
-                      //end of interactivity
 
                     //on data event
                     channel.onmessage = event => {
+                      console.log('onmessage datachannel method triggered')
                       let data = event.data;
 
                       //conditionally apply or remove filter
@@ -245,16 +268,14 @@ function createMirage() {
                         document.getElementById('messages').textContent += dataObj.message + '\n';
                       }
 
-                      if (dataObj.hasOwnProperty('local')) {
+                      if (dataObj.hasOwnProperty('filter')) {
                         if (dataObj.local) {
+                          //blink function is a little funky
                           setVendorCss(mediaState.peerVideo, dataObj.filterType);
                           blinkerOn('peerBooth', 'videoToggle');
-                        } //conditionally applies or removes filter
-                        else if (!dataObj.local) {
+                        } else {
                           setVendorCss(mediaState.myVideo, dataObj.filterType);
                           blinkerOn('myBooth', 'videoToggle');
-
-                          //add function to make toggle button blink
                         }
                       }
 
@@ -265,7 +286,7 @@ function createMirage() {
                           emoImg.src = dataObj.currentImg;
 
                           animeState.temp = animeState.currentAnimation;
-                          animeState.currentAnimation = eval('(' + dataObj.animation + ')');
+                          animeState.currentAnimation = animeState.anime[dataObj.animation];
                           animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
                           animeState.currentAnimation = animeState.temp;
                           blinkerOn('peerBooth', 'videoToggle')
@@ -276,7 +297,7 @@ function createMirage() {
                           emoImg.src = dataObj.currentImg;
 
                           animeState.temp = animeState.currentAnimation;
-                          animeState.currentAnimation = eval('(' + dataObj.animation + ')');
+                          animeState.currentAnimation = animeState.anime[dataObj.animation];
                           animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
                           animeState.currentAnimation = animeState.temp;
                           blinkerOn('myBooth', 'videoToggle')
@@ -298,13 +319,8 @@ function createMirage() {
                     mediaState.peerCanvas = mediaState.peerMedia.canvas;
                     mediaState.peerContext = mediaState.peerMedia.context;
 
-                    hiddenToggle(document.getElementById('myBooth'), document.getElementById('peerBooth'));
+                    hiddenToggle('myBooth', 'peerBooth');
 
-                    animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
-
-                    window.onresize = () => {
-                      resize(window, myVideo, peerVideo, myCanvas, peerCanvas, myContext, peerContext, document.getElementById('vidContainer'), generateDims);
-                    }
                   } ///end on stream added event///
 
 
@@ -323,12 +339,12 @@ function createMirage() {
                     mediaState.myVideo.src = "";
                     mediaState.peerVideo.src = "";
 
-                    hiddenToggle(document.getElementById('roomApp'), document.getElementById('boothApp'));
-                    disableToggle(document.getElementById('connect'), document.getElementById('disconnect'));
+                    hiddenToggle('roomApp', 'boothApp');
+                    disableToggle('connect', 'disconnect');
                   }
 
                   //disconnect event
-                  document.getElementById('disconnect').addEventListener('click', function(event) {
+                  document.getElementById('disconnect').addEventListener('click', (event) => {
                       // console.log('hi there Blake')
                       socket.emit('disconnect');
                       endCall();
@@ -343,7 +359,7 @@ function createMirage() {
                   });
 
                 }, //end of stream//
-                function(err) {
+                (err) => {
                   console.error(err);
                 });
 
@@ -352,83 +368,6 @@ function createMirage() {
           }) //end of socket 'process' event
 
       }, false) //end of 'join' event
-
-
-    //these functions need to be ported to proper file
-    function hiddenToggle(ele1, ele2) {
-      let args = [...arguments];
-      args.forEach((ele, idx) => {
-        ele.classList.toggle('hidden');
-      })
-    }
-
-    function disableToggle(ele1, ele2) {
-      let args = [...arguments];
-      args.forEach((ele, idx) => {
-        ele.disabled ? ele.disabled = false : ele.disabled = true;
-      })
-    }
-
-    function resize(win, locVideo, remVideo, locCanvas, remCanvas, locContext, remContext, container, func) {
-
-      let dims = func(container, win);
-      //resize local elements
-      locVideo.setAttribute('width', '' + dims.vidWidth);
-      locVideo.setAttribute('height', '' + dims.vidHeight);
-
-      locCanvas.setAttribute('width', '' + dims.vidWidth);
-      locCanvas.setAttribute('height', '' + dims.vidHeight);
-
-      //resize remote elements
-      remVideo.setAttribute('width', '' + dims.vidWidth);
-      remVideo.setAttribute('height', '' + dims.vidHeight);
-
-      remCanvas.setAttribute('width', '' + dims.vidWidth);
-      remCanvas.setAttribute('height', '' + dims.vidHeight);
-    }
-
-    function generateDims(container, win) {
-      let containerStyle = win.getComputedStyle(container);
-      let styleWidth = containerStyle.getPropertyValue('width');
-      let videoWidth = Math.round(+styleWidth.substring(0, styleWidth.length - 2));
-      let videoHeight = Math.round((videoWidth / 4) * 3);
-
-      return {
-        vidWidth: videoWidth,
-        vidHeight: videoHeight
-      }
-    }
-
-    function scaleToFill(videoTag, height, width) {
-      let video = videoTag,
-        videoRatio = 4 / 3,
-        tagRatio = width / height;
-      if (videoRatio < tagRatio) {
-        video.setAttribute('style', '-webkit-transform: scaleX(' + tagRatio / videoRatio + ')')
-      } else if (tagRatio < videoRatio) {
-        video.setAttribute('style', '-webkit-transform: scaleY(' + videoRatio / tagRatio + ')')
-      }
-    }
-
-    function scaleElement(vid, height, width) {
-      let video = vid;
-      let actualRatio = 4 / 3;
-      let targetRatio = width / height;
-      let adjustmentRatio = targetRatio / actualRatio;
-      let scale = actualRatio < targetRatio ? targetRatio / actualRatio : actualRatio / targetRatio;
-      console.log(scale);
-      video.setAttribute('style', '-webkit-transform: scale(' + scale + ')');
-    };
-
-    function blinkerOn(boothEleId, btnEleId) {
-      if (document.getElementById(boothEleId).classList.contains('hidden')) {
-        document.getElementById(btnEleId).classList.toggle('elementToFadeInAndOut');
-      }
-    }
-
-    function blinkerOff(btnId) {
-      document.getElementById(btnId).classList.remove('elementToFadeInAndOut');
-    }
 
   }
   return mirageComponent;
