@@ -1,22 +1,22 @@
 //allows inputs for client to hook DOM elements
 //concerning filters. Preset filters for now, will be dynamic
 //in future
-import {
-  cutCircle,
-  angularVelocity,
-  velocity,
-  drawVideo,
-  setVendorCss,
-  getCursorPosition,
-  orbit,
-  paste,
-  bounce
-} from './funcStore';
+// import {
+  // cutCircle,
+  // angularVelocity,
+  // velocity,
+  // drawVideo,
+  // setVendorCss,
+  // getCursorPosition,
+  // orbit,
+  // paste,
+  // bounce
+// } from './funcStore';
 
-function filterStore(btnEle, dispEle){
+function filterStore(filterDispId, filterBtnId){
   return {
-    currFilter: dispEle,
-    filterBtn: btnEle,
+    currFilter: document.getElementById(filterDispId),
+    filterBtn: document.getElementById(filterBtnId),
     filters: ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', 'none'],
     idx: 0
   }
@@ -35,8 +35,8 @@ function mediaStore(){
   return {
     peerMedia: null,
     peerVideo: null,
-    peerCanva: null,
-    peerContex: null,
+    peerCanvas: null,
+    peerContext: null,
     myMedia: null,
     myCanvas: null,
     myVideo: null,
@@ -44,23 +44,23 @@ function mediaStore(){
   }
 }
 
-function animeStore(animeBtn, animeDisp, emojiEls){
+function animeStore(animeBtnId, animeDispId, emojiClass, functionArray){
   return {
     anime: {
-      paste: paste,
-      bounce: bounce,
-      orbit: orbit
+      paste: functionArray[0], //paste,
+      bounce: functionArray[1], //bounce,
+      orbit: functionArray[2] //orbit
     },
     animeKeys: ['paste', 'bounce', 'orbit'],
     idx: 1,
-    animeBtn: animeBtn,
-    currAnime: animeDisp,
+    animeBtn: document.getElementById(animeBtnId),
+    currAnime: document.getElementById(animeDispId),
     currentAnimation: null,
     temp: null,
     raf: null,
     emoImg: new Image(),
     currentImg: null,
-    emojis: emojiEls
+    emojis: document.getElementsByClassName(emojiClass)
   }
 }
 
