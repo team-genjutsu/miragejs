@@ -4,6 +4,10 @@ import {
   createMirage
 } from './index.js';
 
+import {
+  domReady
+} from './components/domReady';
+
 function initMirage() {
 
   const mirageObj = {};
@@ -12,7 +16,8 @@ function initMirage() {
 
   // mirageObj.initializeComponent = mirageComponent();
 
-  mirageObj.begin = createMirage().startApp;
+  mirageObj.begin = createMirage();
+  // mirageObj.begin = createMirage().startApp;
 
   // mirageObj.stores = [
   // roomStore,
@@ -44,10 +49,11 @@ function initMirage() {
   return mirageObj;
 }
 
+domReady(function() {
 
+  const mirage = initMirage().begin;
+  const mountMirage = mirage.blowChunks();
+  mirage.startApp();
 
-const mirage = initMirage();
-mirage.begin();
-
-
+});
 // export default { Mirage };

@@ -142,6 +142,85 @@
     context.fill();
   }//end cutCircle//
 
+  //these functions need to be ported to proper file
+    function hiddenToggle(ele1, ele2) {
+      let args = [...arguments];
+      args.forEach((ele, idx) => {
+        let tag = document.getElementById(ele);
+        if(tag.classList.contains('hidden')){
+          tag.classList.toggle('hidden');
+        }else{
+          tag.classList.add('hidden');
+        }
+      })
+    }
+
+    function disableToggle(ele1, ele2) {
+      let args = [...arguments];
+      args.forEach((ele, idx) => {
+        document.getElementById(ele).disabled ? document.getElementById(ele).disabled = false : document.getElementById(ele).disabled = true;
+      })
+    }
+
+    function resize(win, locVideo, remVideo, locCanvas, remCanvas, locContext, remContext, container, func) {
+
+      let dims = func(container, win);
+      //resize local elements
+      locVideo.setAttribute('width', '' + dims.vidWidth);
+      locVideo.setAttribute('height', '' + dims.vidHeight);
+
+      locCanvas.setAttribute('width', '' + dims.vidWidth);
+      locCanvas.setAttribute('height', '' + dims.vidHeight);
+
+      //resize remote elements
+      remVideo.setAttribute('width', '' + dims.vidWidth);
+      remVideo.setAttribute('height', '' + dims.vidHeight);
+
+      remCanvas.setAttribute('width', '' + dims.vidWidth);
+      remCanvas.setAttribute('height', '' + dims.vidHeight);
+    }
+
+    function generateDims(container, win) {
+      let containerStyle = win.getComputedStyle(container);
+      let styleWidth = containerStyle.getPropertyValue('width');
+      let videoWidth = Math.round(+styleWidth.substring(0, styleWidth.length - 2));
+      let videoHeight = Math.round((videoWidth / 4) * 3);
+
+      return {
+        vidWidth: videoWidth,
+        vidHeight: videoHeight
+      }
+    }
+
+    function scaleToFill(videoTag, height, width) {
+      let video = videoTag,
+        videoRatio = 4 / 3,
+        tagRatio = width / height;
+      if (videoRatio < tagRatio) {
+        video.setAttribute('style', '-webkit-transform: scaleX(' + tagRatio / videoRatio + ')')
+      } else if (tagRatio < videoRatio) {
+        video.setAttribute('style', '-webkit-transform: scaleY(' + videoRatio / tagRatio + ')')
+      }
+    }
+
+    function scaleElement(vid, height, width) {
+      let video = vid;
+      let actualRatio = 4 / 3;
+      let targetRatio = width / height;
+      let adjustmentRatio = targetRatio / actualRatio;
+      let scale = actualRatio < targetRatio ? targetRatio / actualRatio : actualRatio / targetRatio;
+      video.setAttribute('style', '-webkit-transform: scale(' + scale + ')');
+    };
+
+    function blinkerOn(boothEleId, btnEleId) {
+      if (document.getElementById(boothEleId).classList.contains('hidden')) {
+        document.getElementById(btnEleId).classList.add('elementToFadeInAndOut');
+      }
+    }
+
+    function blinkerOff(btnId) {
+      document.getElementById(btnId).classList.remove('elementToFadeInAndOut');
+    }
   ///end of function store///
 
-export { cutCircle, angularVelocity, velocity, drawVideo, setVendorCss, getCursorPosition, orbit, paste, bounce };
+export { hiddenToggle, disableToggle, resize, generateDims, scaleToFill, scaleElement, blinkerOn, blinkerOff, cutCircle, angularVelocity, velocity, drawVideo, setVendorCss, getCursorPosition, orbit, paste, bounce };
