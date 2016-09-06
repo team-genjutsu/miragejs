@@ -5,6 +5,8 @@ import {
   animationListener
 } from './components/listenerFuncs';
 import {
+  toggleVidSize,
+  vidDims,
   hiddenToggle,
   disableToggle,
   resize,
@@ -55,7 +57,7 @@ function createMirage() {
   const mirageComponent = {};
 
   mirageComponent.blowChunks = () => {
-  
+
     // console.log(mirageChunk);
     document.body.insertAdjacentHTML('afterbegin', mirageChunk);
   }
@@ -81,8 +83,19 @@ function createMirage() {
     //  );
     //}
 
-    // console.log(mirageChunk);
-    // document.body.insertAdjacentHTML('afterbegin', mirageChunk);
+    animeState.emojis.forEach((ele, idx) => {
+        let btn = document.createElement('button')
+        btn.classList.add('btn');
+        btn.classList.add('btn-default');
+        btn.classList.add('emoji');
+        let emoj = document.createElement('img');
+        emoj.classList.add('img-responsive');
+        emoj.src = ele;
+        btn.appendChild(emoj);
+        document.getElementById('emojiButtons').appendChild(btn);
+      })
+      // console.log(mirageChunk);
+      // document.body.insertAdjacentHTML('afterbegin', mirageChunk);
 
     document.getElementById('materialBtn').addEventListener('click', () => {
       var demo = document.getElementById('demo');
@@ -195,7 +208,8 @@ function createMirage() {
                       filterListener(mediaState.peerVideo, 'peerFilter', filterState.currFilter, false, channel, setVendorCss);
 
                       document.getElementById('videoToggle').addEventListener('click', () => {
-                        hiddenToggle('myBooth', 'peerBooth');
+                        // hiddenToggle('myBooth', 'peerBooth');
+                        toggleVidSize(window, mediaState, generateDims, vidDims);
                         blinkerOff('videoToggle');
                       })
 
@@ -220,7 +234,7 @@ function createMirage() {
                       }, false)
 
                       //adding click handler for active emoji selection
-                      Array.from(animeState.emojis, (ele) => {
+                      Array.from(animeState.emoBtns, (ele) => {
                         ele.addEventListener('click', (event) => {
                           animeState.currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
                           animeState.emoImg.src = animeState.currentImg;
@@ -251,7 +265,7 @@ function createMirage() {
                         channel.send(yourMessageObj)
                       }) //end send click event//
 
-                    
+
                     //on data event
                     channel.onmessage = event => {
                       console.log('onmessage datachannel method triggered')
@@ -315,7 +329,8 @@ function createMirage() {
                     mediaState.peerCanvas = mediaState.peerMedia.canvas;
                     mediaState.peerContext = mediaState.peerMedia.context;
 
-                    hiddenToggle('myBooth', 'peerBooth');
+                    // hiddenToggle('myBooth', 'peerBooth');
+                    toggleVidSize(window, mediaState, generateDims, vidDims);
 
                   } ///end on stream added event///
 
