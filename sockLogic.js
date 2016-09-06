@@ -109,6 +109,7 @@ module.exports = function(server) {
 
     //beginning of signaling
     socket.on('message', function(payload) {
+      console.log(payload.data.type)
 
       let sharedRoom = rooms.filter(room => room.id === payload.roomID)[0];
 

@@ -108,8 +108,10 @@ function createMirage() {
         mediaState = mediaStore();
         filterState = filterStore('filterDisp', 'filter');
         animeState = animeStore('animation', 'animateDisp', 'emoji', [paste, bounce, orbit]);
+        rtcState = null;
+        console.log('rtcstate pre join',rtcState);
         rtcState = rtcStore();
-        console.log(mediaState)
+        console.log('rtcstate post join',rtcState);
         const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
         roomState.roomID = document.getElementById('room-id-input').value;
         socket.emit('joinRoom', JSON.stringify(roomState.roomID));
@@ -201,11 +203,15 @@ function createMirage() {
 
                       filterListener(mediaState.peerVideo, 'peerFilter', filterState.currFilter, false, channel, setVendorCss);
 
-                      document.getElementById('videoToggle').addEventListener('click', () => {
+                      if (!document.getElementById('videoToggle').getAttribute("addedListen")){
+                        document.getElementById('videoToggle').addEventListener('click', () => {
 
-                        hiddenToggle('myBooth', 'peerBooth');
-                        blinkerOff('videoToggle');
-                      })
+                          hiddenToggle('myBooth', 'peerBooth');
+                          blinkerOff('videoToggle');
+                        })
+                        console.log('add 1')
+                      }
+                      document.getElementById('videoToggle').setAttribute('addedListen',true)
 
                       disableToggle('connect', 'disconnect')
 
@@ -344,8 +350,10 @@ function createMirage() {
 
                   //all this disconnect logic needs to be revamped, VERY SOON!
                   function endCall() {
+                    console.log('disconnected')
                     socket.disconnect()
-                    // rtcState.peerConn.close();
+                    rtcState.peerConn.close();
+                    rtcState.dataChannel.close()
                     // rtcState.peerConn = null;
                     // rtcState.localStream.getTracks().forEach((track) => {
                     //   track.stop();
@@ -355,13 +363,24 @@ function createMirage() {
 
                     // disableToggle('connect', 'disconnect');
                     let element = document.getElementById("top");
-
+                    //remove old video instances from the dom
                     removeChildren('myBooth');
                     removeChildren('peerBooth');
-                    document.getElementById('connect').disabled;
-                    document.getElementById('disconnect').disabled;
+                    //disable both buttons
+                    document.getElementById('connect').disabled = true;
+                    document.getElementById('disconnect').disabled = true;
+                    // document.getElementById('videoToggle').removeEventListener('click', () => {
+                    //   hiddenToggle('myBooth', 'peerBooth');
+                    //   blinkerOff('videoToggle');
+                    // })
+
+                    //old toggle doesn't work, unhide peerbooth and show mybooth, can make a function later
+                    if(document.getElementById('myBooth').classList.contains('hidden')) {
+                      document.getElementById('myBooth').classList.remove('hidden');
+                    }
+                    document.getElementById('peerBooth').classList.add('hidden');
+
                     hiddenToggle('roomApp', 'boothApp');
-                    hiddenToggle('myBooth', 'peerBooth');
                   }
 
                   //disconnect event

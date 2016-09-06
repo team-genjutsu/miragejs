@@ -27,8 +27,8 @@ let mirageChunk = `<div id='fixed' class='fixPos'>
       <div id="boothApp" class="hidden">
         <div id='booth'>
           <div id='vidContainer'>
-            <div id='myBooth'></div>
-            <div id='peerBooth' class='hidden'></div>
+            <div id='myBooth'>MYBOOTH</div>
+            <div id='peerBooth' class='hidden'>PEER BOOTH</div>
           </div>
           <div id="emojiButtons" class="btn-group">
             <!-- <div id="selectImg">Select Image</div> -->
