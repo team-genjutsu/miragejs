@@ -158,67 +158,72 @@ function hiddenToggle(ele1, ele2) {
 
 function toggleVidSize(win, state, func1, func2) {
 
-  let maxVid,
-    minVid,
-    maxCan,
-    minCan,
-    maxCon,
-    minCon,
-    styleWidth1 = func1(state.myVideo, win).vidWidth, 
-    styleWidth2 = func1(state.peerVideo, win).vidWidth; 
+  let arr,
+    styleWidth1 = func1(state.myVideo, win).vidWidth,
+    styleWidth2 = func1(state.peerVideo, win).vidWidth;
 
   if (styleWidth1 >= styleWidth2) {
-    maxVid = state.myVideo; //locVideo;
-    maxCan = state.myCanvas; //locCanvas;
-    maxCon = state.myContext; //locContext;
-    minVid = state.peerVideo; //remVideo;
-    minCan = state.peerCanvas; //remCanvas;
-    minCon = state.peerContext; //remContext;
+    let dims = func2(state.myVideo, win);
+    
+    state.peerVideo.setAttribute('width', '' + dims.bigVidWidth);
+    state.peerVideo.setAttribute('height', '' + dims.bigVidHeight);
+
+    state.peerContext = state.peerCanvas.getContext('2d');
+    state.peerCanvas.width = dims.bigVidWidth;
+    state.peerCanvas.height = dims.bigVidHeight;
+    state.peerContext.rect(0, 0, state.peerCanvas.width, state.peerCanvas.height);
+    state.peerContext.scale(1,1);
+    state.peerContext.stroke();
+
+    state.myVideo.setAttribute('width', '' + dims.smallVidWidth);
+    state.myVideo.setAttribute('height', '' + dims.smallVidHeight);
+
+    state.myContext = state.myCanvas.getContext('2d');
+    state.myCanvas.width = dims.smallVidWidth;
+    state.myCanvas.height = dims.smallVidHeight;
+    state.myContext.rect(0, 0, state.myCanvas.width, state.myCanvas.height);
+    state.myContext.scale(.2, .2);
+    state.myContext.stroke();
+    
+    arr = [state.myVideo, state.myCanvas, state.peerVideo, state.peerCanvas];
+
   } else {
-    maxVid = state.peerVideo; //remVideo;
-    maxCan = state.peerCanvas; //remCanvas;
-    maxCon = state.peerContext; //remContext;
-    minVid = state.myVideo; //locVideo;
-    minCan = state.myCanvas; //locCanvas;
-    minCon = state.myContext; //locContext;
+    let dims = func2(state.peerVideo, win);
+
+    state.myVideo.setAttribute('width', '' + dims.bigVidWidth);
+    state.myVideo.setAttribute('height', '' + dims.bigVidHeight);
+
+    state.myContext = state.myCanvas.getContext('2d');
+    state.myCanvas.width = dims.bigVidWidth;
+    state.myCanvas.height = dims.bigVidHeight;
+    state.myContext.rect(0, 0, state.myCanvas.width, state.myCanvas.height);
+    state.myContext.scale(1,1);
+    state.myContext.stroke();
+
+    state.peerVideo.setAttribute('width', '' + dims.smallVidWidth);
+    state.peerVideo.setAttribute('height', '' + dims.smallVidHeight);
+
+    state.peerContext = state.peerCanvas.getContext('2d');
+    state.peerCanvas.width = dims.smallVidWidth;
+    state.peerCanvas.height = dims.smallVidHeight;
+    state.peerContext.rect(0, 0, state.peerCanvas.width, state.peerCanvas.height);
+    state.peerContext.scale(.2, .2);
+    state.peerContext.stroke();
+
+    arr = [state.peerVideo, state.peerCanvas, state.myVideo, state.myCanvas];
+
   }
 
-
-  let dims = func2(maxVid, win),
-    arr = [maxVid, maxCan, minVid, minCan];
-
-  arr.forEach( (ele, idx) => {
-    if(idx < 2) {
+  arr.forEach((ele, idx) => {
+    if (idx < 2) {
       ele.style.zIndex = '3';
       // ele.classList.add('btmRight');
-    }else{
+    } else {
       ele.style.zIndex = '2';
       // ele.classList.remove('btmRight');
     }
   })
 
-  maxVid.setAttribute('width', '' + dims.smallVidWidth);
-  maxVid.setAttribute('height', '' + dims.smallVidHeight);
-
-  maxCan.setAttribute('width', '' + dims.smallVidWidth);
-  maxCan.setAttribute('height', '' + dims.smallVidHeight);
-
-  maxCon.rect(0, 0, dims.smallVidWidth, dims.smallVidHeight);
-  maxCon.stroke();
-  // maxCon.setAttribute('width', '' + dims.smallVidWidth);
-  // maxCon.setAttribute('height', '' + dims.smallVidHeight);
-
-  //resize remote elements
-  minVid.setAttribute('width', '' + dims.bigVidWidth);
-  minVid.setAttribute('height', '' + dims.bigVidHeight);
-
-  minCan.setAttribute('width', '' + dims.bigVidWidth);
-  minCan.setAttribute('height', '' + dims.bigVidHeight);
-
-  minCon.rect(0, 0, dims.smallVidWidth, dims.smallVidHeight);
-  minCon.stroke();
-  // minCon.setAttribute('width', '' + dims.bigVidWidth);
-  // minCon.setAttribute('height', '' + dims.bigVidHeight);
 }
 
 function disableToggle(ele1, ele2) {
@@ -247,7 +252,7 @@ function resize(win, locVideo, remVideo, locCanvas, remCanvas, locContext, remCo
 
   remCanvas.setAttribute('width', '' + dims.vidWidth);
   remCanvas.setAttribute('height', '' + dims.vidHeight);
-  
+
   // remContext.setAttribute('width', '' + dims.vidWidth);
   // remContext.setAttribute('height', '' + dims.vidHeight);
 }
