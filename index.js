@@ -63,11 +63,11 @@ function createMirage() {
   mirageComponent.startApp = () => {
 
     //states//
-    let roomState = roomStore(window.URL);
-    let mediaState = mediaStore();
-    let filterState = filterStore('filterDisp', 'filter');
-    let animeState = animeStore('animation', 'animateDisp', 'emoji', [paste, bounce, orbit]);
-    let rtcState = rtcStore();
+    let roomState;
+    let mediaState;
+    let filterState;
+    let animeState;
+    let rtcState;
 
     // clear canvas
     let clearButton = document.getElementById('clear');
@@ -104,11 +104,16 @@ function createMirage() {
 
 
       //room selection
-
+        roomState = roomStore(window.URL);
+        mediaState = mediaStore();
+        filterState = filterStore('filterDisp', 'filter');
+        animeState = animeStore('animation', 'animateDisp', 'emoji', [paste, bounce, orbit]);
+        rtcState = rtcStore();
+        console.log(mediaState)
         const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
         roomState.roomID = document.getElementById('room-id-input').value;
         socket.emit('joinRoom', JSON.stringify(roomState.roomID));
-
+        (console.log('afteremitjoin'))
         socket.on('process', (payload) => {
             payload = JSON.parse(payload);
             if (!payload) {
@@ -129,7 +134,6 @@ function createMirage() {
                   }))
 
                   socket.on('readyConnect', (payload) => {
-                    console.log('in readykiss', document.getElementById('connect'))
                     document.getElementById('connect').disabled = false;
                   })
 
@@ -137,9 +141,8 @@ function createMirage() {
                   socket.on('initiated', (member) => {
 
                     member = JSON.parse(member);
-
+                    console.log('before add media',mediaState)
                     mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'myBooth', 'myVideo', 'myCanvas');
-
                     mediaState.myVideo = mediaState.myMedia.video;
                     mediaState.myCanvas = mediaState.myMedia.canvas;
                     mediaState.myContext = mediaState.myMedia.context;
@@ -199,6 +202,7 @@ function createMirage() {
                       filterListener(mediaState.peerVideo, 'peerFilter', filterState.currFilter, false, channel, setVendorCss);
 
                       document.getElementById('videoToggle').addEventListener('click', () => {
+
                         hiddenToggle('myBooth', 'peerBooth');
                         blinkerOff('videoToggle');
                       })
@@ -258,6 +262,7 @@ function createMirage() {
 
                     //on data event
                     channel.onmessage = event => {
+
                       console.log('onmessage datachannel method triggered')
                       let data = event.data;
 
@@ -311,7 +316,7 @@ function createMirage() {
                   function handleRemoteStreamAdded(event) {
                     // console.log('Remote Stream Added, event: ', event);
                     rtcState.remoteStream = event.stream;
-                    // console.log('local', rtcState.localStream, 'remote', rtcState.remoteStream)
+                    console.log('local', rtcState.localStream, 'remote', rtcState.remoteStream)
 
                     mediaState.peerMedia = mediaGenerator(event.stream, roomState.vendorUrl, 'peerBooth', 'peerVideo', 'peerCanvas');
 
@@ -328,19 +333,35 @@ function createMirage() {
                     animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
                   }
 
+                  //remove child element of passed in argument from dom
+                  function removeChildren(el) {
+                    let element = document.getElementById(el);
+
+                    while (element.firstChild) {
+                      element.removeChild(element.firstChild);
+                    }
+                  }
+
                   //all this disconnect logic needs to be revamped, VERY SOON!
                   function endCall() {
-                    rtcState.peerConn.close();
-                    rtcState.peerConn = null;
                     socket.disconnect()
-                    rtcState.localStream.getTracks().forEach((track) => {
-                      track.stop();
-                    });
-                    mediaState.myVideo.src = "";
-                    mediaState.peerVideo.src = "";
+                    // rtcState.peerConn.close();
+                    // rtcState.peerConn = null;
+                    // rtcState.localStream.getTracks().forEach((track) => {
+                    //   track.stop();
+                    // });
+                    // mediaState.myVideo.src = "";
+                    // mediaState.peerVideo.src = "";
 
+                    // disableToggle('connect', 'disconnect');
+                    let element = document.getElementById("top");
+
+                    removeChildren('myBooth');
+                    removeChildren('peerBooth');
+                    document.getElementById('connect').disabled;
+                    document.getElementById('disconnect').disabled;
                     hiddenToggle('roomApp', 'boothApp');
-                    disableToggle('connect', 'disconnect');
+                    hiddenToggle('myBooth', 'peerBooth');
                   }
 
                   //disconnect event

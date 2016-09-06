@@ -30,7 +30,7 @@ function createPeerConnection(rtcState, roomState, func, socket) {
     rtcState.peerConn.onicecandidate = () => handleIceCandidate(event, roomState, socket);
     rtcState.peerConn.onaddstream = func //handleRemoteStreamAdded;
     rtcState.peerConn.onremovestream = handleRemoteStreamRemoved;
-
+    rtcState.peerConn.oniceconnectionstatechange = () => handleIceConnStateChange(event, rtcState);
   } catch (err) {
     console.log('Failed to connect. Error: ' + err);
     return;
@@ -77,6 +77,13 @@ function handleIceCandidate(event, roomState, socket) {
   }
 }
 
+function handleIceConnStateChange(event, rtcState) {
+  if (rtcState.peerConn.iceConnectionState === 'disconnected') {
+    console.log('Disconnected');
+    rtcState.peerConn.close();
+    console.log('iceConn state change remove rtc', rtcState.peerConn);
+  }
+}
 
 //another gap, handleRemoteStreamAdded function usually lives here,
 //it has a lot of depended functions in it right now

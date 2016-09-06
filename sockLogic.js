@@ -55,15 +55,16 @@ module.exports = function(server) {
 
       })
 
-      console.log('after going through and disconnecting sockets',rooms)
+      // console.log('after going through and disconnecting sockets',rooms)
       connections.splice(connections.indexOf(socket), 1);
-      console.log(socket.id + ' left room ' + member.roomId)
+      // console.log(socket.id + ' left room ' + member.roomId)
 
       // console.log('room:  ', rooms[0])
     })
 
     //join room logic
     socket.on('joinRoom', (payload) => {
+
       payload = JSON.parse(payload);
       let roomCheck = rooms.filter(room => room.id === payload);
       if (roomCheck.length > 0) {
@@ -75,6 +76,7 @@ module.exports = function(server) {
       } else {
         io.to(socket.id).emit('process', JSON.stringify(true));
       }
+
     })
 
     //initiate
@@ -107,6 +109,7 @@ module.exports = function(server) {
 
     //beginning of signaling
     socket.on('message', function(payload) {
+
       let sharedRoom = rooms.filter(room => room.id === payload.roomID)[0];
 
       // not used for anything yet but maybe for chatroom fallback?

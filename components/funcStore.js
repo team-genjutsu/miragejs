@@ -147,6 +147,7 @@
       let args = [...arguments];
       args.forEach((ele, idx) => {
         let tag = document.getElementById(ele);
+        if (ele1 === 'myBooth') {console.log(tag)}
         if(tag.classList.contains('hidden')){
           tag.classList.toggle('hidden');
         }else{
@@ -156,6 +157,7 @@
     }
 
     function disableToggle(ele1, ele2) {
+
       let args = [...arguments];
       args.forEach((ele, idx) => {
         document.getElementById(ele).disabled ? document.getElementById(ele).disabled = false : document.getElementById(ele).disabled = true;
