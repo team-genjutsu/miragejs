@@ -38,8 +38,6 @@ let mirageChunk = `<div id='fixed' class='fixPos'>
         <div id='optionBtns'>
 
           <div id='connectivityBtns' class='btn-group'>
-            <button id='connect' class="btn btn-info">Connect</button>
-            <button id='disconnect' class="btn btn-info">Disconnect</button>
           </div>
 
           <div id="filterBtns" class="btn-group">
@@ -60,4 +58,6 @@ let mirageChunk = `<div id='fixed' class='fixPos'>
     <!--close section demo-->
  </div>`;
 
-export { mirageChunk };
+export {
+  mirageChunk
+};

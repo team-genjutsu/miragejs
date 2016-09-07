@@ -16,9 +16,9 @@ function bounce(cv, ctx, evt, pos, emoImg, animate, array) {
   //initial image load on canvas
   emoticon.onload();
   let callBack = function() {
-      array[0](emoticon, ctx, cv, callBack, emoImg, animate);
-    }
-    //start drawing movement
+    array[0](emoticon, ctx, cv, callBack, emoImg, animate);
+  };
+  //start drawing movement
   animate = window.requestAnimationFrame(callBack);
 } //end bounce//
 
@@ -60,25 +60,57 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array) {
   //initial image load on canvas
   emoticon.onload();
   let callBack = function() {
-      array[1](emoticon, ctx, cv, callBack, emoImg, animate);
-    }
-    //start drawing movement
+    array[1](emoticon, ctx, cv, callBack, emoImg, animate);
+  };
   animate = window.requestAnimationFrame(callBack);
-} //end orbit//
+} //end velocity//
+
+//doesnt work yet, but would provide a way to erase drawn
+//objects in circular fashion rather than rectangular
+function cutCircle(context, x, y, radius) {
+  context.globalCompositeOperation = 'destination-out';
+  context.arc(x, y, radius, 0, Math.PI * 2, true);
+  context.fill();
+} //end cutCircle//
+
+//these functions need to be ported to proper file
+function hiddenToggle(ele1, ele2) {
+  let args = [...arguments];
+  args.forEach((ele, idx) => {
+    let tag = document.getElementById(ele);
+    if (ele1 === 'myBooth') {
+      console.log(tag);
+    }
+    if (tag.classList.contains('hidden')) {
+      tag.classList.toggle('hidden');
+    } else {
+      tag.classList.add('hidden');
+    }
+  });
+}
+
 
 //paste object to canvas
-function pasteImg(video, context, width, height, x, y, source) {
-  context.drawImage(video, 0, 0, width, height);
-  baseImg = new Image();
-  baseImg.src = source; // needs to be path ie --> 'assets/weird.png';
-  baseImg.onload = function() {
-    context.drawImage(baseImg, x - baseImg.width / 2, y - baseImg.height / 2);
+// function pasteImg(video, context, width, height, x, y, source) {
+  // context.drawImage(video, 0, 0, width, height);
+  // baseImg = new Image();
+  // baseImg.src = source; // needs to be path ie --> 'assets/weird.png';
+  // baseImg.onload = function() {
+    // context.drawImage(baseImg, x - baseImg.width / 2, y - baseImg.height / 2);
     //setTimeout for pasted images//
     // var time = window.setTimeout(function() {
     // context.clearRect(x - baseImg.width / 2, y - baseImg.height / 2, baseImg.width, baseImg.height);
     // }, 5000);
-  }
-} //end paste//
+  // }
+// } //end paste//
+
+function disableToggle(ele1, ele2) {
+
+  let args = [...arguments];
+  args.forEach((ele, idx) => {
+    document.getElementById(ele).disabled ? document.getElementById(ele).disabled = false : document.getElementById(ele).disabled = true;
+  });
+}
 
 //gets cursor position upon mouse click that places
 //an object or starts object movement
@@ -134,29 +166,6 @@ function angularVelocity(obj, ctx, cv, cb, emoImg, animate) {
   animate = window.requestAnimationFrame(cb);
 } //end angularVelocity//
 
-//doesnt work yet, but would provide a way to erase drawn
-//objects in circular fashion rather than rectangular
-function cutCircle(context, x, y, radius) {
-  context.globalCompositeOperation = 'destination-out'
-  context.arc(x, y, radius, 0, Math.PI * 2, true);
-  context.fill();
-} //end cutCircle//
-
-//these functions need to be ported to proper file
-function hiddenToggle(ele1, ele2) {
-  let args = [...arguments];
-  args.forEach((ele, idx) => {
-    let tag = document.getElementById(ele);
-    if (tag.classList.contains('hidden')) {
-      tag.classList.toggle('hidden');
-    } else {
-      tag.classList.add('hidden');
-    }
-  })
-}
-
-
-
 function toggleVidSize(win, state, func1, func2) {
   let arr,
     styleWidth1 = func1(state.myVideo, win).vidWidth,
@@ -180,7 +189,7 @@ function toggleVidSize(win, state, func1, func2) {
       ele.style.zIndex = '2';
       // ele.classList.remove('btmRight');
     }
-  })
+  });
 
 }
 
@@ -205,13 +214,6 @@ function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, 
   downContext.rect(0, 0, downCanvas.width, downCanvas.height);
   downContext.stroke();
 
-}
-
-function disableToggle(ele1, ele2) {
-  let args = [...arguments];
-  args.forEach((ele, idx) => {
-    document.getElementById(ele).disabled ? document.getElementById(ele).disabled = false : document.getElementById(ele).disabled = true;
-  })
 }
 
 function resize(win, state, container, func) {
@@ -241,7 +243,7 @@ function generateDims(container, win) {
   return {
     vidWidth: videoWidth,
     vidHeight: videoHeight
-  }
+  };
 }
 
 function vidDims(bigVid, win) {
@@ -257,7 +259,7 @@ function vidDims(bigVid, win) {
     bigVidHeight: bigVidHeight,
     smallVidWidth: smallVidWidth,
     smallVidHeight: smallVidHeight
-  }
+  };
 }
 
 function scaleToFill(videoTag, height, width) {
@@ -265,9 +267,9 @@ function scaleToFill(videoTag, height, width) {
     videoRatio = 4 / 3,
     tagRatio = width / height;
   if (videoRatio < tagRatio) {
-    video.setAttribute('style', '-webkit-transform: scaleX(' + tagRatio / videoRatio + ')')
+    video.setAttribute('style', '-webkit-transform: scaleX(' + tagRatio / videoRatio + ')');
   } else if (tagRatio < videoRatio) {
-    video.setAttribute('style', '-webkit-transform: scaleY(' + videoRatio / tagRatio + ')')
+    video.setAttribute('style', '-webkit-transform: scaleY(' + videoRatio / tagRatio + ')');
   }
 }
 
@@ -278,7 +280,7 @@ function scaleElement(vid, height, width) {
   let adjustmentRatio = targetRatio / actualRatio;
   let scale = actualRatio < targetRatio ? targetRatio / actualRatio : actualRatio / targetRatio;
   video.setAttribute('style', '-webkit-transform: scale(' + scale + ')');
-};
+}
 
 function blinkerOn(boothEleId, btnEleId) {
   if (document.getElementById(boothEleId).classList.contains('hidden')) {
@@ -289,6 +291,26 @@ function blinkerOn(boothEleId, btnEleId) {
 function blinkerOff(btnId) {
   document.getElementById(btnId).classList.remove('elementToFadeInAndOut');
 }
+
+//toggling of vid sizes isn't changing context it seems...
+
+function appendConnectButtons() {
+  //creating buttons will replace everytime so eventlistener is good. Will pull out of file
+  let connectivityBtns = document.getElementById('connectivityBtns');
+  let conButton = document.createElement('button');
+  let disconButton = document.createElement('button');
+  conButton.setAttribute('class', 'btn btn-info');
+  disconButton.setAttribute('class', 'btn btn-info');
+  conButton.setAttribute('id', 'connect');
+  disconButton.setAttribute('id', 'disconnect');
+  conButton.innerHTML = 'Connect';
+  disconButton.innerHTML = 'Disconnect';
+  conButton.disabled = true;
+  disconButton.disabled = true;
+  connectivityBtns.appendChild(conButton);
+  connectivityBtns.appendChild(disconButton);
+}
+
 ///end of function store///
 
 export {
@@ -310,7 +332,6 @@ export {
   getCursorPosition,
   orbit,
   paste,
-  bounce
+  bounce,
+  appendConnectButtons
 };
-
-//toggling of vid sizes isn't changing context it seems...

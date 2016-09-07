@@ -23,7 +23,8 @@ import {
   getCursorPosition,
   orbit,
   paste,
-  bounce
+  bounce,
+  appendConnectButtons
 } from './components/funcStore';
 import {
   mediaGenerator
@@ -57,21 +58,22 @@ function createMirage() {
   const mirageComponent = {};
 
   mirageComponent.store = (obj) => {
-    
-  }
+
+  };
 
   mirageComponent.insertChunk = () => {
+
     document.body.insertAdjacentHTML('afterbegin', mirageChunk);
-  }
+  };
 
   mirageComponent.startApp = () => {
 
     //states//
-    let roomState = roomStore(window.URL);
-    let mediaState = mediaStore();
-    let filterState = filterStore('filterDisp', 'filter');
-    let animeState = animeStore('animation', 'animateDisp', 'emoji', [paste, bounce, orbit]);
-    let rtcState = rtcStore();
+    let roomState;
+    let mediaState;
+    let filterState;
+    let animeState;
+    let rtcState;
 
     // clear canvas
     let clearButton = document.getElementById('clear');
@@ -86,7 +88,7 @@ function createMirage() {
     //}
 
     animeState.emojis.forEach((ele, idx) => {
-      let btn = document.createElement('button')
+      let btn = document.createElement('button');
       btn.classList.add('btn');
       btn.classList.add('btn-default');
       btn.classList.add('emoji');
@@ -95,7 +97,7 @@ function createMirage() {
       emoj.src = ele;
       btn.appendChild(emoj);
       document.getElementById('emojiButtons').appendChild(btn);
-    })
+    });
 
     document.getElementById('materialBtn').addEventListener('click', () => {
       var demo = document.getElementById('demo');
@@ -104,20 +106,33 @@ function createMirage() {
       //need to parse through stylesheets and set z-indexes of elements to -1 with
       //each toggle
       demo.classList.toggle('hidden');
-    })
+    });
 
     // vendor media objects//
     navigator.getMedia = navigator.mediaDevices.getUserMedia ||
       navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
       navigator.msGetUserMedia; //end vendor media objects//
 
-    //room selection
 
     joinButton.addEventListener('click', () => {
+
+
+        //room selection
+        roomState = roomStore(window.URL);
+        mediaState = mediaStore();
+        filterState = filterStore('filterDisp', 'filter');
+        animeState = animeStore('animation', 'animateDisp', 'emoji', [paste, bounce, orbit]);
+        rtcState = null;
+        console.log('rtcstate pre join', rtcState);
+        rtcState = rtcStore();
+        console.log('rtcstate post join', rtcState);
         const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
         roomState.roomID = document.getElementById('room-id-input').value;
-        socket.emit('joinRoom', JSON.stringify(roomState.roomID));
+        appendConnectButtons();
 
+
+        socket.emit('joinRoom', JSON.stringify(roomState.roomID));
+        (console.log('afteremitjoin'))
         socket.on('process', (payload) => {
             payload = JSON.parse(payload);
             if (!payload) {
@@ -144,9 +159,8 @@ function createMirage() {
                   socket.on('initiated', (member) => {
 
                     member = JSON.parse(member);
-
+                    console.log('before add media', mediaState)
                     mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'myBooth', 'myVideo', 'myCanvas');
-
                     mediaState.myVideo = mediaState.myMedia.video;
                     mediaState.myCanvas = mediaState.myMedia.canvas;
                     mediaState.myContext = mediaState.myMedia.context;
@@ -162,11 +176,11 @@ function createMirage() {
                     }
 
                     //instantiate peer objects and finish signaling for webRTC data and video channels
+
                     document.getElementById('connect').addEventListener('click', () => {
                       connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket)
                         // onDataChannelCreated(rtcState.dataChannel)
                     });
-
 
                     socket.on('message', (message) => {
                       // console.log("Client received Message", message);
@@ -205,31 +219,40 @@ function createMirage() {
 
                       filterListener(mediaState.peerVideo, 'peerFilter', filterState.currFilter, false, channel, setVendorCss);
 
+                      //this would work, or store these dom elements as variables or don't use anon functions to remove listeners on end
+
                       document.getElementById('videoToggle').addEventListener('click', () => {
                         // hiddenToggle('myBooth', 'peerBooth');
                         toggleVidSize(window, mediaState, generateDims, vidDims);
                         blinkerOff('videoToggle');
                       })
 
-                      disableToggle('connect', 'disconnect')
+
+                      // disableToggle('connect', 'disconnect')
+                      // changing this because the multi event listener is retogglei
+                      disableToggle('connect', 'disconnect');
 
                       window.onresize = () => {
                         resize(window, mediaState, document.getElementById('vidContainer'), generateDims);
                       }
 
                       //changing filters//
-                      filterState.filterBtn.addEventListener('click', () => {
-                        filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
-                        console.log(filterState.currFilter.innerHTML)
-                        if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
-                      }, false); //end of filter test//
+                      if (!filterState.filterBtn.getAttribute('addedListen')) {
+                        filterState.filterBtn.addEventListener('click', () => {
+                          filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
+                          console.log(filterState.currFilter.innerHTML)
+                          if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
+                        }, false); //end of filter test//
+                      }
 
                       //changing animations//
-                      animeState.animeBtn.addEventListener('click', () => {
-                        animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
-                        animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
-                        if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
-                      }, false)
+                      if (!animeState.animeBtn.getAttribute('addedListen')) {
+                        animeState.animeBtn.addEventListener('click', () => {
+                          animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
+                          animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
+                          if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
+                        }, false)
+                      }
 
                       //adding click handler for active emoji selection
                       Array.from(animeState.emoBtns, (ele) => {
@@ -245,6 +268,8 @@ function createMirage() {
                         mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
                         mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
                       }, false);
+
+                      document.getElementById('videoToggle').setAttribute('addedListen', true);
 
                     }; //end onopen method
 
@@ -266,6 +291,7 @@ function createMirage() {
 
                     //on data event
                     channel.onmessage = event => {
+
                       console.log('onmessage datachannel method triggered')
                       let data = event.data;
 
@@ -319,7 +345,7 @@ function createMirage() {
                   function handleRemoteStreamAdded(event) {
                     // console.log('Remote Stream Added, event: ', event);
                     rtcState.remoteStream = event.stream;
-                    // console.log('local', rtcState.localStream, 'remote', rtcState.remoteStream)
+                    console.log('local', rtcState.localStream, 'remote', rtcState.remoteStream)
 
                     mediaState.peerMedia = mediaGenerator(event.stream, roomState.vendorUrl, 'peerBooth', 'peerVideo', 'peerCanvas');
 
@@ -337,29 +363,54 @@ function createMirage() {
                     animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
                   }
 
+                  //remove child element of passed in argument from dom
+                  function removeChildren(el) {
+                    let element = document.getElementById(el);
+
+                    while (element.firstChild) {
+                      element.removeChild(element.firstChild);
+                    }
+                  }
+
                   //all this disconnect logic needs to be revamped, VERY SOON!
                   function endCall() {
+                    console.log('disconnected');
+                    socket.disconnect();
                     rtcState.peerConn.close();
-                    rtcState.peerConn = null;
-                    socket.disconnect()
-                    rtcState.localStream.getTracks().forEach((track) => {
-                      track.stop();
-                    });
-                    mediaState.myVideo.src = "";
-                    mediaState.peerVideo.src = "";
+                    rtcState.dataChannel.close();
+                    // rtcState.peerConn = null;
+                    // rtcState.localStream.getTracks().forEach((track) => {
+                    //   track.stop();
+                    // });
+                    // mediaState.myVideo.src = "";
+                    // mediaState.peerVideo.src = "";
+
+                    // disableToggle('connect', 'disconnect');
+                    let element = document.getElementById("top");
+                    //remove old video instances from the dom as well as connect buttons
+                    removeChildren('myBooth');
+                    removeChildren('peerBooth');
+                    removeChildren('connectivityBtns');
+
+
+                    //old toggle doesn't work, unhide peerbooth and show mybooth, can make a function later
+                    if (document.getElementById('myBooth').classList.contains('hidden')) {
+                      document.getElementById('myBooth').classList.remove('hidden');
+                    }
+                    document.getElementById('peerBooth').classList.add('hidden');
 
                     hiddenToggle('roomApp', 'boothApp');
-                    disableToggle('connect', 'disconnect');
                   }
 
                   //disconnect event
                   document.getElementById('disconnect').addEventListener('click', (event) => {
                       // console.log('hi there Blake')
-                      socket.emit('severe');
+                      socket.emit('disconnect');
+                      endCall();
                     }) //end of disconnect click event//
 
                   socket.on('updateChatters', (chatter) => {
-                    socket.emit('severe')
+                    socket.emit('disconnect')
                     endCall();
                     document.getElementById('messages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
                     roomState.chattersClient.splice(roomState.chattersClient.indexOf(chatter), 1);
