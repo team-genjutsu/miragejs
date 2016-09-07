@@ -78,13 +78,10 @@ function hiddenToggle(ele1, ele2) {
   let args = [...arguments];
   args.forEach((ele, idx) => {
     let tag = document.getElementById(ele);
-    if (ele1 === 'myBooth') {
-      console.log(tag);
-    }
-    if (tag.classList.contains('hidden')) {
-      tag.classList.toggle('hidden');
+    if (tag.classList.contains('MRGhidden')) {
+      tag.classList.toggle('MRGhidden');
     } else {
-      tag.classList.add('hidden');
+      tag.classList.add('MRGhidden');
     }
   });
 }
@@ -283,26 +280,26 @@ function scaleElement(vid, height, width) {
 }
 
 function blinkerOn(boothEleId, btnEleId) {
-  if (document.getElementById(boothEleId).classList.contains('hidden')) {
-    document.getElementById(btnEleId).classList.add('elementToFadeInAndOut');
+  if (document.getElementById(boothEleId).classList.contains('MRGhidden')) {
+    document.getElementById(btnEleId).classList.add('MRGelementToFadeInAndOut');
   }
 }
 
 function blinkerOff(btnId) {
-  document.getElementById(btnId).classList.remove('elementToFadeInAndOut');
+  document.getElementById(btnId).classList.remove('MRGelementToFadeInAndOut');
 }
 
 //toggling of vid sizes isn't changing context it seems...
 
 function appendConnectButtons() {
   //creating buttons will replace everytime so eventlistener is good. Will pull out of file
-  let connectivityBtns = document.getElementById('connectivityBtns');
+  let connectivityBtns = document.getElementById('MRGconnectivityBtns');
   let conButton = document.createElement('button');
   let disconButton = document.createElement('button');
-  conButton.setAttribute('class', 'btn btn-info');
-  disconButton.setAttribute('class', 'btn btn-info');
-  conButton.setAttribute('id', 'connect');
-  disconButton.setAttribute('id', 'disconnect');
+  conButton.setAttribute('class', 'MRGbtn');
+  disconButton.setAttribute('class', 'MRGbtn');
+  conButton.setAttribute('id', 'MRGconnect');
+  disconButton.setAttribute('id', 'MRGdisconnect');
   conButton.innerHTML = 'Connect';
   disconButton.innerHTML = 'Disconnect';
   conButton.disabled = true;

@@ -57,9 +57,9 @@ function createMirage() {
 
   const mirageComponent = {};
 
-  mirageComponent.store = (obj) => {
+  // mirageComponent.store = (obj) => {
 
-  };
+  // };
 
   mirageComponent.insertChunk = () => {
 
@@ -76,9 +76,9 @@ function createMirage() {
     let rtcState;
 
     // clear canvas
-    let clearButton = document.getElementById('clear');
+    let clearButton = document.getElementById('MRGclear');
     // room buttons
-    let joinButton = document.getElementById('join-button');
+    let joinButton = document.getElementById('MRGjoin-button');
 
     //turn server to use
     //if (location.hostname != 'localhost') {
@@ -88,13 +88,13 @@ function createMirage() {
     //}
 
 
-    document.getElementById('materialBtn').addEventListener('click', () => {
-      var demo = document.getElementById('demo');
-      var matBtn = document.getElementById('materialBtn');
+    document.getElementById('MRGmaterialBtn').addEventListener('click', () => {
+      var demo = document.getElementById('MRGdemo');
+      var matBtn = document.getElementById('MRGmaterialBtn');
 
-      //need to parse through stylesheets and set z-indexes of elements to -1 with
-      //each toggle
-      demo.classList.toggle('hidden');
+      // need to parse through stylesheets and set z-indexes of elements to -1 with
+      // each toggle
+      demo.classList.toggle('MRGhidden');
     });
 
     // vendor media objects//
@@ -107,39 +107,43 @@ function createMirage() {
 
 
         //room selection
+        roomState = null;
+        mediaState = null;
+        filterState = null;
+        animeState = null;
+        rtcState = null;
         roomState = roomStore(window.URL);
         mediaState = mediaStore();
-        filterState = filterStore('filterDisp', 'filter');
-        animeState = animeStore('animation', 'animateDisp', 'emoji', [paste, bounce, orbit]);
-        rtcState = null;
-        console.log('rtcstate pre join', rtcState);
+        filterState = filterStore('MRGfilterDisp', 'MRGfilter');
+        animeState = animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
+        // console.log('rtcstate pre join', rtcState);
         rtcState = rtcStore();
-        console.log('rtcstate post join', rtcState);
+        // console.log('rtcstate post join', rtcState);
         const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
-        roomState.roomID = document.getElementById('room-id-input').value;
+        roomState.roomID = document.getElementById('MRGroom-id-input').value;
         appendConnectButtons();
 
         animeState.emojis.forEach((ele, idx) => {
           let btn = document.createElement('button');
-          btn.classList.add('btn');
-          btn.classList.add('btn-default');
-          btn.classList.add('emoji');
+          btn.classList.add('MRGemojibtn');
+          btn.classList.add('MRGemoji');
           let emoj = document.createElement('img');
-          emoj.classList.add('img-responsive');
           emoj.src = ele;
+          emoj.style.height = '25px';
+          emoj.style.width = '25px';
           btn.appendChild(emoj);
-          document.getElementById('emojiButtons').appendChild(btn);
+          document.getElementById('MRGemojiButtons').appendChild(btn);
         });
 
 
         socket.emit('joinRoom', JSON.stringify(roomState.roomID));
-        (console.log('afteremitjoin'))
+        // (console.log('afteremitjoin'))
         socket.on('process', (payload) => {
             payload = JSON.parse(payload);
             if (!payload) {
               alert('Try a different room!')
             } else {
-              hiddenToggle('roomApp', 'boothApp')
+              hiddenToggle('MRGroomApp', 'MRGboothApp');
                 //begin streaming!//
               navigator.getMedia({
                 video: true,
@@ -153,15 +157,15 @@ function createMirage() {
                   }))
 
                   socket.on('readyConnect', (payload) => {
-                    document.getElementById('connect').disabled = false;
-                  })
+                    document.getElementById('MRGconnect').disabled = false;
+                  });
 
 
                   socket.on('initiated', (member) => {
 
                     member = JSON.parse(member);
-                    console.log('before add media', mediaState)
-                    mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'myBooth', 'myVideo', 'myCanvas');
+                    console.log('before add media', mediaState);
+                    mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'MRGmyBooth', 'MRGmyVideo', 'MRGmyCanvas');
                     mediaState.myVideo = mediaState.myMedia.video;
                     mediaState.myCanvas = mediaState.myMedia.canvas;
                     mediaState.myContext = mediaState.myMedia.context;
@@ -178,8 +182,8 @@ function createMirage() {
 
                     //instantiate peer objects and finish signaling for webRTC data and video channels
 
-                    document.getElementById('connect').addEventListener('click', () => {
-                      connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket)
+                    document.getElementById('MRGconnect').addEventListener('click', () => {
+                      connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket);
                         // onDataChannelCreated(rtcState.dataChannel)
                     });
 
@@ -217,44 +221,40 @@ function createMirage() {
 
                       animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition); //local
 
-                      filterListener(mediaState.myVideo, 'myFilter', filterState.currFilter, true, channel, setVendorCss);
+                      filterListener(mediaState.myVideo, 'MRGmyFilter', filterState.currFilter, true, channel, setVendorCss);
 
-                      filterListener(mediaState.peerVideo, 'peerFilter', filterState.currFilter, false, channel, setVendorCss);
+                      filterListener(mediaState.peerVideo, 'MRGpeerFilter', filterState.currFilter, false, channel, setVendorCss);
 
                       //this would work, or store these dom elements as variables or don't use anon functions to remove listeners on end
 
-                      document.getElementById('videoToggle').addEventListener('click', () => {
+                      document.getElementById('MRGvideoToggle').addEventListener('click', () => {
                         // hiddenToggle('myBooth', 'peerBooth');
                         toggleVidSize(window, mediaState, generateDims, vidDims);
-                        blinkerOff('videoToggle');
+                        blinkerOff('MRGvideoToggle');
                       })
 
 
                       // disableToggle('connect', 'disconnect')
                       // changing this because the multi event listener is retogglei
-                      disableToggle('connect', 'disconnect');
+                      disableToggle('MRGconnect', 'MRGdisconnect');
 
                       window.onresize = () => {
-                        resize(window, mediaState, document.getElementById('vidContainer'), generateDims);
+                        resize(window, mediaState, document.getElementById('MRGvidContainer'), generateDims);
                       }
 
                       //changing filters//
-                      if (!filterState.filterBtn.getAttribute('addedListen')) {
-                        filterState.filterBtn.addEventListener('click', () => {
-                          filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
-                          console.log(filterState.currFilter.innerHTML)
-                          if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
-                        }, false); //end of filter test//
-                      }
+                      filterState.filterBtn.addEventListener('click', () => {
+                        filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
+                        console.log(filterState.currFilter.innerHTML)
+                        if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
+                      }, false); //end of filter test//
 
                       //changing animations//
-                      if (!animeState.animeBtn.getAttribute('addedListen')) {
-                        animeState.animeBtn.addEventListener('click', () => {
-                          animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
-                          animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
-                          if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
-                        }, false)
-                      }
+                      animeState.animeBtn.addEventListener('click', () => {
+                        animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
+                        animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
+                        if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
+                      }, false)
 
                       //adding click handler for active emoji selection
                       Array.from(animeState.emoBtns, (ele) => {
@@ -271,24 +271,22 @@ function createMirage() {
                         mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
                       }, false);
 
-                      document.getElementById('videoToggle').setAttribute('addedListen', true);
-
                     }; //end onopen method
 
                     //beginning of interactivity
                     //looks for click event on the send button//
-                    document.getElementById('send').addEventListener('click', () => {
-                        //post message in text context on your side
-                        //send message object to the data channel
-                        let yourMessageObj = JSON.stringify({
-                          message: "them:" + " " + document.getElementById('yourMessage').value
-                        });
-                        //creates a variable with the same information to display on your side
-                        let yourMessage = "me:" + " " + document.getElementById('yourMessage').value;
-                        //post message in text context on your side
-                        document.getElementById('messages').textContent += yourMessage + '\n';
-                        channel.send(yourMessageObj)
-                      }) //end send click event//
+                    // document.getElementById('MRGsend').addEventListener('click', () => {
+                        // post message in text context on your side
+                        // send message object to the data channel
+                        // let yourMessageObj = JSON.stringify({
+                          // message: "them:" + " " + document.getElementById('MRGyourMessage').value
+                        // });
+                        // creates a variable with the same information to display on your side
+                        // let yourMessage = "me:" + " " + document.getElementById('MRGyourMessage').value;
+                        // post message in text context on your side
+                        // document.getElementById('messages').textContent += yourMessage + '\n';
+                        // channel.send(yourMessageObj)
+                      // }) //end send click event//
 
 
                     //on data event
@@ -300,23 +298,26 @@ function createMirage() {
                       //conditionally apply or remove filter
                       let dataObj = JSON.parse(data);
 
-                      if (dataObj.message) {
-                        document.getElementById('messages').textContent += dataObj.message + '\n';
-                      }
+                      // if (dataObj.message) {
+                        // document.getElementById('MRGmessages').textContent += dataObj.message + '\n';
+                      // }
 
                       if (dataObj.hasOwnProperty('filter')) {
                         if (dataObj.local) {
+                          console.log('local true')
                           //blink function is a little funky
                           setVendorCss(mediaState.peerVideo, dataObj.filterType);
-                          blinkerOn('peerBooth', 'videoToggle');
+                          blinkerOn('MRGpeerBooth', 'MRGvideoToggle');
                         } else {
+                          console.log('local false')
                           setVendorCss(mediaState.myVideo, dataObj.filterType);
-                          blinkerOn('myBooth', 'videoToggle');
+                          blinkerOn('MRGmyBooth', 'MRGvideoToggle');
                         }
                       }
 
                       if (dataObj.hasOwnProperty('localEmoji')) {
                         if (dataObj.localEmoji) {
+                          console.log('localemoji true')
                           //remote display bounce animation!
                           let emoImg = new Image();
                           emoImg.src = dataObj.currentImg;
@@ -325,9 +326,10 @@ function createMirage() {
                           animeState.currentAnimation = animeState.anime[dataObj.animation];
                           animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
                           animeState.currentAnimation = animeState.temp;
-                          blinkerOn('peerBooth', 'videoToggle')
+                          blinkerOn('MRGpeerBooth', 'MRGvideoToggle')
 
                         } else if (!dataObj.localEmoji) {
+                          console.log('localemoji false')
                           //local display bounce animation!
                           let emoImg = new Image();
                           emoImg.src = dataObj.currentImg;
@@ -336,7 +338,7 @@ function createMirage() {
                           animeState.currentAnimation = animeState.anime[dataObj.animation];
                           animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
                           animeState.currentAnimation = animeState.temp;
-                          blinkerOn('myBooth', 'videoToggle')
+                          blinkerOn('MRGmyBooth', 'MRGvideoToggle')
 
                         }
                       }
@@ -349,7 +351,7 @@ function createMirage() {
                     rtcState.remoteStream = event.stream;
                     console.log('local', rtcState.localStream, 'remote', rtcState.remoteStream)
 
-                    mediaState.peerMedia = mediaGenerator(event.stream, roomState.vendorUrl, 'peerBooth', 'peerVideo', 'peerCanvas');
+                    mediaState.peerMedia = mediaGenerator(event.stream, roomState.vendorUrl, 'MRGpeerBooth', 'MRGpeerVideo', 'MRGpeerCanvas');
 
                     mediaState.peerVideo = mediaState.peerMedia.video;
                     mediaState.peerCanvas = mediaState.peerMedia.canvas;
@@ -362,6 +364,7 @@ function createMirage() {
 
 
                   function activateAnime() {
+                    console.log('activate popped')
                     animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
                   }
 
@@ -388,17 +391,17 @@ function createMirage() {
                     // mediaState.peerVideo.src = "";
 
                     // disableToggle('connect', 'disconnect');
-                    let element = document.getElementById("top");
+                    // let element = document.getElementById("top");
                     //remove old video instances from the dom as well as connect buttons
-                    removeChildren('myBooth');
-                    removeChildren('peerBooth');
-                    removeChildren('connectivityBtns');
+                    removeChildren('MRGmyBooth');
+                    removeChildren('MRGpeerBooth');
+                    removeChildren('MRGconnectivityBtns');
 
-                    hiddenToggle('roomApp', 'boothApp');
+                    hiddenToggle('MRGroomApp', 'MRGboothApp');
                   }
 
                   //disconnect event
-                  document.getElementById('disconnect').addEventListener('click', (event) => {
+                  document.getElementById('MRGdisconnect').addEventListener('click', (event) => {
                       // console.log('hi there Blake')
                       socket.emit('disconnect');
                       endCall();
@@ -407,7 +410,7 @@ function createMirage() {
                   socket.on('updateChatters', (chatter) => {
                     socket.emit('disconnect')
                     endCall();
-                    document.getElementById('messages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
+                    // document.getElementById('MRGmessages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
                     roomState.chattersClient.splice(roomState.chattersClient.indexOf(chatter), 1);
                     // document.getElementById('connect').disabled = false;
                   });
