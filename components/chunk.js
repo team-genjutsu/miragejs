@@ -19,42 +19,21 @@ let mirageChunk = `<div id='fixed' class='fixPos'>
           </div>
           <div id="recent-rooms">
             <!-- <p>Recently used rooms:</p> -->
-            <ul id="recent-rooms-list"></ul>
+            <!-- <ul id="recent-rooms-list"></ul> -->
           </div>
         </div>
       </div>
       <!-- End room container-->
+
       <div id="boothApp" class="hidden">
         <div id='booth'>
           <div id='vidContainer'>
-            <div id='myBooth'>MYBOOTH</div>
-            <div id='peerBooth' class='hidden'>PEER BOOTH</div>
+            <div id='myBooth'></div>
+            <div id='peerBooth'></div>
           </div>
-          <div id="emojiButtons" class="btn-group">
-            <!-- <div id="selectImg">Select Image</div> -->
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f385.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4a9.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4af.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f354.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f436.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f414.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f389.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f60d.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f4b8.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f951.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f984.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/2705.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f64a.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f382.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f602.png"/></button>
-            <button class="btn btn-default emoji"><img class="img-responsive" src="./assets/emojione/small/1f64c.png"/></button>
-          </div>
-
-
+          <div id="emojiButtons" class="btn-group"></div>
         </div>
         <!-- end booth -->
-
-
 
         <div id='optionBtns'>
 
@@ -79,4 +58,6 @@ let mirageChunk = `<div id='fixed' class='fixPos'>
     <!--close section demo-->
  </div>`;
 
-export { mirageChunk };
+export {
+  mirageChunk
+};

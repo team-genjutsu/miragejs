@@ -12,12 +12,11 @@ function initMirage() {
 
   const mirageObj = {};
 
-
-
-  // mirageObj.initializeComponent = mirageComponent();
-
   mirageObj.begin = createMirage();
-  // mirageObj.begin = createMirage().startApp;
+
+  //require mirage-js in server, then input your server in the
+  //socket call in initMirage().socket(),  
+  // mirageObj.sockit = require('./sockLogic.js');
 
   // mirageObj.stores = [
   // roomStore,
@@ -52,7 +51,11 @@ function initMirage() {
 domReady(function() {
 
   const mirage = initMirage().begin;
-  const mountMirage = mirage.blowChunks();
+
+  //mount mirage chunk on DOM
+  mirage.insertChunk();
+
+  //start mirage logic
   mirage.startApp();
 
 });

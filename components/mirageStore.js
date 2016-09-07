@@ -2,27 +2,34 @@
 //concerning filters. Preset filters for now, will be dynamic
 //in future
 // import {
-  // cutCircle,
-  // angularVelocity,
-  // velocity,
-  // drawVideo,
-  // setVendorCss,
-  // getCursorPosition,
-  // orbit,
-  // paste,
-  // bounce
+// cutCircle,
+// angularVelocity,
+// velocity,
+// drawVideo,
+// setVendorCss,
+// getCursorPosition,
+// orbit,
+// paste,
+// bounce
 // } from './funcStore';
 
-function filterStore(filterDispId, filterBtnId){
+function filterStore(filterDispId, filterBtnId) {
   return {
     currFilter: document.getElementById(filterDispId),
     filterBtn: document.getElementById(filterBtnId),
     filters: ['blur(5px)', 'brightness(0.4)', 'contrast(200%)', 'grayscale(100%)', 'hue-rotate(90deg)', 'invert(100%)', 'sepia(100%)', 'saturate(20)', 'none'],
-    idx: 0
+    idx: 0,
+    addFilter: (filterArr) => {
+      if (filterArr != undefined || filterArr.length > 0) {
+        filterArr.forEach((ele, idx) => {
+          ele.push(filter);
+        })
+      }
+    }
   }
 }
 
-function roomStore(url){
+function roomStore(url) {
   return {
     vendorUrl: url,
     chattersClient: [],
@@ -31,7 +38,7 @@ function roomStore(url){
   }
 }
 
-function mediaStore(){
+function mediaStore() {
   return {
     peerMedia: null,
     peerVideo: null,
@@ -44,7 +51,7 @@ function mediaStore(){
   }
 }
 
-function animeStore(animeBtnId, animeDispId, emojiClass, functionArray){
+function animeStore(animeBtnId, animeDispId, emojiClass, functionArray) {
   return {
     anime: {
       paste: functionArray[0], //paste,
@@ -60,11 +67,30 @@ function animeStore(animeBtnId, animeDispId, emojiClass, functionArray){
     raf: null,
     emoImg: new Image(),
     currentImg: null,
-    emojis: document.getElementsByClassName(emojiClass)
+    emojis: [
+      "http://static1.squarespace.com/static/5018d08ae4b0a463fb2fc659/t/546175abe4b011fe10901497/1418889965591/",
+      // "./assets/emojione/small/1f385.png",
+      "./assets/emojione/small/1f4a9.png",
+      "./assets/emojione/small/1f4af.png",
+      "./assets/emojione/small/1f354.png",
+      "./assets/emojione/small/1f436.png",
+      "./assets/emojione/small/1f414.png",
+      "./assets/emojione/small/1f389.png",
+      "./assets/emojione/small/1f60d.png",
+      "./assets/emojione/small/1f4b8.png",
+      "./assets/emojione/small/1f951.png",
+      "./assets/emojione/small/1f984.png",
+      "./assets/emojione/small/2705.png",
+      "./assets/emojione/small/1f64a.png",
+      "./assets/emojione/small/1f382.png",
+      "./assets/emojione/small/1f602.png",
+      "./assets/emojione/small/1f64c.png"
+    ],
+    emoBtns: document.getElementsByClassName(emojiClass)
   }
 }
 
-function rtcStore(){
+function rtcStore() {
   return {
     sdpConstraints: {
       'mandatory': {
@@ -89,4 +115,10 @@ function rtcStore(){
   }
 }
 
-export { roomStore, filterStore, mediaStore, animeStore, rtcStore }
+export {
+  roomStore,
+  filterStore,
+  mediaStore,
+  animeStore,
+  rtcStore
+}
