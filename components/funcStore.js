@@ -147,6 +147,7 @@
       let args = [...arguments];
       args.forEach((ele, idx) => {
         let tag = document.getElementById(ele);
+        if (ele1 === 'myBooth') {console.log(tag)}
         if(tag.classList.contains('hidden')){
           tag.classList.toggle('hidden');
         }else{
@@ -156,6 +157,7 @@
     }
 
     function disableToggle(ele1, ele2) {
+
       let args = [...arguments];
       args.forEach((ele, idx) => {
         document.getElementById(ele).disabled ? document.getElementById(ele).disabled = false : document.getElementById(ele).disabled = true;
@@ -221,6 +223,24 @@
     function blinkerOff(btnId) {
       document.getElementById(btnId).classList.remove('elementToFadeInAndOut');
     }
+
+    function appendConnectButtons() {
+      //creating buttons will replace everytime so eventlistener is good. Will pull out of file
+      let connectivityBtns = document.getElementById('connectivityBtns');
+      let conButton = document.createElement('button');
+      let disconButton = document.createElement('button');
+      conButton.setAttribute('class', 'btn btn-info');
+      disconButton.setAttribute('class', 'btn btn-info');
+      conButton.setAttribute('id', 'connect');
+      disconButton.setAttribute('id', 'disconnect');
+      conButton.innerHTML = 'Connect';
+      disconButton.innerHTML = 'Disconnect';
+      conButton.disabled = true;
+      disconButton.disabled = true;
+      connectivityBtns.appendChild(conButton);
+      connectivityBtns.appendChild(disconButton);
+    }
+
   ///end of function store///
 
-export { hiddenToggle, disableToggle, resize, generateDims, scaleToFill, scaleElement, blinkerOn, blinkerOff, cutCircle, angularVelocity, velocity, drawVideo, setVendorCss, getCursorPosition, orbit, paste, bounce };
+export { hiddenToggle, disableToggle, resize, generateDims, scaleToFill, scaleElement, blinkerOn, blinkerOff, cutCircle, angularVelocity, velocity, drawVideo, setVendorCss, getCursorPosition, orbit, paste, bounce, appendConnectButtons };
