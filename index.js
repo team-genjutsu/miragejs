@@ -198,6 +198,7 @@ function createMirage() {
                   function onDataChannelCreated(channel) {
 
                     channel.onopen = () => {
+
                       console.log('data channel onopen method triggered');
                       animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
 
