@@ -87,17 +87,6 @@ function createMirage() {
     //  );
     //}
 
-    animeState.emojis.forEach((ele, idx) => {
-      let btn = document.createElement('button');
-      btn.classList.add('btn');
-      btn.classList.add('btn-default');
-      btn.classList.add('emoji');
-      let emoj = document.createElement('img');
-      emoj.classList.add('img-responsive');
-      emoj.src = ele;
-      btn.appendChild(emoj);
-      document.getElementById('emojiButtons').appendChild(btn);
-    });
 
     document.getElementById('materialBtn').addEventListener('click', () => {
       var demo = document.getElementById('demo');
@@ -129,6 +118,18 @@ function createMirage() {
         const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
         roomState.roomID = document.getElementById('room-id-input').value;
         appendConnectButtons();
+
+        animeState.emojis.forEach((ele, idx) => {
+          let btn = document.createElement('button');
+          btn.classList.add('btn');
+          btn.classList.add('btn-default');
+          btn.classList.add('emoji');
+          let emoj = document.createElement('img');
+          emoj.classList.add('img-responsive');
+          emoj.src = ele;
+          btn.appendChild(emoj);
+          document.getElementById('emojiButtons').appendChild(btn);
+        });
 
 
         socket.emit('joinRoom', JSON.stringify(roomState.roomID));
@@ -210,6 +211,7 @@ function createMirage() {
                   function onDataChannelCreated(channel) {
 
                     channel.onopen = () => {
+
                       console.log('data channel onopen method triggered');
                       animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
 
@@ -391,13 +393,6 @@ function createMirage() {
                     removeChildren('myBooth');
                     removeChildren('peerBooth');
                     removeChildren('connectivityBtns');
-
-
-                    //old toggle doesn't work, unhide peerbooth and show mybooth, can make a function later
-                    if (document.getElementById('myBooth').classList.contains('hidden')) {
-                      document.getElementById('myBooth').classList.remove('hidden');
-                    }
-                    document.getElementById('peerBooth').classList.add('hidden');
 
                     hiddenToggle('roomApp', 'boothApp');
                   }
