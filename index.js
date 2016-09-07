@@ -21,7 +21,8 @@ import {
   getCursorPosition,
   orbit,
   paste,
-  bounce
+  bounce,
+  appendConnectButtons
 } from './components/funcStore';
 import {
   mediaGenerator
@@ -114,6 +115,9 @@ function createMirage() {
         console.log('rtcstate post join',rtcState);
         const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
         roomState.roomID = document.getElementById('room-id-input').value;
+        appendConnectButtons();
+
+
         socket.emit('joinRoom', JSON.stringify(roomState.roomID));
         (console.log('afteremitjoin'))
         socket.on('process', (payload) => {
@@ -160,11 +164,11 @@ function createMirage() {
                     }
 
                     //instantiate peer objects and finish signaling for webRTC data and video channels
+
                     document.getElementById('connect').addEventListener('click', () => {
                       connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket)
                         // onDataChannelCreated(rtcState.dataChannel)
                     });
-
 
                     socket.on('message', (message) => {
                       // console.log("Client received Message", message);
@@ -203,35 +207,39 @@ function createMirage() {
 
                       filterListener(mediaState.peerVideo, 'peerFilter', filterState.currFilter, false, channel, setVendorCss);
 
-                      if (!document.getElementById('videoToggle').getAttribute("addedListen")){
-                        document.getElementById('videoToggle').addEventListener('click', () => {
+                      //this would work, or store these dom elements as variables or don't use anon functions to remove listeners on end
 
-                          hiddenToggle('myBooth', 'peerBooth');
-                          blinkerOff('videoToggle');
-                        })
-                        console.log('add 1')
-                      }
-                      document.getElementById('videoToggle').setAttribute('addedListen',true)
+                      document.getElementById('videoToggle').addEventListener('click', () => {
+                        hiddenToggle('myBooth', 'peerBooth');
+                        blinkerOff('videoToggle');
+                      })
 
-                      disableToggle('connect', 'disconnect')
+
+                      // disableToggle('connect', 'disconnect')
+                      // changing this because the multi event listener is retogglei
+                      disableToggle('connect', 'disconnect');
 
                       window.onresize = () => {
                         resize(window, mediaState.myVideo, mediaState.peerVideo, mediaState.myCanvas, mediaState.peerCanvas, mediaState.myContext, mediaState.peerContext, document.getElementById('vidContainer'), generateDims);
                       }
 
                       //changing filters//
-                      filterState.filterBtn.addEventListener('click', () => {
-                        filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
-                        console.log(filterState.currFilter.innerHTML)
-                        if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
-                      }, false); //end of filter test//
+                      if (!filterState.filterBtn.getAttribute('addedListen')) {
+                        filterState.filterBtn.addEventListener('click', () => {
+                          filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
+                          console.log(filterState.currFilter.innerHTML)
+                          if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
+                        }, false); //end of filter test//
+                      }
 
                       //changing animations//
-                      animeState.animeBtn.addEventListener('click', () => {
-                        animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
-                        animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
-                        if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
-                      }, false)
+                      if (!animeState.animeBtn.getAttribute('addedListen')) {
+                        animeState.animeBtn.addEventListener('click', () => {
+                          animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
+                          animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
+                          if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
+                        }, false)
+                      }
 
                       //adding click handler for active emoji selection
                       Array.from(animeState.emojis, (ele) => {
@@ -247,6 +255,8 @@ function createMirage() {
                         mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
                         mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
                       }, false);
+
+                      document.getElementById('videoToggle').setAttribute('addedListen',true);
 
                     }; //end onopen method
 
@@ -350,10 +360,10 @@ function createMirage() {
 
                   //all this disconnect logic needs to be revamped, VERY SOON!
                   function endCall() {
-                    console.log('disconnected')
-                    socket.disconnect()
+                    console.log('disconnected');
+                    socket.disconnect();
                     rtcState.peerConn.close();
-                    rtcState.dataChannel.close()
+                    rtcState.dataChannel.close();
                     // rtcState.peerConn = null;
                     // rtcState.localStream.getTracks().forEach((track) => {
                     //   track.stop();
@@ -363,16 +373,11 @@ function createMirage() {
 
                     // disableToggle('connect', 'disconnect');
                     let element = document.getElementById("top");
-                    //remove old video instances from the dom
+                    //remove old video instances from the dom as well as connect buttons
                     removeChildren('myBooth');
                     removeChildren('peerBooth');
-                    //disable both buttons
-                    document.getElementById('connect').disabled = true;
-                    document.getElementById('disconnect').disabled = true;
-                    // document.getElementById('videoToggle').removeEventListener('click', () => {
-                    //   hiddenToggle('myBooth', 'peerBooth');
-                    //   blinkerOff('videoToggle');
-                    // })
+                    removeChildren('connectivityBtns');
+
 
                     //old toggle doesn't work, unhide peerbooth and show mybooth, can make a function later
                     if(document.getElementById('myBooth').classList.contains('hidden')) {
