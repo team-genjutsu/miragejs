@@ -156,62 +156,20 @@ function hiddenToggle(ele1, ele2) {
 }
 
 
-function toggleVidSize(win, state, func1, func2) {
 
+function toggleVidSize(win, state, func1, func2) {
   let arr,
     styleWidth1 = func1(state.myVideo, win).vidWidth,
     styleWidth2 = func1(state.peerVideo, win).vidWidth;
 
   if (styleWidth1 >= styleWidth2) {
     let dims = func2(state.myVideo, win);
-    
-    state.peerVideo.setAttribute('width', '' + dims.bigVidWidth);
-    state.peerVideo.setAttribute('height', '' + dims.bigVidHeight);
-
-    state.peerContext = state.peerCanvas.getContext('2d');
-    state.peerCanvas.width = dims.bigVidWidth;
-    state.peerCanvas.height = dims.bigVidHeight;
-    state.peerContext.rect(0, 0, state.peerCanvas.width, state.peerCanvas.height);
-    state.peerContext.scale(1,1);
-    state.peerContext.stroke();
-
-    state.myVideo.setAttribute('width', '' + dims.smallVidWidth);
-    state.myVideo.setAttribute('height', '' + dims.smallVidHeight);
-
-    state.myContext = state.myCanvas.getContext('2d');
-    state.myCanvas.width = dims.smallVidWidth;
-    state.myCanvas.height = dims.smallVidHeight;
-    state.myContext.rect(0, 0, state.myCanvas.width, state.myCanvas.height);
-    state.myContext.scale(.2, .2);
-    state.myContext.stroke();
-    
+    setSizes(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, dims);
     arr = [state.myVideo, state.myCanvas, state.peerVideo, state.peerCanvas];
-
   } else {
     let dims = func2(state.peerVideo, win);
-
-    state.myVideo.setAttribute('width', '' + dims.bigVidWidth);
-    state.myVideo.setAttribute('height', '' + dims.bigVidHeight);
-
-    state.myContext = state.myCanvas.getContext('2d');
-    state.myCanvas.width = dims.bigVidWidth;
-    state.myCanvas.height = dims.bigVidHeight;
-    state.myContext.rect(0, 0, state.myCanvas.width, state.myCanvas.height);
-    state.myContext.scale(1,1);
-    state.myContext.stroke();
-
-    state.peerVideo.setAttribute('width', '' + dims.smallVidWidth);
-    state.peerVideo.setAttribute('height', '' + dims.smallVidHeight);
-
-    state.peerContext = state.peerCanvas.getContext('2d');
-    state.peerCanvas.width = dims.smallVidWidth;
-    state.peerCanvas.height = dims.smallVidHeight;
-    state.peerContext.rect(0, 0, state.peerCanvas.width, state.peerCanvas.height);
-    state.peerContext.scale(.2, .2);
-    state.peerContext.stroke();
-
+    setSizes(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, dims);
     arr = [state.peerVideo, state.peerCanvas, state.myVideo, state.myCanvas];
-
   }
 
   arr.forEach((ele, idx) => {
@@ -226,6 +184,29 @@ function toggleVidSize(win, state, func1, func2) {
 
 }
 
+function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, dims) {
+  upVid.setAttribute('width', '' + dims.bigVidWidth);
+  upVid.setAttribute('height', '' + dims.bigVidHeight);
+
+  upContext = upCanvas.getContext('2d');
+  upCanvas.width = dims.bigVidWidth;
+  upCanvas.height = dims.bigVidHeight;
+  upContext.rect(0, 0, upCanvas.width, upCanvas.height);
+  // state.peerContext.scale(1,1);
+  upContext.stroke();
+
+  downVid.setAttribute('width', '' + dims.smallVidWidth);
+  downVid.setAttribute('height', '' + dims.smallVidHeight);
+
+  downContext = downCanvas.getContext('2d');
+  downCanvas.width = dims.smallVidWidth;
+  downCanvas.height = dims.smallVidHeight;
+  downContext.scale(.25, .25);
+  downContext.rect(0, 0, downCanvas.width, downCanvas.height);
+  downContext.stroke();
+
+}
+
 function disableToggle(ele1, ele2) {
   let args = [...arguments];
   args.forEach((ele, idx) => {
@@ -233,28 +214,22 @@ function disableToggle(ele1, ele2) {
   })
 }
 
-function resize(win, locVideo, remVideo, locCanvas, remCanvas, locContext, remContext, container, func) {
+function resize(win, state, container, func) {
 
   let dims = func(container, win);
   //resize local elements
-  locVideo.setAttribute('width', '' + dims.vidWidth);
-  locVideo.setAttribute('height', '' + dims.vidHeight);
+  state.myVideo.setAttribute('width', '' + dims.vidWidth);
+  state.myVideo.setAttribute('height', '' + dims.vidHeight);
 
-  locCanvas.setAttribute('width', '' + dims.vidWidth);
-  locCanvas.setAttribute('height', '' + dims.vidHeight);
-
-  // locContext.setAttribute('width', '' + dims.vidWidth);
-  // locContext.setAttribute('height', '' + dims.vidHeight);
+  state.myCanvas.setAttribute('width', '' + dims.vidWidth);
+  state.myCanvas.setAttribute('height', '' + dims.vidHeight);
 
   //resize remote elements
-  remVideo.setAttribute('width', '' + dims.vidWidth);
-  remVideo.setAttribute('height', '' + dims.vidHeight);
+  state.peerVideo.setAttribute('width', '' + dims.vidWidth);
+  state.peerVideo.setAttribute('height', '' + dims.vidHeight);
 
-  remCanvas.setAttribute('width', '' + dims.vidWidth);
-  remCanvas.setAttribute('height', '' + dims.vidHeight);
-
-  // remContext.setAttribute('width', '' + dims.vidWidth);
-  // remContext.setAttribute('height', '' + dims.vidHeight);
+  state.peerCanvas.setAttribute('width', '' + dims.vidWidth);
+  state.peerCanvas.setAttribute('height', '' + dims.vidHeight);
 }
 
 function generateDims(container, win) {

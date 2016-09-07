@@ -56,10 +56,14 @@ function createMirage() {
 
   const mirageComponent = {};
 
-  mirageComponent.blowChunks = () => {
-
-    // console.log(mirageChunk);
+  mirageComponent.insertChunk = () => {
     document.body.insertAdjacentHTML('afterbegin', mirageChunk);
+  }
+
+  mirageComponent.store = (obj) => {
+    for(var k in obj){
+  
+    }
   }
 
   mirageComponent.startApp = () => {
@@ -94,8 +98,6 @@ function createMirage() {
         btn.appendChild(emoj);
         document.getElementById('emojiButtons').appendChild(btn);
       })
-      // console.log(mirageChunk);
-      // document.body.insertAdjacentHTML('afterbegin', mirageChunk);
 
     document.getElementById('materialBtn').addEventListener('click', () => {
       var demo = document.getElementById('demo');
@@ -104,7 +106,6 @@ function createMirage() {
       //need to parse through stylesheets and set z-indexes of elements to -1 with
       //each toggle
       demo.classList.toggle('hidden');
-      // demo.style.display = 'block';
     })
 
     // vendor media objects//
@@ -124,7 +125,6 @@ function createMirage() {
             if (!payload) {
               alert('Try a different room!')
             } else {
-              // hiddenToggle(document.getElementById('roomApp'), document.getElementById('boothApp'))
               hiddenToggle('roomApp', 'boothApp')
                 //begin streaming!//
               navigator.getMedia({
@@ -216,7 +216,7 @@ function createMirage() {
                       disableToggle('connect', 'disconnect')
 
                       window.onresize = () => {
-                        resize(window, mediaState.myVideo, mediaState.peerVideo, mediaState.myCanvas, mediaState.peerCanvas, mediaState.myContext, mediaState.peerContext, document.getElementById('vidContainer'), generateDims);
+                        resize(window, mediaState, document.getElementById('vidContainer'), generateDims);
                       }
 
                       //changing filters//
