@@ -56,14 +56,12 @@ function createMirage() {
 
   const mirageComponent = {};
 
-  mirageComponent.insertChunk = () => {
-    document.body.insertAdjacentHTML('afterbegin', mirageChunk);
+  mirageComponent.store = (obj) => {
+    
   }
 
-  mirageComponent.store = (obj) => {
-    for(var k in obj){
-  
-    }
+  mirageComponent.insertChunk = () => {
+    document.body.insertAdjacentHTML('afterbegin', mirageChunk);
   }
 
   mirageComponent.startApp = () => {
@@ -88,16 +86,16 @@ function createMirage() {
     //}
 
     animeState.emojis.forEach((ele, idx) => {
-        let btn = document.createElement('button')
-        btn.classList.add('btn');
-        btn.classList.add('btn-default');
-        btn.classList.add('emoji');
-        let emoj = document.createElement('img');
-        emoj.classList.add('img-responsive');
-        emoj.src = ele;
-        btn.appendChild(emoj);
-        document.getElementById('emojiButtons').appendChild(btn);
-      })
+      let btn = document.createElement('button')
+      btn.classList.add('btn');
+      btn.classList.add('btn-default');
+      btn.classList.add('emoji');
+      let emoj = document.createElement('img');
+      emoj.classList.add('img-responsive');
+      emoj.src = ele;
+      btn.appendChild(emoj);
+      document.getElementById('emojiButtons').appendChild(btn);
+    })
 
     document.getElementById('materialBtn').addEventListener('click', () => {
       var demo = document.getElementById('demo');
