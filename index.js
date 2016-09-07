@@ -24,7 +24,8 @@ import {
   orbit,
   paste,
   bounce,
-  appendConnectButtons
+  appendConnectButtons,
+  removeChildren
 } from './components/funcStore';
 import {
   mediaGenerator
@@ -213,9 +214,9 @@ function createMirage() {
                     channel.onopen = () => {
 
                       console.log('data channel onopen method triggered');
-                      animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
+                      animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition, animeState.rafArray); //remote
 
-                      animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition); //local
+                      animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafArray); //local
 
                       filterListener(mediaState.myVideo, 'myFilter', filterState.currFilter, true, channel, setVendorCss);
 
@@ -266,7 +267,14 @@ function createMirage() {
 
                       //attempts to clear canvas
                       clearButton.addEventListener('click', (event) => {
-                        cancelAnimationFrame(animeState.raf);
+
+                        // animeState.rafArray.forEach(x => {
+                        //   cancelAnimationFrame(x);
+                        //   // console.log(x)
+                        // })
+                        console.log(animeState.rafArray[animeState.rafArray.length-1])
+                        cancelAnimationFrame(animeState.rafArray[animeState.rafArray.length-1])
+
                         mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
                         mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
                       }, false);
@@ -323,7 +331,7 @@ function createMirage() {
 
                           animeState.temp = animeState.currentAnimation;
                           animeState.currentAnimation = animeState.anime[dataObj.animation];
-                          animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
+                          animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity], animeState.rafArray);
                           animeState.currentAnimation = animeState.temp;
                           blinkerOn('peerBooth', 'videoToggle')
 
@@ -334,7 +342,7 @@ function createMirage() {
 
                           animeState.temp = animeState.currentAnimation;
                           animeState.currentAnimation = animeState.anime[dataObj.animation];
-                          animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
+                          animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity], animeState.rafArray);
                           animeState.currentAnimation = animeState.temp;
                           blinkerOn('myBooth', 'videoToggle')
 
@@ -362,16 +370,7 @@ function createMirage() {
 
 
                   function activateAnime() {
-                    animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
-                  }
-
-                  //remove child element of passed in argument from dom
-                  function removeChildren(el) {
-                    let element = document.getElementById(el);
-
-                    while (element.firstChild) {
-                      element.removeChild(element.firstChild);
-                    }
+                    animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition, animeState.rafArray); //remote
                   }
 
                   //all this disconnect logic needs to be revamped, VERY SOON!
@@ -393,6 +392,7 @@ function createMirage() {
                     removeChildren('myBooth');
                     removeChildren('peerBooth');
                     removeChildren('connectivityBtns');
+                    removeChildren('emojiButtons');
 
                     hiddenToggle('roomApp', 'boothApp');
                   }

@@ -1,6 +1,6 @@
 //function store//
 
-function bounce(cv, ctx, evt, pos, emoImg, animate, array) {
+function bounce(cv, ctx, evt, pos, emoImg, animate, array, rafArray) {
   let onload = emoImg.onload;
   //this object keeps track of the movement, loads the images, and determines
   //the velocity
@@ -16,10 +16,13 @@ function bounce(cv, ctx, evt, pos, emoImg, animate, array) {
   //initial image load on canvas
   emoticon.onload();
   let callBack = function() {
-    array[0](emoticon, ctx, cv, callBack, emoImg, animate);
+    array[0](emoticon, ctx, cv, callBack, emoImg, animate, rafArray);
   };
   //start drawing movement
-  animate = window.requestAnimationFrame(callBack);
+  animate = requestAnimationFrame(callBack);
+  // rafArray[animate] = ;
+  console.log(rafArray);
+
 } //end bounce//
 
 function paste(cv, ctx, evt, pos, emoImg) {
@@ -40,7 +43,7 @@ function paste(cv, ctx, evt, pos, emoImg) {
 } //end staticPaste//
 
 //orbit func//
-function orbit(cv, ctx, evt, pos, emoImg, animate, array) {
+function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafArray) {
   let onload = emoImg.onload;
   //this object keeps track of the movement, loads the images, and determines
   //the angular veloctiy. We're keeping track of frequency of refreshes to
@@ -60,9 +63,12 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array) {
   //initial image load on canvas
   emoticon.onload();
   let callBack = function() {
-    array[1](emoticon, ctx, cv, callBack, emoImg, animate);
+    array[1](emoticon, ctx, cv, callBack, emoImg, animate, rafArray);
   };
-  animate = window.requestAnimationFrame(callBack);
+  animate = requestAnimationFrame(callBack);
+  rafArray.push(animate);
+  console.log(rafArray);
+
 } //end velocity//
 
 //doesnt work yet, but would provide a way to erase drawn
@@ -140,7 +146,7 @@ function drawVideo(v, c, w, h) {
 } //end drawVideo//
 
 //canvas draw function for velocity motion
-function velocity(obj, ctx, cv, cb, emoImg, animate) {
+function velocity(obj, ctx, cv, cb, emoImg, animate, rafArray) {
   ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 8, emoImg.height + 8);
   obj.onload();
   obj.x += obj.vx;
@@ -152,10 +158,12 @@ function velocity(obj, ctx, cv, cb, emoImg, animate) {
     obj.vx = -obj.vx;
   }
   animate = window.requestAnimationFrame(cb);
+  rafArray.push(animate);
+  console.log(animate);
 } //end velocity//
 
 //angularVelocity func//
-function angularVelocity(obj, ctx, cv, cb, emoImg, animate) {
+function angularVelocity(obj, ctx, cv, cb, emoImg, animate, rafArray) {
   ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 10, emoImg.height + 10);
   obj.onload();
 
@@ -164,6 +172,8 @@ function angularVelocity(obj, ctx, cv, cb, emoImg, animate) {
   obj.rotateCount++;
 
   animate = window.requestAnimationFrame(cb);
+  rafArray.push(animate);
+  console.log(animate);
 } //end angularVelocity//
 
 function toggleVidSize(win, state, func1, func2) {
@@ -311,6 +321,15 @@ function appendConnectButtons() {
   connectivityBtns.appendChild(disconButton);
 }
 
+//remove child element of passed in argument from dom
+function removeChildren(el) {
+  let element = document.getElementById(el);
+
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+}
+
 ///end of function store///
 
 export {
@@ -333,5 +352,6 @@ export {
   orbit,
   paste,
   bounce,
-  appendConnectButtons
+  appendConnectButtons,
+  removeChildren
 };
