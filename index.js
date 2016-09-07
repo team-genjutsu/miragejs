@@ -5,6 +5,8 @@ import {
   animationListener
 } from './components/listenerFuncs';
 import {
+  toggleVidSize,
+  vidDims,
   hiddenToggle,
   disableToggle,
   resize,
@@ -55,11 +57,14 @@ function createMirage() {
 
   const mirageComponent = {};
 
-  mirageComponent.blowChunks = () => {
+  mirageComponent.store = (obj) => {
 
-    // console.log(mirageChunk);
+  };
+
+  mirageComponent.insertChunk = () => {
+
     document.body.insertAdjacentHTML('afterbegin', mirageChunk);
-  }
+  };
 
   mirageComponent.startApp = () => {
 
@@ -82,8 +87,6 @@ function createMirage() {
     //  );
     //}
 
-    // console.log(mirageChunk);
-    // document.body.insertAdjacentHTML('afterbegin', mirageChunk);
 
     document.getElementById('materialBtn').addEventListener('click', () => {
       var demo = document.getElementById('demo');
@@ -92,30 +95,41 @@ function createMirage() {
       //need to parse through stylesheets and set z-indexes of elements to -1 with
       //each toggle
       demo.classList.toggle('hidden');
-      // demo.style.display = 'block';
-    })
+    });
 
     // vendor media objects//
     navigator.getMedia = navigator.mediaDevices.getUserMedia ||
-    navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
-    navigator.msGetUserMedia; //end vendor media objects//
+      navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia; //end vendor media objects//
 
 
     joinButton.addEventListener('click', () => {
 
 
-      //room selection
+        //room selection
         roomState = roomStore(window.URL);
         mediaState = mediaStore();
         filterState = filterStore('filterDisp', 'filter');
         animeState = animeStore('animation', 'animateDisp', 'emoji', [paste, bounce, orbit]);
         rtcState = null;
-        console.log('rtcstate pre join',rtcState);
+        console.log('rtcstate pre join', rtcState);
         rtcState = rtcStore();
-        console.log('rtcstate post join',rtcState);
+        console.log('rtcstate post join', rtcState);
         const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
         roomState.roomID = document.getElementById('room-id-input').value;
         appendConnectButtons();
+
+        animeState.emojis.forEach((ele, idx) => {
+          let btn = document.createElement('button');
+          btn.classList.add('btn');
+          btn.classList.add('btn-default');
+          btn.classList.add('emoji');
+          let emoj = document.createElement('img');
+          emoj.classList.add('img-responsive');
+          emoj.src = ele;
+          btn.appendChild(emoj);
+          document.getElementById('emojiButtons').appendChild(btn);
+        });
 
 
         socket.emit('joinRoom', JSON.stringify(roomState.roomID));
@@ -125,7 +139,6 @@ function createMirage() {
             if (!payload) {
               alert('Try a different room!')
             } else {
-              // hiddenToggle(document.getElementById('roomApp'), document.getElementById('boothApp'))
               hiddenToggle('roomApp', 'boothApp')
                 //begin streaming!//
               navigator.getMedia({
@@ -147,7 +160,7 @@ function createMirage() {
                   socket.on('initiated', (member) => {
 
                     member = JSON.parse(member);
-                    console.log('before add media',mediaState)
+                    console.log('before add media', mediaState)
                     mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'myBooth', 'myVideo', 'myCanvas');
                     mediaState.myVideo = mediaState.myMedia.video;
                     mediaState.myCanvas = mediaState.myMedia.canvas;
@@ -211,7 +224,8 @@ function createMirage() {
                       //this would work, or store these dom elements as variables or don't use anon functions to remove listeners on end
 
                       document.getElementById('videoToggle').addEventListener('click', () => {
-                        hiddenToggle('myBooth', 'peerBooth');
+                        // hiddenToggle('myBooth', 'peerBooth');
+                        toggleVidSize(window, mediaState, generateDims, vidDims);
                         blinkerOff('videoToggle');
                       })
 
@@ -221,7 +235,7 @@ function createMirage() {
                       disableToggle('connect', 'disconnect');
 
                       window.onresize = () => {
-                        resize(window, mediaState.myVideo, mediaState.peerVideo, mediaState.myCanvas, mediaState.peerCanvas, mediaState.myContext, mediaState.peerContext, document.getElementById('vidContainer'), generateDims);
+                        resize(window, mediaState, document.getElementById('vidContainer'), generateDims);
                       }
 
                       //changing filters//
@@ -243,7 +257,7 @@ function createMirage() {
                       }
 
                       //adding click handler for active emoji selection
-                      Array.from(animeState.emojis, (ele) => {
+                      Array.from(animeState.emoBtns, (ele) => {
                         ele.addEventListener('click', (event) => {
                           animeState.currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
                           animeState.emoImg.src = animeState.currentImg;
@@ -257,7 +271,7 @@ function createMirage() {
                         mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
                       }, false);
 
-                      document.getElementById('videoToggle').setAttribute('addedListen',true);
+                      document.getElementById('videoToggle').setAttribute('addedListen', true);
 
                     }; //end onopen method
 
@@ -341,7 +355,8 @@ function createMirage() {
                     mediaState.peerCanvas = mediaState.peerMedia.canvas;
                     mediaState.peerContext = mediaState.peerMedia.context;
 
-                    hiddenToggle('myBooth', 'peerBooth');
+                    // hiddenToggle('myBooth', 'peerBooth');
+                    toggleVidSize(window, mediaState, generateDims, vidDims);
 
                   } ///end on stream added event///
 
@@ -378,13 +393,6 @@ function createMirage() {
                     removeChildren('myBooth');
                     removeChildren('peerBooth');
                     removeChildren('connectivityBtns');
-
-
-                    //old toggle doesn't work, unhide peerbooth and show mybooth, can make a function later
-                    if(document.getElementById('myBooth').classList.contains('hidden')) {
-                      document.getElementById('myBooth').classList.remove('hidden');
-                    }
-                    document.getElementById('peerBooth').classList.add('hidden');
 
                     hiddenToggle('roomApp', 'boothApp');
                   }
