@@ -1,55 +1,54 @@
-let mirageChunk = `<div id='fixed' class='fixPos'>
-    <div id='materialBtn'>
-      </div>
+let mirageChunk = `<div id='MRGfixed' class='MRGfixPos'>
+    <div id='MRGmaterialBtn'></div>
     <!-- Video demo area -->
-    <section id="demo" class='hidden'>
+    <section id="MRGdemo" class='MRGhidden'>
 
-      <div id="roomApp" class="room container">
-        <div id="room-selection" class="">
+      <div id="MRGroomApp" class="MRGroom">
+        <div id="MRGroom-selection">
           <h1>Choose a room!</h1>
           <div>
-            <div id="room-id-input-div">
-              <input type="text" id="room-id-input" autofocus="">
-              <label class="error-label hidden" for="room-id-input" id="room-id-input-label">Room name must be 5 or more characters and include only letters, numbers, underscore and hyphen.</label>
+            <div id="MRGroom-id-input-div">
+              <input type="text" id="MRGroom-id-input" autofocus="">
+              <label class="MRGerror-label hidden" for="MRGroom-id-input" id="MRGroom-id-input-label">Room name must be 5 or more characters and include only letters, numbers, underscore and hyphen.</label>
             </div>
-            <div id="room-id-input-buttons">
-              <button id="join-button" class='roombtn'>JOIN</button>
-              <!-- <button id="random-button" class='roombtn'>RANDOM</button> -->
+            <div id="MRGroom-id-input-buttons">
+              <button id="MRGjoin-button" class='MRGroombtn'>JOIN</button>
+              <!-- <button id="MRG-random-button" class='MRG-roombtn'>RANDOM</button> -->
             </div>
           </div>
-          <div id="recent-rooms">
+          <div id="MRGrecent-rooms">
             <!-- <p>Recently used rooms:</p> -->
-            <!-- <ul id="recent-rooms-list"></ul> -->
+            <!-- <ul id="MRG-recent-rooms-list"></ul> -->
           </div>
         </div>
       </div>
       <!-- End room container-->
 
-      <div id="boothApp" class="hidden">
-        <div id='booth'>
-          <div id='vidContainer'>
-            <div id='myBooth'></div>
-            <div id='peerBooth'></div>
+      <div id="MRGboothApp" class="MRGhidden">
+        <div id='MRGbooth'>
+          <div id='MRGvidContainer'>
+            <div id='MRGmyBooth'></div>
+            <div id='MRGpeerBooth'></div>
           </div>
-          <div id="emojiButtons" class="btn-group"></div>
+          <div id="MRGemojiButtons"></div>
         </div>
         <!-- end booth -->
 
-        <div id='optionBtns'>
+        <div id='MRGoptionBtns'>
 
-          <div id='connectivityBtns' class='btn-group'>
+          <div id='MRGconnectivityBtns'>
           </div>
 
-          <div id="filterBtns" class="btn-group">
-            <button id='filter' class="btn btn-primary">filter: <span id='filterDisp'></span></button>
-            <button id='myFilter' class="btn btn-info">filter me!</button>
-            <button id='peerFilter' class="btn btn-info">filter them!</button><br/>
-            <button id='videoToggle' class="btn btn-info">Toggle video!</button><br/>
+          <div id="MRGfilterBtns">
+            <button id='MRGfilter' class="MRGbtn">filter: <span id='MRGfilterDisp'></span></button>
+            <button id='MRGmyFilter' class="MRGbtn">filter me!</button>
+            <button id='MRGpeerFilter' class="MRGbtn">filter them!</button><br/>
+            <button id='MRGvideoToggle' class="MRGbtn">Toggle video!</button><br/>
           </div>
 
-          <div id="animeBtn" class="btn-group">
-            <button id='clear' class="btn btn-primary">clear</button>
-            <button id='animation' class='btn btn-success'>animation: <span id='animateDisp'>paste</span></button>
+          <div id="MRGanimeBtn">
+            <button id='MRGclear' class="MRGbtn">clear</button>
+            <button id='MRGanimation' class='MRGbtn'>animation: <span id='MRGanimateDisp'>paste</span></button>
           </div>
         </div>
       </div>

@@ -69,8 +69,7 @@ function animeStore(animeBtnId, animeDispId, emojiClass, functionArray) {
     emoImg: new Image(),
     currentImg: null,
     emojis: [
-      "http://static1.squarespace.com/static/5018d08ae4b0a463fb2fc659/t/546175abe4b011fe10901497/1418889965591/",
-      // "./assets/emojione/small/1f385.png",
+      "./assets/emojione/small/1f385.png",
       "./assets/emojione/small/1f4a9.png",
       "./assets/emojione/small/1f4af.png",
       "./assets/emojione/small/1f354.png",

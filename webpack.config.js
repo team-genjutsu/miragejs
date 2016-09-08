@@ -6,7 +6,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 module.exports = {
   entry: [
-    './client-index.js',
+    './index.js',
   ],
   output: {
     path: path.join(__dirname, './public'),

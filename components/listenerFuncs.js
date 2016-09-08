@@ -9,7 +9,7 @@ function filterListener(vid, whoisFilter, currFilter, whoisBool, channel, func) 
     });
     func(vid, currFilter.innerHTML);
     channel.send(filterDataObj);
-  }, false)
+  }, false);
 }
 
 
@@ -38,7 +38,7 @@ function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, ar
     });
 
     channel.send(canvasObj);
-  }, false)
+  }, false);
 }
 
 function clearListener(channel, func, clearButton, animeSt, mediaSt) {
