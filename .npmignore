@@ -10,7 +10,6 @@ npm-debug.log
 /.idea
 
 /public/index.html
-/public/bundle.js
 
 .babelrc
 .eslintrc.js

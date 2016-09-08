@@ -1,8 +1,8 @@
 {
   "name": "mirage-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Allows developers access to a customizable video chat component",
-  "main": "index.js",
+  "main": "./public/bundle.js",
   "scripts": {
     "test": "karma start",
     "dev": "nodemon server.js",
