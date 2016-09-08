@@ -65,6 +65,7 @@ function animeStore(animeBtnId, animeDispId, emojiClass, functionArray) {
     currentAnimation: null,
     temp: null,
     raf: null,
+    rafObj: {},
     emoImg: new Image(),
     currentImg: null,
     emojis: [
