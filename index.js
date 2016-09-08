@@ -1,3 +1,6 @@
+// import {
+  // domReady
+// } from './components/domReady';
 import adapter from 'webrtc-adapter';
 import io from 'socket.io-client';
 import {
@@ -164,7 +167,6 @@ function createMirage() {
                   socket.on('initiated', (member) => {
 
                     member = JSON.parse(member);
-                    console.log('before add media', mediaState);
                     mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'MRGmyBooth', 'MRGmyVideo', 'MRGmyCanvas');
                     mediaState.myVideo = mediaState.myMedia.video;
                     mediaState.myCanvas = mediaState.myMedia.canvas;
@@ -216,7 +218,6 @@ function createMirage() {
 
                     channel.onopen = () => {
 
-                      console.log('data channel onopen method triggered');
                       animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
 
                       animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition); //local
@@ -230,8 +231,8 @@ function createMirage() {
                       document.getElementById('MRGvideoToggle').addEventListener('click', () => {
                         // hiddenToggle('myBooth', 'peerBooth');
                         toggleVidSize(window, mediaState, generateDims, vidDims);
-                        blinkerOff('MRGvideoToggle');
-                      })
+                        // blinkerOff('MRGvideoToggle');
+                      });
 
 
                       // disableToggle('connect', 'disconnect')
@@ -240,12 +241,11 @@ function createMirage() {
 
                       window.onresize = () => {
                         resize(window, mediaState, document.getElementById('MRGvidContainer'), generateDims);
-                      }
+                      };
 
                       //changing filters//
                       filterState.filterBtn.addEventListener('click', () => {
                         filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
-                        console.log(filterState.currFilter.innerHTML)
                         if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
                       }, false); //end of filter test//
 
@@ -273,7 +273,7 @@ function createMirage() {
 
                     }; //end onopen method
 
-                    //beginning of interactivity
+                    // for messaging if we want to integrate later
                     //looks for click event on the send button//
                     // document.getElementById('MRGsend').addEventListener('click', () => {
                         // post message in text context on your side
@@ -292,7 +292,6 @@ function createMirage() {
                     //on data event
                     channel.onmessage = event => {
 
-                      console.log('onmessage datachannel method triggered')
                       let data = event.data;
 
                       //conditionally apply or remove filter
@@ -304,20 +303,17 @@ function createMirage() {
 
                       if (dataObj.hasOwnProperty('filter')) {
                         if (dataObj.local) {
-                          console.log('local true')
                           //blink function is a little funky
                           setVendorCss(mediaState.peerVideo, dataObj.filterType);
-                          blinkerOn('MRGpeerBooth', 'MRGvideoToggle');
+                          // blinkerOn('MRGpeerBooth', 'MRGvideoToggle');
                         } else {
-                          console.log('local false')
                           setVendorCss(mediaState.myVideo, dataObj.filterType);
-                          blinkerOn('MRGmyBooth', 'MRGvideoToggle');
+                          // blinkerOn('MRGmyBooth', 'MRGvideoToggle');
                         }
                       }
 
                       if (dataObj.hasOwnProperty('localEmoji')) {
                         if (dataObj.localEmoji) {
-                          console.log('localemoji true')
                           //remote display bounce animation!
                           let emoImg = new Image();
                           emoImg.src = dataObj.currentImg;
@@ -326,10 +322,9 @@ function createMirage() {
                           animeState.currentAnimation = animeState.anime[dataObj.animation];
                           animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
                           animeState.currentAnimation = animeState.temp;
-                          blinkerOn('MRGpeerBooth', 'MRGvideoToggle')
+                          // blinkerOn('MRGpeerBooth', 'MRGvideoToggle')
 
                         } else if (!dataObj.localEmoji) {
-                          console.log('localemoji false')
                           //local display bounce animation!
                           let emoImg = new Image();
                           emoImg.src = dataObj.currentImg;
@@ -338,7 +333,7 @@ function createMirage() {
                           animeState.currentAnimation = animeState.anime[dataObj.animation];
                           animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity]);
                           animeState.currentAnimation = animeState.temp;
-                          blinkerOn('MRGmyBooth', 'MRGvideoToggle')
+                          // blinkerOn('MRGmyBooth', 'MRGvideoToggle');
 
                         }
                       }
@@ -349,7 +344,6 @@ function createMirage() {
                   function handleRemoteStreamAdded(event) {
                     // console.log('Remote Stream Added, event: ', event);
                     rtcState.remoteStream = event.stream;
-                    console.log('local', rtcState.localStream, 'remote', rtcState.remoteStream)
 
                     mediaState.peerMedia = mediaGenerator(event.stream, roomState.vendorUrl, 'MRGpeerBooth', 'MRGpeerVideo', 'MRGpeerCanvas');
 
@@ -364,7 +358,6 @@ function createMirage() {
 
 
                   function activateAnime() {
-                    console.log('activate popped')
                     animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition); //remote
                   }
 
@@ -379,7 +372,6 @@ function createMirage() {
 
                   //all this disconnect logic needs to be revamped, VERY SOON!
                   function endCall() {
-                    console.log('disconnected');
                     socket.disconnect();
                     rtcState.peerConn.close();
                     rtcState.dataChannel.close();
@@ -405,10 +397,10 @@ function createMirage() {
                       // console.log('hi there Blake')
                       socket.emit('disconnect');
                       endCall();
-                    }) //end of disconnect click event//
+                    });//end of disconnect click event//
 
                   socket.on('updateChatters', (chatter) => {
-                    socket.emit('disconnect')
+                    socket.emit('disconnect');
                     endCall();
                     // document.getElementById('MRGmessages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
                     roomState.chattersClient.splice(roomState.chattersClient.indexOf(chatter), 1);
@@ -422,14 +414,27 @@ function createMirage() {
 
             } //end of boolean in socket 'process' event
 
-          }) //end of socket 'process' event
+          }); //end of socket 'process' event
 
-      }, false) //end of 'join' event
+      }, false); //end of 'join' event
 
-  }
+  };
   return mirageComponent;
 }
 
 export {
   createMirage
 };
+
+//for testing
+// domReady(function() {
+
+  // const mirage = createMirage();
+
+  // mount mirage chunk on DOM
+  // mirage.insertChunk();
+
+  // start mirage logic
+  // mirage.startApp();
+
+// });
