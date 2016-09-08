@@ -57,6 +57,10 @@ import {
 import {
   mirageChunk
 } from './components/chunk';
+import {
+  cssChunk
+} from './components/cssChunk';
+
 
 
 function createMirage() {
@@ -66,6 +70,10 @@ function createMirage() {
   // mirageComponent.store = (obj) => {
 
   // };
+
+  mirageComponent.insertCss = () => {
+    document.head.insertAdjacentHTML('beforeend', cssChunk);
+  };
 
   mirageComponent.insertChunk = () => {
 
