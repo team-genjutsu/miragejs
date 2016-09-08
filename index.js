@@ -2,7 +2,8 @@ import adapter from 'webrtc-adapter';
 import io from 'socket.io-client';
 import {
   filterListener,
-  animationListener
+  animationListener,
+  clearListener
 } from './components/listenerFuncs';
 import {
   toggleVidSize,
@@ -25,7 +26,8 @@ import {
   paste,
   bounce,
   appendConnectButtons,
-  removeChildren
+  removeChildren,
+  clearFunc
 } from './components/funcStore';
 import {
   mediaGenerator
@@ -214,13 +216,15 @@ function createMirage() {
                     channel.onopen = () => {
 
                       console.log('data channel onopen method triggered');
-                      animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition, animeState.rafArray); //remote
+                      animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition, animeState.rafObj); //remote
 
-                      animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafArray); //local
+                      animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafObj); //local
 
                       filterListener(mediaState.myVideo, 'myFilter', filterState.currFilter, true, channel, setVendorCss);
 
                       filterListener(mediaState.peerVideo, 'peerFilter', filterState.currFilter, false, channel, setVendorCss);
+
+                      clearListener(channel, clearFunc, clearButton, animeState, mediaState);
 
                       //this would work, or store these dom elements as variables or don't use anon functions to remove listeners on end
 
@@ -266,18 +270,19 @@ function createMirage() {
                       })
 
                       //attempts to clear canvas
-                      clearButton.addEventListener('click', (event) => {
-
-                        // animeState.rafArray.forEach(x => {
-                        //   cancelAnimationFrame(x);
-                        //   // console.log(x)
-                        // })
-                        console.log(animeState.rafArray[animeState.rafArray.length-1])
-                        cancelAnimationFrame(animeState.rafArray[animeState.rafArray.length-1])
-
-                        mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
-                        mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
-                      }, false);
+                      // clearButton.addEventListener('click', (event) => {
+                      //
+                      //   for (let rafID in animeState.rafObj) {
+                      //     cancelAnimationFrame(animeState.rafObj[rafID]);
+                      //     console.log(rafID);
+                      //   }
+                      //
+                      //   mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
+                      //   mediaState.peerContext.clearRect(0, 0, mediaState.peerCanvas.width, mediaState.peerCanvas.height);
+                      //
+                      //   //send to other client to run clear function
+                      //   channel.send(JSON.stringify({'type' : 'clear'}));
+                      // }, false);
 
                       document.getElementById('videoToggle').setAttribute('addedListen', true);
 
@@ -331,7 +336,7 @@ function createMirage() {
 
                           animeState.temp = animeState.currentAnimation;
                           animeState.currentAnimation = animeState.anime[dataObj.animation];
-                          animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity], animeState.rafArray);
+                          animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity], animeState.rafObj);
                           animeState.currentAnimation = animeState.temp;
                           blinkerOn('peerBooth', 'videoToggle')
 
@@ -342,13 +347,15 @@ function createMirage() {
 
                           animeState.temp = animeState.currentAnimation;
                           animeState.currentAnimation = animeState.anime[dataObj.animation];
-                          animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity], animeState.rafArray);
+                          animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity], animeState.rafObj);
                           animeState.currentAnimation = animeState.temp;
                           blinkerOn('myBooth', 'videoToggle')
 
                         }
                       }
-                    }
+                      if (dataObj.type === 'clear') {
+                        clearFunc(animeState, mediaState);}
+                    };
                   }
 
 
@@ -370,7 +377,7 @@ function createMirage() {
 
 
                   function activateAnime() {
-                    animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition, animeState.rafArray); //remote
+                    animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition, animeState.rafObj); //remote
                   }
 
                   //all this disconnect logic needs to be revamped, VERY SOON!

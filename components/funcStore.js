@@ -1,6 +1,6 @@
 //function store//
 
-function bounce(cv, ctx, evt, pos, emoImg, animate, array, rafArray) {
+function bounce(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
   let onload = emoImg.onload;
   //this object keeps track of the movement, loads the images, and determines
   //the velocity
@@ -16,12 +16,12 @@ function bounce(cv, ctx, evt, pos, emoImg, animate, array, rafArray) {
   //initial image load on canvas
   emoticon.onload();
   let callBack = function() {
-    array[0](emoticon, ctx, cv, callBack, emoImg, animate, rafArray, evt);
+    array[0](emoticon, ctx, cv, callBack, emoImg, animate, rafObj, evt);
   };
   //start drawing movement
   animate = requestAnimationFrame(callBack);
-  rafArray[evt.timeStamp.toString()] = animate;
-  console.log(rafArray);
+  //put evt timestamp as key and update val with most recent raf id from velocity vunction
+  rafObj[evt.timeStamp.toString()] = animate;
 } //end bounce//
 
 function paste(cv, ctx, evt, pos, emoImg) {
@@ -42,7 +42,7 @@ function paste(cv, ctx, evt, pos, emoImg) {
 } //end staticPaste//
 
 //orbit func//
-function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafArray) {
+function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
   let onload = emoImg.onload;
   //this object keeps track of the movement, loads the images, and determines
   //the angular veloctiy. We're keeping track of frequency of refreshes to
@@ -62,11 +62,11 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafArray) {
   //initial image load on canvas
   emoticon.onload();
   let callBack = function() {
-    array[1](emoticon, ctx, cv, callBack, emoImg, animate, rafArray);
+    array[1](emoticon, ctx, cv, callBack, emoImg, animate, rafObj, evt);
   };
   animate = requestAnimationFrame(callBack);
-  rafArray.push(animate);
-  console.log(rafArray);
+  //put evt timestamp as key and update val with most recent raf id from angularVelocity vunction
+  rafObj[evt.timeStamp.toString()] = animate;
 
 } //end velocity//
 
@@ -145,7 +145,7 @@ function drawVideo(v, c, w, h) {
 } //end drawVideo//
 
 //canvas draw function for velocity motion
-function velocity(obj, ctx, cv, cb, emoImg, animate, rafArray, evt) {
+function velocity(obj, ctx, cv, cb, emoImg, animate, rafObj, evt) {
   ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 8, emoImg.height + 8);
   obj.onload();
   obj.x += obj.vx;
@@ -157,12 +157,13 @@ function velocity(obj, ctx, cv, cb, emoImg, animate, rafArray, evt) {
     obj.vx = -obj.vx;
   }
   animate = window.requestAnimationFrame(cb);
-  rafArray[evt.timeStamp.toString()] = animate;
+  //update the raf of latest draw of velocity recursive call for clearing purposes
+  rafObj[evt.timeStamp.toString()] = animate;
 
 } //end velocity//
 
 //angularVelocity func//
-function angularVelocity(obj, ctx, cv, cb, emoImg, animate, rafArray) {
+function angularVelocity(obj, ctx, cv, cb, emoImg, animate, rafObj, evt) {
   ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 10, emoImg.height + 10);
   obj.onload();
 
@@ -171,8 +172,8 @@ function angularVelocity(obj, ctx, cv, cb, emoImg, animate, rafArray) {
   obj.rotateCount++;
 
   animate = window.requestAnimationFrame(cb);
-  rafArray.push(animate);
-  console.log(animate);
+  //update the raf of latest draw of velocity recursive call for clearing purposes
+  rafObj[evt.timeStamp.toString()] = animate;
 } //end angularVelocity//
 
 function toggleVidSize(win, state, func1, func2) {
@@ -329,6 +330,15 @@ function removeChildren(el) {
   }
 }
 
+function clearFunc(animeSt, mediaSt) {
+  for (let rafID in animeSt.rafObj) {
+    cancelAnimationFrame(animeSt.rafObj[rafID]);
+  }
+
+  mediaSt.myContext.clearRect(0, 0, 10000,10000);
+  mediaSt.peerContext.clearRect(0, 0, 10000,10000);
+}
+
 ///end of function store///
 
 export {
@@ -352,5 +362,6 @@ export {
   paste,
   bounce,
   appendConnectButtons,
-  removeChildren
+  removeChildren,
+  clearFunc
 };
