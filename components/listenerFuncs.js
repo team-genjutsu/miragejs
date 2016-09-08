@@ -13,7 +13,7 @@ function filterListener(vid, whoisFilter, currFilter, whoisBool, channel, func) 
 }
 
 
-function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, array, channel, local, func, rafArray) {
+function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, array, channel, local, func, rafObj) {
 
   canvas.addEventListener('click', (event) => {
 
@@ -25,7 +25,7 @@ function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, ar
     // let currImg =
     let animation = animeObj[animeEle.innerHTML];
     //animation for local display and data transmission to peer
-    animation(canvas, context, event, position, emoImage, reqAnim, array, rafArray);
+    animation(canvas, context, event, position, emoImage, reqAnim, array, rafObj);
 
     let canvasObj = JSON.stringify({
       animation: animeEle.innerHTML,
