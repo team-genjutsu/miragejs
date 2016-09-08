@@ -16,13 +16,12 @@ function bounce(cv, ctx, evt, pos, emoImg, animate, array, rafArray) {
   //initial image load on canvas
   emoticon.onload();
   let callBack = function() {
-    array[0](emoticon, ctx, cv, callBack, emoImg, animate, rafArray);
+    array[0](emoticon, ctx, cv, callBack, emoImg, animate, rafArray, evt);
   };
   //start drawing movement
   animate = requestAnimationFrame(callBack);
-  // rafArray[animate] = ;
+  rafArray[evt.timeStamp.toString()] = animate;
   console.log(rafArray);
-
 } //end bounce//
 
 function paste(cv, ctx, evt, pos, emoImg) {
@@ -146,7 +145,7 @@ function drawVideo(v, c, w, h) {
 } //end drawVideo//
 
 //canvas draw function for velocity motion
-function velocity(obj, ctx, cv, cb, emoImg, animate, rafArray) {
+function velocity(obj, ctx, cv, cb, emoImg, animate, rafArray, evt) {
   ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 8, emoImg.height + 8);
   obj.onload();
   obj.x += obj.vx;
@@ -158,8 +157,8 @@ function velocity(obj, ctx, cv, cb, emoImg, animate, rafArray) {
     obj.vx = -obj.vx;
   }
   animate = window.requestAnimationFrame(cb);
-  rafArray.push(animate);
-  console.log(animate);
+  rafArray[evt.timeStamp.toString()] = animate;
+
 } //end velocity//
 
 //angularVelocity func//
