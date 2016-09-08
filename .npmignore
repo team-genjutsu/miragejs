@@ -12,7 +12,8 @@ npm-debug.log
 /public/index.html
 /public/bundle.js
 
-eslintrc.js
+.babelrc
+.eslintrc.js
 webpack.config.js
 server.js
 /tests
