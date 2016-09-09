@@ -63,7 +63,7 @@ import {
 
 
 
-function createMirage() {
+export function createMirage() {
 
   const mirageComponent = {};
 
@@ -439,9 +439,7 @@ function createMirage() {
   return mirageComponent;
 }
 
-export {
-  createMirage
-};
+
 
 //for testing
 // domReady(function() {
