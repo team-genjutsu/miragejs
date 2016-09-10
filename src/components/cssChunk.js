@@ -380,6 +380,15 @@ div#MRGroom-selection {
 .aboutUs {
   z-index: -1;
 }
+
+.notMirage {
+  z-index: -1;
+}
+
+.notMirageFixed {
+  z-index: 1;
+}
+
 </style>`;
 
 export { cssChunk };
