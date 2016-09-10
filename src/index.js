@@ -442,18 +442,18 @@ export function createMirage() {
 }
 
 
-
-// for testing
-import {domReady} from './components/domReady.js'
-domReady(function() {
-
-const mirage = createMirage();
-
-// mount mirage chunk on DOM
-mirage.insertChunk();
-mirage.insertCss();
-
-// start mirage logic
-mirage.startApp();
-
-});
+//
+// // for testing
+// import {domReady} from './components/domReady.js'
+// domReady(function() {
+//
+// const mirage = createMirage();
+//
+// // mount mirage chunk on DOM
+// mirage.insertChunk();
+// mirage.insertCss();
+//
+// // start mirage logic
+// mirage.startApp();
+//
+// });
