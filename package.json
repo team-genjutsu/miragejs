@@ -1,12 +1,16 @@
 {
   "name": "mirage-js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Allows developers access to a customizable video chat component",
-  "main": "./public/bundle.js",
+  "main": "./lib/index.js",
   "scripts": {
+    "prepublish": "node_modules/babel-cli/bin/babel.js src --out-dir lib",
     "test": "karma start",
     "dev": "nodemon server.js",
     "start": "node server.js"
+  },
+  "babel": {
+    "presets": ["es2015"]
   },
   "authors": [
     "Kevin <kevinliu987@gmail.com>",
@@ -21,6 +25,7 @@
     "webrtc-adapter": "^2.0.2"
   },
   "devDependencies": {
+    "babel-cli": "^6.14.0",
     "babel-core": "^6.2.1",
     "babel-loader": "^6.2.0",
     "babel-preset-es2015": "^6.1.18",
