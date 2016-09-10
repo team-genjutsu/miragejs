@@ -349,10 +349,6 @@ div#MRGroom-selection {
   }
 }
 
-.app {
-  margin: 15px;
-}
-
 @keyframes fade {
   0%,
   100% {
@@ -373,12 +369,9 @@ div#MRGroom-selection {
   }
 }
 
-.blckQt {
-  z-index: -1;
-}
-
-.aboutUs {
-  z-index: -1;
+img {
+  height: 30px;
+  width: 30px;
 }
 </style>`;
 

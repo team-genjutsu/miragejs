@@ -4,13 +4,14 @@ function bounce(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
   let onload = emoImg.onload;
   //this object keeps track of the movement, loads the images, and determines
   //the velocity
+  let dim = 50;
   let emoticon = {
     x: pos.x,
     y: pos.y,
     vx: 5,
     vy: 2,
     onload: function() {
-      ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+      ctx.drawImage(emoImg, this.x - dim / 2, this.y - dim / 2, dim, dim);
     }
   };
   //initial image load on canvas
@@ -28,13 +29,14 @@ function paste(cv, ctx, evt, pos, emoImg) {
   let onload = emoImg.onload;
   //this object keeps track of the movement, loads the images, and determines
   //the velocity
+  let dim = 50;
   let emoticon = {
     x: pos.x,
     y: pos.y,
     vx: 5,
     vy: 2,
     onload: function() {
-      ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+      ctx.drawImage(emoImg, this.x - dim / 2, this.y - dim / 2, dim, dim);
     }
   };
   //initial image load on canvas
@@ -47,6 +49,7 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
   //this object keeps track of the movement, loads the images, and determines
   //the angular veloctiy. We're keeping track of frequency of refreshes to
   //imcrement the degrees
+  let dim = 50;
   let movement = .0349066;
   let emoticon = {
     x: pos.x,
@@ -56,7 +59,7 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
     wx: movement,
     wy: movement,
     onload: function() {
-      ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
+      ctx.drawImage(emoImg, this.x - dim / 2, this.y - dim / 2, dim, dim);
     }
   };
   //initial image load on canvas

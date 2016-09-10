@@ -392,11 +392,17 @@ function createMirage() {
                 rtcState.peerConn.close();
                 rtcState.dataChannel.close();
                 // rtcState.peerConn = null;
-                // rtcState.localStream.getTracks().forEach((track) => {
-                //   track.stop();
-                // });
+                rtcState.localStream.getTracks().forEach((track) => {
+                  track.stop();
+                });
                 // mediaState.myVideo.src = "";
                 // mediaState.peerVideo.src = "";
+
+                roomState = null;
+                mediaState = null;
+                filterState = null;
+                animeState = null;
+                rtcState = null;
 
                 // disableToggle('connect', 'disconnect');
                 // let element = document.getElementById("top");

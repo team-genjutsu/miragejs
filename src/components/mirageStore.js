@@ -68,24 +68,7 @@ function animeStore(animeBtnId, animeDispId, emojiClass, functionArray) {
     rafObj: {},
     emoImg: new Image(),
     currentImg: null,
-    emojis: [
-      "./assets/emojione/small/1f385.png",
-      "./assets/emojione/small/1f4a9.png",
-      "./assets/emojione/small/1f4af.png",
-      "./assets/emojione/small/1f354.png",
-      "./assets/emojione/small/1f436.png",
-      "./assets/emojione/small/1f414.png",
-      "./assets/emojione/small/1f389.png",
-      "./assets/emojione/small/1f60d.png",
-      "./assets/emojione/small/1f4b8.png",
-      "./assets/emojione/small/1f951.png",
-      "./assets/emojione/small/1f984.png",
-      "./assets/emojione/small/2705.png",
-      "./assets/emojione/small/1f64a.png",
-      "./assets/emojione/small/1f382.png",
-      "./assets/emojione/small/1f602.png",
-      "./assets/emojione/small/1f64c.png"
-    ],
+    emojis: ["http://emojione.com/wp-content/uploads/assets/emojis/1f916.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f453.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f47b.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f631.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f480.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f42a.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f415.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f98d.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f429.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f490.svg", "http://emojione.com/wp-content/uploads/assets/emojis/2604.svg", "http://emojione.com/wp-content/uploads/assets/emojis/26c4.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f988.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f989.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f622.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f63b.svg"],
     emoBtns: document.getElementsByClassName(emojiClass)
   }
 }
