@@ -373,6 +373,15 @@ img {
   height: 30px;
   width: 30px;
 }
+
+.notMirage {
+  z-index: -1;
+}
+
+.notMirageFixed {
+  z-index: 1;
+}
+
 </style>`;
 
 export { cssChunk };
