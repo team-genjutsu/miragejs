@@ -1,0 +1,33 @@
+{
+  "name": "tracking",
+  "homepage": "http://trackingjs.com",
+  "authors": [
+    "Eduardo Lundgren <edu@rdo.io>"
+  ],
+  "description": "Augmented Reality JavaScript Framework.",
+  "main": "build/tracking.js",
+  "keywords": [
+    "tracking",
+    "webrtc"
+  ],
+  "license": "BSD",
+  "ignore": [
+    "**/.*",
+    "node_modules"
+  ],
+  "dependencies": {
+    "dat-gui": "0.5.0",
+    "threejs": "r67"
+  },
+  "version": "1.1.2",
+  "_release": "1.1.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.1.2",
+    "commit": "b7ba1e6e38fc32e100012c1be2fedcfa45d707de"
+  },
+  "_source": "https://github.com/eduardolundgren/tracking.js.git",
+  "_target": "^1.1.2",
+  "_originalSource": "tracking.js",
+  "_direct": true
+}

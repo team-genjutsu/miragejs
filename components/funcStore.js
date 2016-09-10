@@ -62,7 +62,6 @@
         ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
       }
     };
-
     //initial image load on canvas
     emoticon.onload();
 
@@ -73,6 +72,11 @@
     //start drawing movement
     animate = window.requestAnimationFrame(callBack);
   }//end orbit//
+
+  function hat(cv, ctx, rect, emoImg) {
+    console.log("hat has been called");
+    ctx.drawImage(emoImg, rect.x, rect.y - 50, 100, 50);
+  }
 
   //paste object to canvas
   function paste(video, context, width, height, x, y, source) {
@@ -116,7 +120,8 @@
   }//end drawVideo//
 
   function intersects(obj, rect){
-    return (obj.x > rect.x && obj.x < rect.x + rect.width && obj.y > rect.y && obj.y < rect.y + rect.height)
+    //console.log(obj.x, rect.x);
+    return (obj.x + 40 > rect.x && obj.x - 40 < rect.x + rect.width && obj.y + 140 > rect.y && obj.y - 40 < rect.y + rect.height);
 
   }
 
@@ -126,6 +131,7 @@
     obj.onload();
       obj.x += obj.vx;
       obj.y += obj.vy;
+      //console.log("intersects", intersects(obj, rect));
 
         if (obj.y + obj.vy > cv.height || obj.y + obj.vy < 0) {
             obj.vy = -obj.vy;
@@ -134,19 +140,10 @@
             obj.vx = -obj.vx;
         }
         if (intersects(obj, rect)) {
+          //console.log("it's true");
+          obj.vx = -obj.vx;
+          obj.vy = -obj.vy;
 
-          if(obj.x + obj.vx + 2 > rect.x + rect.width){
-            obj.vx = -obj.vx;
-          }
-          if (obj.x + obj.vx - 2 < rect.x){
-            obj.vx = -obj.vx;
-          }
-          if (obj.y + obj.vy - 2 < rect.y){
-            obj.vy = -obj.vy;
-          }
-          if (obj.y + obj.vy - 2 > rect.y + rect.height){
-            obj.vy = -obj.vy;
-          }
         }
 
 
@@ -178,4 +175,4 @@
 
   ///end of function store///
 
-export { cutCircle, angularVelocity, velocity, drawVideo, setVendorCss, getCursorPosition, orbit, staticPaste, bounce };
+export { cutCircle, angularVelocity, velocity, drawVideo, setVendorCss, getCursorPosition, orbit, staticPaste, bounce, hat, intersects };

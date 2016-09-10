@@ -10,9 +10,10 @@ import {
   orbit,
   staticPaste,
   bounce,
-  intersects
+  intersects,
+  hat
 } from './components/funcStore';
-require("tracking/src/tracking");
+require("public/tracking");
 //let ObjectTracker = require("tracking/src/trackers/ObjectTracker");
 //let face = require("tracking/src/detection/training/haar/face");
 //console.log("tracking", tracking.ViolaJones.classifiers);
@@ -47,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   bounceButton = document.getElementById('bounce'),
   orbitButton = document.getElementById('orbit'),
   currentAnimation = bounce,
+  myHat = false,
   temp,
   // room buttons
   joinButton = document.getElementById('join-button'),
@@ -120,18 +122,27 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       tracker.setStepSize(2);
                       tracker.setEdgesDensity(0.1);
                       tracker.canvasOverlay = myCanvas;
-                      tracking.track(myVideo, tracker, { camera: true }, stream);
+                      tracker.canvasContext = myContext;
+                      tracking.track(myVideo, tracker, { camera: true });
 
                       tracker.on('track', function(event) {
-                        //myContext.clearRect(myFaceRect.x - 1, myFaceRect.y - 1, myFaceRect.width + 2, myFaceRect.height + 2);
-                        //myContext.clearRect(event.data[0].x - 1, event.data[0].y -1, event.data[0].width + 1, event.data[0].height + 1);
+                        //myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
+                      myContext.clearRect(myFaceRect.x - 4, myFaceRect.y - 105, myFaceRect.width + 8, myFaceRect.height + 110);
                         event.data.forEach(function(rect) {
-                          // myContext.strokeStyle = '#EB4C4C';
-                          // myContext.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                          if (myHat === false) {
+
+                          myContext.strokeStyle = '#EB4C4C';
+                          myContext.strokeRect(rect.x, rect.y, myFaceRect.width, myFaceRect.height);
+                        } else {
+                          let emoji = new Image();
+                          emoji.src = currentImg;
+
+                          hat(myCanvas, myContext, rect, emoji);
+                        }
                           // // console.log("Drawing the rectangle on the face");
                           myFaceRect.x = rect.x;
                           myFaceRect.y = rect.y;
-                          console.log(myFaceRect);
+                          //console.log(myFaceRect);
                           //console.log(myFaceRect.x);
 
                         });
@@ -292,6 +303,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         //send object to data channel
                         peer.send(filterDataObj);
                       })
+
+                      document.getElementById('myHat').addEventListener('click', function() {
+
+                        if (myHat === true){
+                          myHat = false;
+
+                        } else {
+                          myHat = true;
+
+                        }
+
+                      });
 
                       //click event for the "filter them" button
                       document.getElementById('peerFilter').addEventListener('click', function() {
