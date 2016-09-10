@@ -30,7 +30,8 @@ import {
   bounce,
   appendConnectButtons,
   removeChildren,
-  clearFunc
+  clearFunc,
+  toggleZindex
 } from './components/funcStore';
 import {
   mediaGenerator
@@ -109,6 +110,7 @@ export function createMirage() {
       // need to parse through stylesheets and set z-indexes of elements to -1 with
       // each toggle
       demo.classList.toggle('MRGhidden');
+      toggleZindex();
     });
 
     // vendor media objects//
@@ -441,15 +443,17 @@ export function createMirage() {
 
 
 
-//for testing
-// domReady(function() {
+// for testing
+import {domReady} from './components/domReady.js'
+domReady(function() {
 
-// const mirage = createMirage();
+const mirage = createMirage();
 
 // mount mirage chunk on DOM
-// mirage.insertChunk();
+mirage.insertChunk();
+mirage.insertCss();
 
 // start mirage logic
-// mirage.startApp();
+mirage.startApp();
 
-// });
+});

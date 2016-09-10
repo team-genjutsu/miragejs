@@ -18,8 +18,8 @@ let server = http.createServer(app).listen(httpPort, function(){
 });
 
 const options = {
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.crt')
+  key: fs.readFileSync(__dirname + '/server_cert/server.key'),
+  cert: fs.readFileSync(__dirname + '/server_cert/server.crt')
 };
 
 
@@ -45,7 +45,3 @@ app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 // });
 
 startSockets(server);
-
-
-
-
