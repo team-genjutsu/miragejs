@@ -6,10 +6,10 @@ let cssChunk = `<style>
 
 #MRGfixed {
   position: fixed;
-  width: 61px;
-  height: 61px;
-  bottom: 10px;
-  right: 20px;
+  width: 50%;
+  height: 60%;
+  bottom: 60px;
+  right: 70px;
 }
 
 #MRGmaterialBtn {
@@ -47,17 +47,11 @@ let cssChunk = `<style>
 }
 
 #MRGemojiButtons {
-  /* height: 22%; */
-  width: 13%;
-  margin-left: 7%;
-
+  width: 20%;
 }
 
 #MRGoptionBtns {
   display: inline-flex;
-  margin-right: 15%;
-  /* width: 100%; */
-  /* margin-left: -22%; */
 }
 
 #MRGanimeBtn {
@@ -85,31 +79,35 @@ let cssChunk = `<style>
 
 #MRGdemo {
   z-index: 2147483646;
-  position: absolute;
+  /* position: absolute; */
   /* display: block; */
   overflow: hidden;
-  bottom: 0;
-  right: 0;
+  /* bottom: 0; */
+  /* right: 0; */
   text-align: center;
-  height: 700px;
-  width: 900px;
+  height: 100%;
+  width: 100%;
   /* padding-top: 75%; */
-  border: 1px solid;
-  margin-bottom: 80%;
-  margin-right: 80%;
+  /* border: 1px solid; */
+  /* margin-bottom: 80%; */
+  /* margin-right: 80%; */
   border-radius: 10px;
-  background-color: white;
+  /* background-color: white; */
 }
 
 #MRGboothApp {
-  padding-top: 5%;
+  // padding-top: 5%;
   text-align: center;
   height: inherit;
   width: inherit;
+  background-color: white;
+  border: 2px solid #a6a6a6;
+  border-radius: 10px;
 }
 
 #MRGbooth {
-  height: 80%;
+  padding: 5%;
+  height: 90%;
   width: 100%;
   position: relative;
   display: inline-flex;
@@ -124,19 +122,15 @@ let cssChunk = `<style>
 
 #MRGvidContainer {
   height: 100%;
-  /*45em;*/
-  width: 75%;
-  /*60em;*/
+  width: 80%;
 }
 
 #MRGmyBooth {
-  margin-left: 5%;
   position: absolute;
 }
 
 #MRGpeerBooth {
   position: absolute;
-  margin-left: 5%;
 }
 
 #MRGmyVideo {
@@ -183,7 +177,7 @@ let cssChunk = `<style>
   color: white;
   font-size: 0.8em;
   /* margin: 0 5px 20px 5px; */
-  width: 7em;
+  width: 50%;
   height: 4em;
   /* padding: 0.5em 0.7em 0.5em 0.7em; */
   -webkit-box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
@@ -213,7 +207,7 @@ let cssChunk = `<style>
   color: white;
   font-size: 0.8em;
   /* margin: 0 5px 20px 5px; */
-  width: 4em;
+  width: 40%;
   height: 4em;
   /* padding: 0.5em 0.7em 0.5em 0.7em; */
   -webkit-box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
@@ -238,8 +232,11 @@ let cssChunk = `<style>
 /*////// room selection start ///////////////////*/
 
 #MRGroomApp {
+  position: absolute;
   height: 100%;
   width: 100%;
+  border-radius: 10px;
+  border: 2px solid #a6a6a6;
   background-color: white;
 }
 

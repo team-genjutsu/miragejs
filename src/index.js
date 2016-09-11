@@ -326,7 +326,7 @@ export function createMirage() {
                   // }
 
                   if (dataObj.hasOwnProperty('filter')) {
-                    if (dataObj.local) {
+                    if (dataObj.filter) {
                       //blink function is a little funky
                       setVendorCss(mediaState.peerVideo, dataObj.filterType);
                       // blinkerOn('MRGpeerBooth', 'MRGvideoToggle');
