@@ -327,6 +327,7 @@ function removeChildren(el) {
   }
 }
 
+//this should stop the request animation frame recursive calls and also clear the canvas
 function clearFunc(animeSt, mediaSt) {
   for (let rafID in animeSt.rafObj) {
     cancelAnimationFrame(animeSt.rafObj[rafID]);
