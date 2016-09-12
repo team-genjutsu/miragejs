@@ -164,7 +164,6 @@ describe('clearFunc functionality', () => {
 
     function step(timestamp) {
       let progress = timestamp - start;
-      d.style.left = Math.min(progress/10, 200) + 'px';
       if (progress < 2000) {
         animeSt.myReq = requestAnimationFrame(step);
       }
