@@ -46,6 +46,10 @@ let cssChunk = `<style>
   /* border-radius: 5px; */
 }
 
+.MRGpointerToggle {
+  pointer-events: none;  
+}
+
 .MRGelementToFadeInAndOut {
   -webkit-animation: fadeinout 1s linear forwards infinite;
   animation: fadeinout 1s linear forwards infinite;

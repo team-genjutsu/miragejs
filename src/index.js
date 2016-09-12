@@ -13,11 +13,10 @@ import {
   vidDims,
   hiddenToggle,
   disableToggle,
-  // resize,
   generateDims,
   scaleToFill,
   scaleElement,
-  blinkerToggle,
+  classToggle,
   cutCircle,
   angularVelocity,
   velocity,
@@ -130,7 +129,7 @@ export function createMirage() {
       animeState = null;
       rtcState = null;
       roomState = roomStore(window.URL);
-      mediaState = mediaStore();
+      mediaState = mediaStore('MRGmyBooth', 'MRGpeerBooth');
       filterState = filterStore('MRGfilterDisp', 'MRGfilter');
       animeState = animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
       // console.log('rtcstate pre join', rtcState);
@@ -175,7 +174,7 @@ export function createMirage() {
 
               socket.on('readyConnect', (payload) => {
                 document.getElementById('MRGconnect').disabled = false;
-                blinkerToggle('MRGconnect');
+                classToggle('MRGconnect', 'MRGelementToFadeInAndOut');
               });
 
 
@@ -201,10 +200,7 @@ export function createMirage() {
 
                 document.getElementById('MRGconnect').addEventListener('click', () => {
                   connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket);
-                  blinkerToggle('MRGconnect');
-                  // hiddenToggle('MRGconnect', 'MRGdisconnect')
-                  // document.getElementById('MRGconnect').style.display = 'none';
-                  // document.getElementById('MRGdisconnect').style.display = 'auto'
+                  classToggle('MRGconnect', 'MRGelementToFadeInAndOut');
                   // onDataChannelCreated(rtcState.dataChannel)
                 });
 
@@ -238,9 +234,9 @@ export function createMirage() {
                 channel.onopen = () => {
 
                   console.log('data channel onopen method triggered');
-                  animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], channel, false, getCursorPosition, animeState.rafObj); //remote
+                  mediaState.peerCanvasListeners.push(animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], channel, false, getCursorPosition, animeState.rafObj)); //remote
 
-                  animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafObj); //local
+                  mediaState.myCanvasListeners.push(animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafObj)); //local
 
                   filterListener(mediaState.myVideo, 'MRGmyFilter', filterState.currFilter, true, channel, setVendorCss);
 
@@ -251,7 +247,7 @@ export function createMirage() {
                   //this would work, or store these dom elements as variables or don't use anon functions to remove listeners on end
 
                   document.getElementById('MRGvideoToggle').addEventListener('click', () => {
-                    toggleVidSize(window, mediaState, generateDims, vidDims);
+                    toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
                   });
 
 
@@ -259,8 +255,7 @@ export function createMirage() {
                   disableToggle('MRGconnect', 'MRGdisconnect');
 
                   window.onresize = () => {
-                    resizeMedia(window, mediaState, document.getElementById('MRGvidContainer'), generateDims, vidDims);
-                    // resize(window, mediaState, document.getElementById('MRGvidContainer'), generateDims);
+                    resizeMedia(window, mediaState, document.getElementById('MRGvidContainer'), generateDims, vidDims, setSizes);
                   };
 
                   //changing filters//
@@ -377,7 +372,7 @@ export function createMirage() {
                 mediaState.peerCanvas = mediaState.peerMedia.canvas;
                 mediaState.peerContext = mediaState.peerMedia.context;
 
-                toggleVidSize(window, mediaState, generateDims, vidDims);
+                toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
                 hiddenToggle('MRGconnect', 'MRGdisconnect')
 
               } ///end on stream added event///

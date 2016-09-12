@@ -176,22 +176,22 @@ function angularVelocity(obj, ctx, cv, cb, emoImg, animate, rafObj, evt) {
   rafObj[evt.timeStamp.toString()] = animate;
 } //end angularVelocity//
 
-function resizeMedia(win, state, container, func1, func2) {
+function resizeMedia(win, state, container, func1, func2, func3) {
 
   let styleWidth1 = func1(state.myVideo, win).vidWidth,
     styleWidth2 = func1(state.peerVideo, win).vidWidth,
     targetDims = func2(container, win);
 
   if (styleWidth1 >= styleWidth2) {
-    setSizes(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, targetDims);
+    func3(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, targetDims);
   } else {
-    setSizes(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, targetDims);
+    func3(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, targetDims);
   }
   container.style.height = func1(container, win).vidHeight + 'px';
 
 }
 
-function toggleVidSize(win, state, func1, func2) {
+function toggleVidSize(win, state, func1, func2, func3) {
   let arr,
     styleWidth1 = func1(state.myVideo, win).vidWidth,
     styleWidth2 = func1(state.peerVideo, win).vidWidth;
@@ -200,19 +200,32 @@ function toggleVidSize(win, state, func1, func2) {
     let dims = func2(state.myVideo, win);
     setSizes(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, dims);
     arr = [state.myVideo, state.myCanvas, state.peerVideo, state.peerCanvas];
+    // func3(state.myBooth, 'MRGpointerToggle');
+    // state.myCanvasListeners.forEach( (ele) => {
+      // state.myCanvas.removeEventListener(ele);
+    // });
+    // state.peerCanvasListeners.forEach( (ele) => {
+      // state.peerCanvas.addEventListener(ele);
+    // });
+
   } else {
     let dims = func2(state.peerVideo, win);
     setSizes(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, dims);
     arr = [state.peerVideo, state.peerCanvas, state.myVideo, state.myCanvas];
+    // state.peerCanvasListeners.forEach( (ele) => {
+      // state.peerCanvas.removeEventListener(ele);
+    // });
+    // state.myCanvasListeners.forEach( (ele) => {
+      // state.myCanvas.addEventListener(ele);
+    // });
+    // func3(state.peerBooth, 'MRGpointerToggle');
   }
 
   arr.forEach((ele, idx) => {
     if (idx < 2) {
       ele.style.zIndex = '3';
-      // ele.classList.add('btmRight');
     } else {
       ele.style.zIndex = '2';
-      // ele.classList.remove('btmRight');
     }
   });
 
@@ -226,8 +239,6 @@ function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, 
   upCanvas.width = dims.bigVidWidth;
   upCanvas.height = dims.bigVidHeight;
   upContext.strokeRect(0, 0, upCanvas.width, upCanvas.height);
-  // state.peerContext.scale(1,1);
-  // upContext.stroke();
 
   downVid.setAttribute('width', '' + dims.smallVidWidth);
   downVid.setAttribute('height', '' + dims.smallVidHeight);
@@ -237,27 +248,8 @@ function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, 
   downCanvas.height = dims.smallVidHeight;
   downContext.scale(.25, .25);
   downContext.strokeRect(0, 0, downCanvas.width, downCanvas.height);
-  // downContext.stroke();
 
 }
-
-// function resize(win, state, container, func) {
-
-  // let dims = func(container, win);
-  // resize local elements
-  // state.myVideo.setAttribute('width', '' + dims.vidWidth);
-  // state.myVideo.setAttribute('height', '' + dims.vidHeight);
-
-  // state.myCanvas.setAttribute('width', '' + dims.vidWidth);
-  // state.myCanvas.setAttribute('height', '' + dims.vidHeight);
-
-  // resize remote elements
-  // state.peerVideo.setAttribute('width', '' + dims.vidWidth);
-  // state.peerVideo.setAttribute('height', '' + dims.vidHeight);
-
-  // state.peerCanvas.setAttribute('width', '' + dims.vidWidth);
-  // state.peerCanvas.setAttribute('height', '' + dims.vidHeight);
-// }
 
 function generateDims(container, win) {
   let containerStyle = win.getComputedStyle(container);
@@ -307,19 +299,14 @@ function scaleElement(vid, height, width) {
   video.setAttribute('style', '-webkit-transform: scale(' + scale + ')');
 }
 
-function blinkerToggle(btnEleId) {
-  if (document.getElementById(btnEleId).classList.contains('MRGelementToFadeInAndOut')) {
-    document.getElementById(btnEleId).classList.remove('MRGelementToFadeInAndOut');
+function classToggle(btnEleId, classType) {
+  if (document.getElementById(btnEleId).classList.contains(classType)) {
+    document.getElementById(btnEleId).classList.remove(classType);
   } else {
-    document.getElementById(btnEleId).classList.add('MRGelementToFadeInAndOut');
+    document.getElementById(btnEleId).classList.add(classType);
   }
+  
 }
-
-// function blinkerOff(btnId) {
-// document.getElementById(btnId).classList.remove('MRGelementToFadeInAndOut');
-// }
-
-//toggling of vid sizes isn't changing context it seems...
 
 function appendConnectButtons() {
   //creating buttons will replace everytime so eventlistener is good. Will pull out of file
@@ -378,11 +365,10 @@ export {
   vidDims,
   hiddenToggle,
   disableToggle,
-  // resize,
   generateDims,
   scaleToFill,
   scaleElement,
-  blinkerToggle,
+  classToggle,
   cutCircle,
   angularVelocity,
   velocity,
@@ -396,5 +382,6 @@ export {
   removeChildren,
   clearFunc,
   toggleZindex,
-  resizeMedia
+  resizeMedia,
+  setSizes
 };

@@ -23,10 +23,10 @@ function filterStore(filterDispId, filterBtnId) {
       if (filterArr != undefined || filterArr.length > 0) {
         filterArr.forEach((ele, idx) => {
           ele.push(filter);
-        })
+        });
       }
     }
-  }
+  };
 }
 
 function roomStore(url) {
@@ -35,20 +35,24 @@ function roomStore(url) {
     chattersClient: [],
     chatterThisClient: null,
     roomID: null
-  }
+  };
 }
 
-function mediaStore() {
+function mediaStore(localBooth, remoteBooth) {
   return {
+    peerBooth: document.getElementById(remoteBooth),
     peerMedia: null,
     peerVideo: null,
     peerCanvas: null,
+    peerCanvasListeners: [],
     peerContext: null,
+    myBooth: document.getElementById(localBooth),
     myMedia: null,
     myCanvas: null,
+    myCanvasListeners: [],
     myVideo: null,
     myContext: null
-  }
+  };
 }
 
 function animeStore(animeBtnId, animeDispId, emojiClass, functionArray) {

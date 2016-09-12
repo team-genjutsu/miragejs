@@ -15,7 +15,7 @@ function filterListener(vid, whoisFilter, currFilter, whoisBool, channel, func) 
 
 function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, array, channel, local, func, rafObj) {
 
-  canvas.addEventListener('click', (event) => {
+  let channelAnime = (event) => {
 
     let position = func(canvas, event);
 
@@ -38,7 +38,11 @@ function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, ar
     });
 
     channel.send(canvasObj);
-  }, false);
+  };
+
+  canvas.addEventListener('click', channelAnime, false);
+
+  return channelAnime;
 }
 
 function clearListener(channel, func, clearButton, animeSt, mediaSt) {

@@ -3,11 +3,6 @@ function mediaGenerator(stream, url, mediaHookId, vidAttr, canAttr) {
   let vidContainer = document.getElementById('MRGvidContainer');
   let vidContainerStyle = window.getComputedStyle(vidContainer);
 
-  // size dependent upon height
-  // let styleHeight = vidContainerStyle.getPropertyValue('height');
-  // let videoHeight = Math.round(+styleHeight.substring(0, styleHeight.length - 2));
-  // let videoWidth = Math.round((videoHeight / 3) * 4);
-
   //size dependent upon width
   let styleWidth = vidContainerStyle.getPropertyValue('width');
   let videoWidth = Math.round(+styleWidth.substring(0, styleWidth.length - 2));
@@ -36,8 +31,7 @@ function mediaGenerator(stream, url, mediaHookId, vidAttr, canAttr) {
   canvas.height = videoHeight;
 
   //draws blank canvas on top of video
-  context.rect(0, 0, videoWidth, videoHeight);
-  context.stroke();
+  context.strokeRect(0, 0, videoWidth, videoHeight);
   //end//
 
   return {
