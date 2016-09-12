@@ -72,7 +72,16 @@ function animeStore(animeBtnId, animeDispId, emojiClass, functionArray) {
     rafObj: {},
     emoImg: new Image(),
     currentImg: null,
-    emojis: ["http://emojione.com/wp-content/uploads/assets/emojis/1f916.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f453.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f47b.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f480.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f42a.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f415.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f98d.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f429.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f490.svg", "http://emojione.com/wp-content/uploads/assets/emojis/2604.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f988.svg"],
+    emojis: ["https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4a9.png",
+     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4af.png",
+     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f354.png",
+     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f436.png",
+     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f414.png",
+     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f389.png",
+     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f60d.png",
+     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4b8.png",
+     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f951.png" 
+     ],
     emoBtns: document.getElementsByClassName(emojiClass)
   }
 }
