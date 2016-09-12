@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 
-describe("functions should exist", () => {
+describe('functions should exist', () => {
   it('paste should exist', () => {
     expect(typeof funcStore.paste).to.equal('function');
   });
@@ -43,7 +43,6 @@ describe("functions should exist", () => {
   });
 });
 
-
 describe('paste functionality', () => {
   let canvas, context, event, position, emoImg, sandbox;
   beforeEach(() => {
@@ -59,26 +58,23 @@ describe('paste functionality', () => {
 
     //new sandbox
     sandbox = sinon.sandbox.create();
-
-
     afterEach(function () {
     //clear spies
-        sandbox.restore();
+      sandbox.restore();
     });
   });
+
   it('should be callable', () => {
     let pasteSpy = sandbox.spy(funcStore, 'paste');
     funcStore.paste(canvas, context, event, position, emoImg);
     expect(pasteSpy.called).to.be.true;
-  })
-
+  });
   it('should not throw an error', () => {
     let pasteSpy = sandbox.spy(funcStore, 'paste');
     funcStore.paste(canvas, context, event, position, emoImg);
     expect(pasteSpy.threw()).to.be.false;
-  })
-
-})
+  });
+});
 
 describe('appendConnectButtons functionality', () => {
   let MRGconnectivityBtns, sandbox, conButton, disconButton;
@@ -91,11 +87,15 @@ describe('appendConnectButtons functionality', () => {
     sandbox = sinon.sandbox.create();
   });
   afterEach(function () {
-      document.body.removeChild(MRGconnectivityBtns);
+    document.body.removeChild(MRGconnectivityBtns);
   //clear spies
-      sandbox.restore();
+    sandbox.restore();
   });
+
   it('should add elements to the dom', () => {
+    //there should be none of these buttons on dom before appendConnectButtons is called
+    expect(document.getElementById('MRGconnect')).to.equal(null);
+    expect(document.getElementById('MRGdisconnect')).to.equal(null);
     funcStore.appendConnectButtons();
     expect(document.getElementById('MRGconnect')).to.not.equal(null);
     expect(document.getElementById('MRGdisconnect')).to.not.equal(null);
@@ -112,7 +112,6 @@ describe('appendConnectButtons functionality', () => {
   });
 });
 
-
 describe('removeChildren functionality', () => {
   let MRGconnectivityBtns, sandbox, conButton, disconButton;
   beforeEach(() => {
@@ -126,17 +125,15 @@ describe('removeChildren functionality', () => {
     MRGconnectivityBtns.appendChild(disconButton);
     document.body.appendChild(MRGconnectivityBtns);
   });
-
   afterEach(() => {
     document.body.removeChild(MRGconnectivityBtns);
-  })
+  });
 
   it('should remove one child if it exists', () => {
     expect(document.getElementById('conButton')).to.not.equal(null);
     funcStore.removeChildren('MRGconnectivityBtns');
     expect(document.getElementById('conButton')).to.equal(null);
   });
-
   it('should remove two child if it exists', () => {
     expect(document.getElementById('conButton')).to.not.equal(null);
     expect(document.getElementById('disconButton')).to.not.equal(null);
@@ -144,7 +141,6 @@ describe('removeChildren functionality', () => {
     expect(document.getElementById('conButton')).to.equal(null);
     expect(document.getElementById('disconButton')).to.equal(null);
   });
-
   it('should work if the children does not exist', () => {
     //first to remove existing children
     funcStore.removeChildren('MRGconnectivityBtns');
@@ -155,16 +151,12 @@ describe('removeChildren functionality', () => {
 
 describe('clearFunc functionality', () => {
   it ('should stop all raf', () => {
-
+    //generic code to generate a raf id to clear.
     let requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
                             window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-
     let cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
-
     let start = window.mozAnimationStartTime;  // Only supported in FF. Other browsers can use something like Date.now().
-
     let animeSt = {};
-
     let mediaSt = {};
 
     mediaSt.myContext = document.createElement('canvas').getContext('2d');
@@ -172,17 +164,16 @@ describe('clearFunc functionality', () => {
 
     function step(timestamp) {
       let progress = timestamp - start;
-      d.style.left = Math.min(progress/10, 200) + "px";
+      d.style.left = Math.min(progress/10, 200) + 'px';
       if (progress < 2000) {
         animeSt.myReq = requestAnimationFrame(step);
       }
     }
     animeSt.myReq = requestAnimationFrame(step);
-
     funcStore.clearFunc(animeSt, mediaSt);
-
-  })
+  });
 });
+
 describe('toggleZindex functionality', () => {
   beforeEach(() => {
     let mirageEl = document.createElement('div');
@@ -202,27 +193,9 @@ describe('toggleZindex functionality', () => {
     funcStore.toggleZindex();
     expect(document.getElementById('hello').classList.contains('notMirage')).to.be.true;
   });
-
   it('should not add the notMirage class if class does not contain MRG', () => {
     expect(document.getElementById('MRG-hello').classList.contains('notMirage')).to.be.false;
     funcStore.toggleZindex();
     expect(document.getElementById('MRG-hello').classList.contains('notMirage')).to.be.false;
-  })
-
+  });
 });
-
-
-//
-// function toggleZindex() {
-//   // toggle Z index of non MRG elements to have Mirage component always show
-//   // only if can access dom elements
-//   if (document.querySelectorAll) {
-//     let domElements = document.body.getElementsByTagName('*');
-//     for (let i = 0; i < domElements.length; i++) {
-//       if (domElements[i].id.substring(0,3)!=="MRG") {
-//         //give fixed elements z index of 1 and non fixed elements z index of -1 to keep positionality
-//         window.getComputedStyle(domElements[i]).getPropertyValue('position')==='fixed' ? domElements[i].classList.toggle('notMirageFixed') : domElements[i].classList.toggle('notMirage');
-//       }
-//     }
-//   }
-// }
