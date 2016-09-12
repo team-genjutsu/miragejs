@@ -16,10 +16,10 @@ let mirageChunk = `<div id='MRGfixed' class='MRGfixPos'>
               <!-- <button id="MRG-random-button" class='MRG-roombtn'>RANDOM</button> -->
             </div>
           </div>
-          <div id="MRGrecent-rooms">
+          <!-- <div id="MRGrecent-rooms"> -->
             <!-- <p>Recently used rooms:</p> -->
             <!-- <ul id="MRG-recent-rooms-list"></ul> -->
-          </div>
+          <!-- </div> -->
         </div>
       </div>
       <!-- End room container-->
@@ -30,14 +30,12 @@ let mirageChunk = `<div id='MRGfixed' class='MRGfixPos'>
             <div id='MRGmyBooth'></div>
             <div id='MRGpeerBooth'></div>
           </div>
-          <div id="MRGemojiButtons"></div>
         </div>
         <!-- end booth -->
 
         <div id='MRGoptionBtns'>
 
-          <div id='MRGconnectivityBtns'>
-          </div>
+          <div id='MRGconnectivityBtns'></div>
 
           <div id="MRGfilterBtns">
             <button id='MRGfilter' class="MRGbtn">filter: <span id='MRGfilterDisp'></span></button>
@@ -51,6 +49,8 @@ let mirageChunk = `<div id='MRGfixed' class='MRGfixPos'>
             <button id='MRGanimation' class='MRGbtn'>animation: <span id='MRGanimateDisp'>paste</span></button>
           </div>
         </div>
+        <div id="MRGemojiButtons"></div>
+
       </div>
 
     </section>
