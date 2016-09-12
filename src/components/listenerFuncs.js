@@ -18,7 +18,6 @@ function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, ar
   let channelAnime = (event) => {
 
     let position = func(canvas, event);
-
     let emoImage = new Image();
     emoImage.src = img.src;
 
@@ -41,7 +40,6 @@ function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, ar
   };
 
   canvas.addEventListener('click', channelAnime, false);
-
   return channelAnime;
 }
 

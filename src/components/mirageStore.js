@@ -22,7 +22,7 @@ function filterStore(filterDispId, filterBtnId) {
     addFilter: (filterArr) => {
       if (filterArr != undefined || filterArr.length > 0) {
         filterArr.forEach((ele, idx) => {
-          ele.push(filter);
+          // ele.push(filter);
         });
       }
     }
@@ -72,9 +72,24 @@ function animeStore(animeBtnId, animeDispId, emojiClass, functionArray) {
     rafObj: {},
     emoImg: new Image(),
     currentImg: null,
-    emojis: ["http://emojione.com/wp-content/uploads/assets/emojis/1f916.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f453.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f47b.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f480.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f42a.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f415.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f98d.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f429.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f490.svg", "http://emojione.com/wp-content/uploads/assets/emojis/2604.svg", "http://emojione.com/wp-content/uploads/assets/emojis/1f988.svg"],
+    emojis: ["https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f385-1f3fb.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4a9.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4af.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f354.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f436.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f414.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f389.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f60d.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4b8.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f951.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f984.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/2705.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f64a.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f382.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f602.png",
+      "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f64c.png"],
     emoBtns: document.getElementsByClassName(emojiClass)
-  }
+  };
 }
 
 function rtcStore() {
@@ -96,10 +111,19 @@ function rtcStore() {
     //stun server to use
     pcConfig: {
       'iceServers': [{
+        //public stun server to use, change to local if preferred
         'url': 'stun:stun.l.google.com:19302'
-      }]
+      },
+      {
+        //public turn server to use, change to local if preferred
+        url: 'turn:numb.viagenie.ca',
+        credential: 'muazkh',
+        username: 'webrtc@live.com'
+      }
+    ]
+
     }
-  }
+  };
 }
 
 export {
@@ -108,4 +132,4 @@ export {
   mediaStore,
   animeStore,
   rtcStore
-}
+};

@@ -188,7 +188,6 @@ function resizeMedia(win, state, container, func1, func2, func3) {
     func3(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, targetDims);
   }
   container.style.height = func1(container, win).vidHeight + 'px';
-
 }
 
 function toggleVidSize(win, state, func1, func2, func3) {
@@ -305,7 +304,6 @@ function classToggle(btnEleId, classType) {
   } else {
     document.getElementById(btnEleId).classList.add(classType);
   }
-  
 }
 
 function appendConnectButtons() {
@@ -335,6 +333,7 @@ function removeChildren(el) {
   }
 }
 
+//this should stop the request animation frame recursive calls and also clear the canvas
 function clearFunc(animeSt, mediaSt) {
   for (let rafID in animeSt.rafObj) {
     cancelAnimationFrame(animeSt.rafObj[rafID]);
@@ -350,7 +349,7 @@ function toggleZindex() {
   if (document.querySelectorAll) {
     let domElements = document.body.getElementsByTagName('*');
     for (let i = 0; i < domElements.length; i++) {
-      if (domElements[i].id.substring(0, 3) !== "MRG") {
+      if (domElements[i].id.substring(0, 3) !== 'MRG') {
         //give fixed elements z index of 1 and non fixed elements z index of -1 to keep positionality
         window.getComputedStyle(domElements[i]).getPropertyValue('position') === 'fixed' ? domElements[i].classList.toggle('notMirageFixed') : domElements[i].classList.toggle('notMirage');
       }
