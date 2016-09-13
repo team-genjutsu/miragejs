@@ -1,18 +1,11 @@
-<<<<<<< HEAD
-import * as funcStore from '../../components/funcStore';
-=======
 import * as funcStore from '../../src/components/funcStore';
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 import { expect } from 'chai';
 // import fs from 'fs';
 import sinon from 'sinon';
 
 
-<<<<<<< HEAD
-describe("functions should exist", () => {
-=======
+
 describe('functions should exist', () => {
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   it('paste should exist', () => {
     expect(typeof funcStore.paste).to.equal('function');
   });
@@ -37,8 +30,7 @@ describe('functions should exist', () => {
   it('angularVelocity should exist', () => {
     expect(typeof funcStore.angularVelocity).to.equal('function');
   });
-<<<<<<< HEAD
-=======
+
   it('appendConnectButtons should exist', () => {
     expect(typeof funcStore.appendConnectButtons).to.equal('function');
   });
@@ -51,7 +43,6 @@ describe('functions should exist', () => {
   it('toggleZindex should exist', () => {
     expect(typeof funcStore.toggleZindex).to.equal('function');
   });
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 });
 
 describe('paste functionality', () => {
@@ -69,41 +60,23 @@ describe('paste functionality', () => {
 
     //new sandbox
     sandbox = sinon.sandbox.create();
-<<<<<<< HEAD
-
-
-    afterEach(function () {
-    //clear spies
-        sandbox.restore();
-    });
-  });
-=======
     afterEach(function () {
     //clear spies
       sandbox.restore();
     });
   });
 
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   it('should be callable', () => {
     let pasteSpy = sandbox.spy(funcStore, 'paste');
     funcStore.paste(canvas, context, event, position, emoImg);
     expect(pasteSpy.called).to.be.true;
-<<<<<<< HEAD
-  })
 
-=======
   });
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   it('should not throw an error', () => {
     let pasteSpy = sandbox.spy(funcStore, 'paste');
     funcStore.paste(canvas, context, event, position, emoImg);
     expect(pasteSpy.threw()).to.be.false;
-<<<<<<< HEAD
-  })
 
-})
-=======
   });
 });
 
@@ -229,4 +202,3 @@ describe('toggleZindex functionality', () => {
     expect(document.getElementById('MRG-hello').classList.contains('notMirage')).to.be.false;
   });
 });
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51

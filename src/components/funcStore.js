@@ -4,21 +4,14 @@ function bounce(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
   let onload = emoImg.onload;
   //this object keeps track of the movement, loads the images, and determines
   //the velocity
-<<<<<<< HEAD
-=======
   let dim = 50;
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   let emoticon = {
     x: pos.x,
     y: pos.y,
     vx: 5,
     vy: 2,
     onload: function() {
-<<<<<<< HEAD
-      ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
-=======
       ctx.drawImage(emoImg, this.x - dim / 2, this.y - dim / 2, dim, dim);
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
     }
   };
   //initial image load on canvas
@@ -36,21 +29,14 @@ function paste(cv, ctx, evt, pos, emoImg) {
   let onload = emoImg.onload;
   //this object keeps track of the movement, loads the images, and determines
   //the velocity
-<<<<<<< HEAD
-=======
   let dim = 50;
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   let emoticon = {
     x: pos.x,
     y: pos.y,
     vx: 5,
     vy: 2,
     onload: function() {
-<<<<<<< HEAD
-      ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
-=======
       ctx.drawImage(emoImg, this.x - dim / 2, this.y - dim / 2, dim, dim);
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
     }
   };
   //initial image load on canvas
@@ -63,10 +49,7 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
   //this object keeps track of the movement, loads the images, and determines
   //the angular veloctiy. We're keeping track of frequency of refreshes to
   //imcrement the degrees
-<<<<<<< HEAD
-=======
   let dim = 50;
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   let movement = .0349066;
   let emoticon = {
     x: pos.x,
@@ -76,11 +59,7 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
     wx: movement,
     wy: movement,
     onload: function() {
-<<<<<<< HEAD
-      ctx.drawImage(emoImg, this.x - emoImg.width / 2, this.y - emoImg.height / 2);
-=======
       ctx.drawImage(emoImg, this.x - dim / 2, this.y - dim / 2, dim, dim);
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
     }
   };
   //initial image load on canvas
@@ -94,7 +73,6 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
 
 } //end velocity//
 
-<<<<<<< HEAD
 function trackFace(video, canvas, context, trackingObj, videoStream, img, channel) {
   //console.log("data channel", channel);
 
@@ -169,8 +147,6 @@ function hat(cv, ctx, rect, img) {
 
 }
 
-=======
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 //doesnt work yet, but would provide a way to erase drawn
 //objects in circular fashion rather than rectangular
 function cutCircle(context, x, y, radius) {
@@ -185,11 +161,7 @@ function hiddenToggle(ele1, ele2) {
   args.forEach((ele, idx) => {
     let tag = document.getElementById(ele);
     if (tag.classList.contains('MRGhidden')) {
-<<<<<<< HEAD
-      tag.classList.toggle('MRGhidden');
-=======
       tag.classList.remove('MRGhidden');
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
     } else {
       tag.classList.add('MRGhidden');
     }
@@ -199,18 +171,6 @@ function hiddenToggle(ele1, ele2) {
 
 //paste object to canvas
 // function pasteImg(video, context, width, height, x, y, source) {
-<<<<<<< HEAD
-  // context.drawImage(video, 0, 0, width, height);
-  // baseImg = new Image();
-  // baseImg.src = source; // needs to be path ie --> 'assets/weird.png';
-  // baseImg.onload = function() {
-    // context.drawImage(baseImg, x - baseImg.width / 2, y - baseImg.height / 2);
-    //setTimeout for pasted images//
-    // var time = window.setTimeout(function() {
-    // context.clearRect(x - baseImg.width / 2, y - baseImg.height / 2, baseImg.width, baseImg.height);
-    // }, 5000);
-  // }
-=======
 // context.drawImage(video, 0, 0, width, height);
 // baseImg = new Image();
 // baseImg.src = source; // needs to be path ie --> 'assets/weird.png';
@@ -221,7 +181,6 @@ function hiddenToggle(ele1, ele2) {
 // context.clearRect(x - baseImg.width / 2, y - baseImg.height / 2, baseImg.width, baseImg.height);
 // }, 5000);
 // }
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 // } //end paste//
 
 function disableToggle(ele1, ele2) {
@@ -277,10 +236,6 @@ function velocity(obj, ctx, cv, cb, emoImg, animate, rafObj, evt) {
 
 } //end velocity//
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 //angularVelocity func//
 function angularVelocity(obj, ctx, cv, cb, emoImg, animate, rafObj, evt) {
   ctx.clearRect(obj.x - emoImg.width / 2 - 5, obj.y - emoImg.height / 2 - 5, emoImg.width + 10, emoImg.height + 10);
@@ -295,12 +250,6 @@ function angularVelocity(obj, ctx, cv, cb, emoImg, animate, rafObj, evt) {
   rafObj[evt.timeStamp.toString()] = animate;
 } //end angularVelocity//
 
-<<<<<<< HEAD
-function toggleVidSize(win, state, func1, func2) {
-  let arr,
-    styleWidth1 = func1(state.myVideo, win).vidWidth,
-    styleWidth2 = func1(state.peerVideo, win).vidWidth;
-=======
 function resizeMedia(win, state, container, func1, func2, func3) {
 
   let styleWidth1 = func1(state.myVideo, win).vidWidth,
@@ -320,43 +269,29 @@ function toggleVidSize(win, state, func1, func2, func3) {
     styleWidth1 = func1(state.myVideo, win).vidWidth,
     styleWidth2 = func1(state.peerVideo, win).vidWidth,
     booths = ['MRGmyCanvas', 'MRGpeerCanvas'];
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
-
   if (styleWidth1 >= styleWidth2) {
     let dims = func2(state.myVideo, win);
     setSizes(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, dims);
     arr = [state.myVideo, state.myCanvas, state.peerVideo, state.peerCanvas];
-<<<<<<< HEAD
-=======
     booths.forEach( (ele, idx) => {
       func3(ele, 'MRGpointerToggle');
     });
 
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   } else {
     let dims = func2(state.peerVideo, win);
     setSizes(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, dims);
     arr = [state.peerVideo, state.peerCanvas, state.myVideo, state.myCanvas];
-<<<<<<< HEAD
-=======
+
     booths.forEach( (ele, idx) => {
       func3(ele, 'MRGpointerToggle');
     });
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   }
 
   arr.forEach((ele, idx) => {
     if (idx < 2) {
       ele.style.zIndex = '3';
-<<<<<<< HEAD
-      // ele.classList.add('btmRight');
     } else {
       ele.style.zIndex = '2';
-      // ele.classList.remove('btmRight');
-=======
-    } else {
-      ele.style.zIndex = '2';
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
     }
   });
 
@@ -369,13 +304,7 @@ function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, 
   upContext = upCanvas.getContext('2d');
   upCanvas.width = dims.bigVidWidth;
   upCanvas.height = dims.bigVidHeight;
-<<<<<<< HEAD
-  upContext.rect(0, 0, upCanvas.width, upCanvas.height);
-  // state.peerContext.scale(1,1);
-  upContext.stroke();
-=======
   upContext.strokeRect(0, 0, upCanvas.width, upCanvas.height);
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 
   downVid.setAttribute('width', '' + dims.smallVidWidth);
   downVid.setAttribute('height', '' + dims.smallVidHeight);
@@ -384,32 +313,7 @@ function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, 
   downCanvas.width = dims.smallVidWidth;
   downCanvas.height = dims.smallVidHeight;
   downContext.scale(.25, .25);
-<<<<<<< HEAD
-  downContext.rect(0, 0, downCanvas.width, downCanvas.height);
-  downContext.stroke();
-
-}
-
-function resize(win, state, container, func) {
-
-  let dims = func(container, win);
-  //resize local elements
-  state.myVideo.setAttribute('width', '' + dims.vidWidth);
-  state.myVideo.setAttribute('height', '' + dims.vidHeight);
-
-  state.myCanvas.setAttribute('width', '' + dims.vidWidth);
-  state.myCanvas.setAttribute('height', '' + dims.vidHeight);
-
-  //resize remote elements
-  state.peerVideo.setAttribute('width', '' + dims.vidWidth);
-  state.peerVideo.setAttribute('height', '' + dims.vidHeight);
-
-  state.peerCanvas.setAttribute('width', '' + dims.vidWidth);
-  state.peerCanvas.setAttribute('height', '' + dims.vidHeight);
-=======
   downContext.strokeRect(0, 0, downCanvas.width, downCanvas.height);
-
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 }
 
 function generateDims(container, win) {
@@ -460,20 +364,6 @@ function scaleElement(vid, height, width) {
   video.setAttribute('style', '-webkit-transform: scale(' + scale + ')');
 }
 
-<<<<<<< HEAD
-function blinkerOn(boothEleId, btnEleId) {
-  if (document.getElementById(boothEleId).classList.contains('MRGhidden')) {
-    document.getElementById(btnEleId).classList.add('MRGelementToFadeInAndOut');
-  }
-}
-
-function blinkerOff(btnId) {
-  document.getElementById(btnId).classList.remove('MRGelementToFadeInAndOut');
-}
-
-//toggling of vid sizes isn't changing context it seems...
-
-=======
 function classToggle(btnEleId, classType) {
   if (document.getElementById(btnEleId).classList.contains(classType)) {
     document.getElementById(btnEleId).classList.remove(classType);
@@ -481,8 +371,6 @@ function classToggle(btnEleId, classType) {
     document.getElementById(btnEleId).classList.add(classType);
   }
 }
-
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 function appendConnectButtons() {
   //creating buttons will replace everytime so eventlistener is good. Will pull out of file
   let connectivityBtns = document.getElementById('MRGconnectivityBtns');
@@ -492,18 +380,11 @@ function appendConnectButtons() {
   disconButton.setAttribute('class', 'MRGbtn');
   conButton.setAttribute('id', 'MRGconnect');
   disconButton.setAttribute('id', 'MRGdisconnect');
-<<<<<<< HEAD
-  conButton.innerHTML = 'Connect';
-  disconButton.innerHTML = 'Disconnect';
-  conButton.disabled = true;
-  disconButton.disabled = true;
-=======
   // conButton.innerHTML = 'Connect';
   // disconButton.innerHTML = 'Disconnect';
   conButton.disabled = true;
   disconButton.disabled = true;
   disconButton.classList.add('MRGhidden');
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   connectivityBtns.appendChild(conButton);
   connectivityBtns.appendChild(disconButton);
 }
@@ -517,22 +398,16 @@ function removeChildren(el) {
   }
 }
 
-<<<<<<< HEAD
-=======
+
 //this should stop the request animation frame recursive calls and also clear the canvas
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 function clearFunc(animeSt, mediaSt) {
   for (let rafID in animeSt.rafObj) {
     cancelAnimationFrame(animeSt.rafObj[rafID]);
   }
-<<<<<<< HEAD
 
-  mediaSt.myContext.clearRect(0, 0, 10000,10000);
-  mediaSt.peerContext.clearRect(0, 0, 10000,10000);
-=======
+
   mediaSt.myContext.clearRect(0, 0, 10000, 10000);
   mediaSt.peerContext.clearRect(0, 0, 10000, 10000);
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 }
 
 function toggleZindex() {
@@ -541,15 +416,10 @@ function toggleZindex() {
   if (document.querySelectorAll) {
     let domElements = document.body.getElementsByTagName('*');
     for (let i = 0; i < domElements.length; i++) {
-<<<<<<< HEAD
-      if (domElements[i].id.substring(0,3)!=="MRG") {
-        //give fixed elements z index of 1 and non fixed elements z index of -1 to keep positionality
-        window.getComputedStyle(domElements[i]).getPropertyValue('position')==='fixed' ? domElements[i].classList.toggle('notMirageFixed') : domElements[i].classList.toggle('notMirage');
-=======
+
       if (domElements[i].id.substring(0, 3) !== 'MRG') {
         //give fixed elements z index of 1 and non fixed elements z index of -1 to keep positionality
         window.getComputedStyle(domElements[i]).getPropertyValue('position') === 'fixed' ? domElements[i].classList.toggle('notMirageFixed') : domElements[i].classList.toggle('notMirage');
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
       }
     }
   }
@@ -562,19 +432,10 @@ export {
   vidDims,
   hiddenToggle,
   disableToggle,
-<<<<<<< HEAD
-  resize,
-  generateDims,
-  scaleToFill,
-  scaleElement,
-  blinkerOn,
-  blinkerOff,
-=======
   generateDims,
   scaleToFill,
   scaleElement,
   classToggle,
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   cutCircle,
   angularVelocity,
   velocity,
@@ -588,11 +449,6 @@ export {
   removeChildren,
   clearFunc,
   toggleZindex,
-<<<<<<< HEAD
-  trackFace,
-  hat
-=======
   resizeMedia,
   setSizes
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 };

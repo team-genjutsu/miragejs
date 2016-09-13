@@ -6,11 +6,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 module.exports = {
   entry: [
-<<<<<<< HEAD
-    './src/index.js',
-=======
     './public/index.js',
->>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   ],
   output: {
     path: path.join(__dirname, './public'),

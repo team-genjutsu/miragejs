@@ -1,4 +1,4 @@
-   onmessage = function(event) {
+  onmessage = function(event) {
 
 
   var data = event.data[0];
