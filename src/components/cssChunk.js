@@ -1,9 +1,10 @@
-.btmRight {
+let cssChunk = `<style>
+.MRGbtmRight {
   bottom: 0;
   right: 0;
 }
 
-#fixed {
+#MRGfixed {
   position: fixed;
   width: 61px;
   height: 61px;
@@ -11,56 +12,60 @@
   right: 20px;
 }
 
-#materialBtn {
+#MRGmaterialBtn {
   z-index: 2147483647;
   position: fixed;
   overflow: visible;
   bottom: 10px;
   right: 20px;
-  background-color: #F44336;
+  /* background-color: #F44336; */
+  background: url('./assets/playimg.png');
   width: 60px;
   height: 60px;
   border-radius: 100%;
-  background: #F44336;
+  background: #03a9f4;
   border: none;
   outline: none;
-  color: #;
+  color: #FFF;
   font-size: 36px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   /* transition: .3s; */
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-.emoji {
+.MRGemoji {
   display: inline;
   height: 50%;
   width: 50%;
   border-radius: 5px;
 }
 
-.elementToFadeInAndOut {
+.MRGelementToFadeInAndOut {
   -webkit-animation: fadeinout 1s linear forwards infinite;
   animation: fadeinout 1s linear forwards infinite;
   opacity: 0;
 }
 
-#emojiButtons {
-  height: 22%;
+#MRGemojiButtons {
+  /* height: 22%; */
   width: 13%;
-  margin: 0 auto;
+  margin-left: 7%;
+
 }
 
-#optionBtns {
-  display: inline-block;
-  width: 100%;
-  margin-left: -22%;
+#MRGoptionBtns {
+  display: inline-flex;
+  margin-right: 15%;
+  /* width: 100%; */
+  /* margin-left: -22%; */
 }
 
-#animeBtn {
-  position: absolute;
+#MRGanimeBtn {
+  position: relative;
+  display: inherit;
 }
 
-#filterBtns {
+#MRGfilterBtns {
   display: inline-flex;
   position: relative;
   vertical-align: middle;
@@ -70,25 +75,25 @@
   font-size: 75px;
 }
 
-.hidden {
+.MRGhidden {
   display: none;
 }
 
-.fixPos {
+.MRGfixPos {
   position: fixed;
 }
 
-#demo {
+#MRGdemo {
   z-index: 2147483646;
   position: absolute;
-  display: block;
+  /* display: block; */
   overflow: hidden;
   bottom: 0;
   right: 0;
   text-align: center;
   height: 700px;
   width: 900px;
-  padding-top: 75%;
+  /* padding-top: 75%; */
   border: 1px solid;
   margin-bottom: 80%;
   margin-right: 80%;
@@ -96,95 +101,154 @@
   background-color: white;
 }
 
-#boothApp {
+#MRGboothApp {
+  padding-top: 5%;
   text-align: center;
   height: inherit;
   width: inherit;
 }
 
-#booth {
+#MRGbooth {
   height: 80%;
   width: 100%;
   position: relative;
   display: inline-flex;
 }
 
-#selectImg {
+#MRGselectImg {
   margin: 5px 20px 5px 5px;
   text-align: center;
   font-weight: bold;
   font-size: 16px;
 }
 
-#vidContainer {
+#MRGvidContainer {
   height: 100%;
   /*45em;*/
   width: 75%;
   /*60em;*/
 }
 
-#myBooth {
+#MRGmyBooth {
   margin-left: 5%;
   position: absolute;
 }
 
-#peerBooth {
+#MRGpeerBooth {
   position: absolute;
   margin-left: 5%;
 }
 
-#myVideo {
+#MRGmyVideo {
   text-align: center;
   position: absolute;
   z-index: 2;
   visibility: visible;
 }
 
-#peerVideo {
+#MRGpeerVideo {
   text-align: center;
   position: absolute;
   z-index: 2;
   visibility: visible;
 }
 
-#myCanvas {
+#MRGmyCanvas {
   text-align: center;
   z-index: 2147483000;
   position: absolute;
   visibility: visible;
 }
 
-#peerCanvas {
+#MRGpeerCanvas {
   text-align: center;
   z-index: 2147483000;
   position: absolute;
   visibility: visible;
 }
 
-#connectivity-buttons {
-  width: 100%;
-  margin: 15px;
+#MRGconnectivity-buttons {
+  /* width: 100%; */
+  /* margin: 15px; */
 }
 
-.connectButton {
+.MRGconnectButton {
   display: inline;
 }
 
+.MRGbtn {
+  background-color: #4285F4;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 0.8em;
+  /* margin: 0 5px 20px 5px; */
+  width: 7em;
+  height: 4em;
+  /* padding: 0.5em 0.7em 0.5em 0.7em; */
+  -webkit-box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
+  -moz-box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
+  box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
+}
 
+.MRGbtn:active {
+  background-color: #3367D6;
+}
+
+.MRGbtn:hover {
+  background-color: #3B78E7;
+}
+
+.MRGbtn:focus {
+  outline: none;
+  -webkit-box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
+  -moz-box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
+  box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
+}
+
+.MRGemojibtn {
+  background-color: #42c9f4;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 0.8em;
+  /* margin: 0 5px 20px 5px; */
+  width: 4em;
+  height: 4em;
+  /* padding: 0.5em 0.7em 0.5em 0.7em; */
+  -webkit-box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
+  -moz-box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
+  box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
+}
+
+.MRGemojibtn:active {
+  background-color: #3367D6;
+}
+
+.MRGemojibtn:hover {
+  background-color: #3B78E7;
+}
+
+.MRGemojibtn:focus {
+  outline: none;
+  -webkit-box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
+  -moz-box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
+  box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
+}
 /*////// room selection start ///////////////////*/
 
-#roomApp {
+#MRGroomApp {
   height: 100%;
   width: 100%;
   background-color: white;
 }
 
-#recent-rooms-list {
+#MRGrecent-rooms-list {
   list-style-type: none;
   padding: 0 15px;
 }
 
-.roombtn {
+.MRGroombtn {
   background-color: #4285F4;
   border: none;
   border-radius: 2px;
@@ -199,29 +263,29 @@
   box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, .5);
 }
 
-.roombtn:active {
+.MRGroombtn:active {
   background-color: #3367D6;
 }
 
-.roombtn:hover {
+.MRGroombtn:hover {
   background-color: #3B78E7;
 }
 
-.roombtn:focus {
+.MRGroombtn:focus {
   outline: none;
   -webkit-box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
   -moz-box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
   box-shadow: 0 10px 15px 0 rgba(0, 0, 0, .5);
 }
 
-.roombtn[disabled] {
+.MRGroombtn[disabled] {
   color: rgb(76, 76, 76);
   color: rgba(255, 255, 255, 0.3);
   background-color: rgb(30, 30, 30);
   background-color: rgba(255, 255, 255, 0.12);
 }
 
-#room-selection input[type=text] {
+#MRGroom-selection input[type=text] {
   border: none;
   border-bottom: solid 1px #4c4c4f;
   font-size: 1em;
@@ -233,43 +297,43 @@
   display: block;
 }
 
-#room-selection input[type="text"]:focus {
+#MRGroom-selection input[type="text"]:focus {
   border-bottom: solid 2px #4285F4;
   outline: none;
 }
 
-#room-selection input[type="text"].invalid {
+#MRGroom-selection input[type="text"].invalid {
   border-bottom: solid 2px #F44336;
 }
 
-#room-selection label.error-label {
+#MRGroom-selection label.error-label {
   color: #F44336;
   font-size: .85em;
   font-weight: 200;
   margin: 0;
 }
 
-#room-id-input-div {
+#MRGroom-id-input-div {
   margin: 15px;
 }
 
-#room-id-input-buttons {
+#MRGroom-id-input-buttons {
   margin: 15px;
 }
 
-#room-selection h1 {
+#MRGroom-selection h1 {
   font-weight: 300;
   margin: 0 0 0.8em 0;
   padding: 0 0 0.2em 0;
 }
 
-div#room-selection {
+div#MRGroom-selection {
   margin: 3em auto 0 auto;
   width: 25em;
-  padding: 1em 1.5em 1.3em 1.5em;
+  padding: 7em 1.5em 1.3em 1.5em;
 }
 
-#room-selection p {
+#MRGroom-selection p {
   color: #eee;
   font-weight: 300;
   line-height: 1.6em;
@@ -316,3 +380,15 @@ div#room-selection {
 .aboutUs {
   z-index: -1;
 }
+
+.notMirage {
+  z-index: -1;
+}
+
+.notMirageFixed {
+  z-index: 1;
+}
+
+</style>`;
+
+export { cssChunk };

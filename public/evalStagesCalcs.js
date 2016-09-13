@@ -1,4 +1,6 @@
-onmessage = function(event) {
+   onmessage = function(event) {
+
+
   var data = event.data[0];
   var integralImage = event.data[1];
   var integralImageSquare = event.data[2];

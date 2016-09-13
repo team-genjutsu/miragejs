@@ -1,0 +1,19 @@
+.DS_Store
+/node_modules
+/server_cert
+/*.env
+npm-debug.log
+/
+/src
+# IntelliJ
+*.iml
+/.idea
+
+/public/index.html
+
+.babelrc
+.eslintrc.js
+webpack.config.js
+server.js
+/tests
+karma.conf.js

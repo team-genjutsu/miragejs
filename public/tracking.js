@@ -140,7 +140,7 @@
   tracking.track = function(element, tracker, opt_options) {
     //console.log("element in track", element);
     //element = tracking.one(element);
-    //console.log(element, "in tracking.track")
+    //console.log("in tracking.track", element);
     if (!element) {
       throw new Error('Element not found, try a different element or selector.');
     }
@@ -201,13 +201,14 @@
    * @private
    */
   tracking.trackCanvasInternal_ = function(element, tracker) {
-    // console.log('element in trackCanvasInterval', element);
+    //console.log('we got in trackCanvasInterval', element, tracker);
     var width = element.width;
     var height = element.height;
     var context = element.getContext('2d');
     //console.log("track canvas internal on", element, context);
 
     var imageData = context.getImageData(0, 0, width, height);
+    //console.log("this is the image data", imageData);
     // console.log(imageData);
      //console.log("image data inside track canvas internal before tracker dot track is called", imageData);
     // console.log(tracker);
@@ -256,6 +257,7 @@
    * @private
    */
   tracking.trackVideo_ = function(element, tracker) {
+    //console.log("inside track video", element, tracker);
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
     var width = element.width;
@@ -263,17 +265,17 @@
     //invisibleCanvas.className = 'hidden';
 
 
-    var resizeCanvas_ = function() {
+    var resizeCanvas_ = function(canvas, tracker) {
       //  console.log('resize is firing and the element width', width);
-      // width = element.width;
-      // height = element.height;
+      width = element.width;
+      height = element.height;
       canvas.width = width;
       canvas.height = height;
       tracker.canvasOverlay.width = width;
       tracker.canvasOverlay.height = height;
       //console.log( canvas);
     };
-    resizeCanvas_();
+    resizeCanvas_(canvas, tracker);
     element.addEventListener('resize', resizeCanvas_);
 
     var requestId;
@@ -950,7 +952,7 @@
    * @static
    */
   tracking.ViolaJones.detect = function(pixels, width, height, initialScale, scaleFactor, stepSize, edgesDensity, data) {
-
+    //console.log("is it detect that is taking a long time?", pixels);
     var total = 0;
     var rects = [];
     var integralImage = new Int32Array(width * height);
@@ -994,8 +996,10 @@
               x: j,
               y: i
             };
+            //console.log("rects from eval stages before it gets returned", rects);
+            //calculator.terminate();
+            return rects;
 
-            return this.mergeRectangles_(rects);
           }
         }
       }
@@ -1051,87 +1055,98 @@
    * @private
    * @static
    */
+  var calculator = new Worker('evalStagesCalcs.js');
+
   tracking.ViolaJones.evalStages_ = function(data, integralImage, integralImageSquare, tiltedIntegralImage, i, j, width, blockWidth, blockHeight, scale) {
-    var inverseArea = 1.0 / (blockWidth * blockHeight);
-    var wbA = i * width + j;
-    var wbB = wbA + blockWidth;
-    var wbD = wbA + blockHeight * width;
-    var wbC = wbD + blockWidth;
-    var mean = (integralImage[wbA] - integralImage[wbB] - integralImage[wbD] + integralImage[wbC]) * inverseArea;
-    var variance = (integralImageSquare[wbA] - integralImageSquare[wbB] - integralImageSquare[wbD] + integralImageSquare[wbC]) * inverseArea - mean * mean;
 
-    var standardDeviation = 1;
-    if (variance > 0) {
-      standardDeviation = Math.sqrt(variance);
-    }
+    calculator.postMessage([data, integralImage, integralImageSquare, tiltedIntegralImage, i, j, width, blockWidth, blockHeight, scale]);
 
-    var length = data.length;
+    return calculator.onmessage = function(e){
+      //console.log('on message', e.data.status);
+      return e.data.status;
+    };
 
-    for (var w = 2; w < length; ) {
-      var stageSum = 0;
-      var stageThreshold = data[w++];
-      var nodeLength = data[w++];
+  //   var inverseArea = 1.0 / (blockWidth * blockHeight);
+  //   var wbA = i * width + j;
+  //   var wbB = wbA + blockWidth;
+  //   var wbD = wbA + blockHeight * width;
+  //   var wbC = wbD + blockWidth;
+  //   var mean = (integralImage[wbA] - integralImage[wbB] - integralImage[wbD] + integralImage[wbC]) * inverseArea;
+  //   var variance = (integralImageSquare[wbA] - integralImageSquare[wbB] - integralImageSquare[wbD] + integralImageSquare[wbC]) * inverseArea - mean * mean;
+  //
+  //   var standardDeviation = 1;
+  //   if (variance > 0) {
+  //     standardDeviation = Math.sqrt(variance);
+  //   }
+  //
+  //   var length = data.length;
+  //
+  //   for (var w = 2; w < length; ) {
+  //     var stageSum = 0;
+  //     var stageThreshold = data[w++];
+  //     var nodeLength = data[w++];
+  //
+  //     while (nodeLength--) {
+  //       var rectsSum = 0;
+  //       var tilted = data[w++];
+  //       var rectsLength = data[w++];
+  //
+  //       for (var r = 0; r < rectsLength; r++) {
+  //         var rectLeft = (j + data[w++] * scale + 0.5) | 0;
+  //         var rectTop = (i + data[w++] * scale + 0.5) | 0;
+  //         var rectWidth = (data[w++] * scale + 0.5) | 0;
+  //         var rectHeight = (data[w++] * scale + 0.5) | 0;
+  //         var rectWeight = data[w++];
+  //
+  //         var w1;
+  //         var w2;
+  //         var w3;
+  //         var w4;
+  //         if (tilted) {
+  //           // RectSum(r) = RSAT(x-h+w, y+w+h-1) + RSAT(x, y-1) - RSAT(x-h, y+h-1) - RSAT(x+w, y+w-1)
+  //           w1 = (rectLeft - rectHeight + rectWidth) + (rectTop + rectWidth + rectHeight - 1) * width;
+  //           w2 = rectLeft + (rectTop - 1) * width;
+  //           w3 = (rectLeft - rectHeight) + (rectTop + rectHeight - 1) * width;
+  //           w4 = (rectLeft + rectWidth) + (rectTop + rectWidth - 1) * width;
+  //           rectsSum += (tiltedIntegralImage[w1] + tiltedIntegralImage[w2] - tiltedIntegralImage[w3] - tiltedIntegralImage[w4]) * rectWeight;
+  //         } else {
+  //           // RectSum(r) = SAT(x-1, y-1) + SAT(x+w-1, y+h-1) - SAT(x-1, y+h-1) - SAT(x+w-1, y-1)
+  //           w1 = rectTop * width + rectLeft;
+  //           w2 = w1 + rectWidth;
+  //           w3 = w1 + rectHeight * width;
+  //           w4 = w3 + rectWidth;
+  //           rectsSum += (integralImage[w1] - integralImage[w2] - integralImage[w3] + integralImage[w4]) * rectWeight;
+  //           // TODO: Review the code below to analyze performance when using it instead.
+  //           // w1 = (rectLeft - 1) + (rectTop - 1) * width;
+  //           // w2 = (rectLeft + rectWidth - 1) + (rectTop + rectHeight - 1) * width;
+  //           // w3 = (rectLeft - 1) + (rectTop + rectHeight - 1) * width;
+  //           // w4 = (rectLeft + rectWidth - 1) + (rectTop - 1) * width;
+  //           // rectsSum += (integralImage[w1] + integralImage[w2] - integralImage[w3] - integralImage[w4]) * rectWeight;
+  //         }
+  //       }
+  //
+  //       var nodeThreshold = data[w++];
+  //       var nodeLeft = data[w++];
+  //       var nodeRight = data[w++];
+  //
+  //       if (rectsSum * inverseArea < nodeThreshold * standardDeviation) {
+  //         //console.log("plus nodeLeft", stageSum, nodeLeft);
+  //         stageSum += nodeLeft;
+  //       } else {
+  //         //console.log("plus nodeRight", stageSum, nodeRight);
+  //         stageSum += nodeRight;
+  //       }
+  //     }
+  //
+  //     if (stageSum < stageThreshold) {
+  // //console.log("eval false", stageSum, stageThreshold);
+  //       return false;
+  //
+  //     }
+  //   }
+  // //console.log("eval true");
+  //   return true;
 
-      while (nodeLength--) {
-        var rectsSum = 0;
-        var tilted = data[w++];
-        var rectsLength = data[w++];
-
-        for (var r = 0; r < rectsLength; r++) {
-          var rectLeft = (j + data[w++] * scale + 0.5) | 0;
-          var rectTop = (i + data[w++] * scale + 0.5) | 0;
-          var rectWidth = (data[w++] * scale + 0.5) | 0;
-          var rectHeight = (data[w++] * scale + 0.5) | 0;
-          var rectWeight = data[w++];
-
-          var w1;
-          var w2;
-          var w3;
-          var w4;
-          if (tilted) {
-            // RectSum(r) = RSAT(x-h+w, y+w+h-1) + RSAT(x, y-1) - RSAT(x-h, y+h-1) - RSAT(x+w, y+w-1)
-            w1 = (rectLeft - rectHeight + rectWidth) + (rectTop + rectWidth + rectHeight - 1) * width;
-            w2 = rectLeft + (rectTop - 1) * width;
-            w3 = (rectLeft - rectHeight) + (rectTop + rectHeight - 1) * width;
-            w4 = (rectLeft + rectWidth) + (rectTop + rectWidth - 1) * width;
-            rectsSum += (tiltedIntegralImage[w1] + tiltedIntegralImage[w2] - tiltedIntegralImage[w3] - tiltedIntegralImage[w4]) * rectWeight;
-          } else {
-            // RectSum(r) = SAT(x-1, y-1) + SAT(x+w-1, y+h-1) - SAT(x-1, y+h-1) - SAT(x+w-1, y-1)
-            w1 = rectTop * width + rectLeft;
-            w2 = w1 + rectWidth;
-            w3 = w1 + rectHeight * width;
-            w4 = w3 + rectWidth;
-            rectsSum += (integralImage[w1] - integralImage[w2] - integralImage[w3] + integralImage[w4]) * rectWeight;
-            // TODO: Review the code below to analyze performance when using it instead.
-            // w1 = (rectLeft - 1) + (rectTop - 1) * width;
-            // w2 = (rectLeft + rectWidth - 1) + (rectTop + rectHeight - 1) * width;
-            // w3 = (rectLeft - 1) + (rectTop + rectHeight - 1) * width;
-            // w4 = (rectLeft + rectWidth - 1) + (rectTop - 1) * width;
-            // rectsSum += (integralImage[w1] + integralImage[w2] - integralImage[w3] - integralImage[w4]) * rectWeight;
-          }
-        }
-
-        var nodeThreshold = data[w++];
-        var nodeLeft = data[w++];
-        var nodeRight = data[w++];
-
-        if (rectsSum * inverseArea < nodeThreshold * standardDeviation) {
-          //console.log("plus nodeLeft", stageSum, nodeLeft);
-          stageSum += nodeLeft;
-        } else {
-          //console.log("plus nodeRight", stageSum, nodeRight);
-          stageSum += nodeRight;
-        }
-      }
-
-      if (stageSum < stageThreshold) {
-//console.log("eval false", stageSum, stageThreshold);
-        return false;
-
-      }
-    }
-//console.log("eval true");
-    return true;
   };
 
   /**
@@ -1142,9 +1157,19 @@
    * @private
    * @static
    */
+  // var merger = new Worker('mergeRectangles.js');
+
   tracking.ViolaJones.mergeRectangles_ = function(rects) {
     var disjointSet = new tracking.DisjointSet(rects.length);
-    // console.log("inside of merge rectangles disjointedSet", disjointSet);
+    //console.log("disjoint set", disjointSet);
+
+    // // console.log("inside of merge rectangles disjointedSet", disjointSet);
+    // merger.postMessage([rects, disjointSet]);
+
+    // return merger.onmessage = function(e){
+    //   console.log("the rectangle from merger", e.data.rectangle);
+    //   return e.data.rectangle;
+    // }
     for (var i = 0; i < rects.length; i++) {
       var r1 = rects[i];
       for (var j = 0; j < rects.length; j++) {
@@ -2448,7 +2473,7 @@
   tracking.ObjectTracker.prototype.track = function(pixels, width, height) {
     var self = this;
     var classifiers = this.getClassifiers();
-     //console.log("inside tracker.track width", pixels);
+     //console.log("inside tracker.track ok", pixels);
 
     if (!classifiers) {
       throw new Error('Object classifier not specified, try `new tracking.ObjectTracker("face")`.');
@@ -2467,6 +2492,7 @@
           data: results
       });
     } else {
+      //console.log('emit run event from tracker dot track');
       this.emit('run');
     }
   };

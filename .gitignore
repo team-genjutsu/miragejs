@@ -1,8 +1,10 @@
 .DS_Store
 /node_modules
+/server_cert
 /*.env
 npm-debug.log
-
+/
+/lib
 # IntelliJ
 *.iml
 /.idea
