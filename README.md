@@ -53,8 +53,7 @@ mirage.putImages = ['https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/asset
      'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4af.png'];
 ```
 
-## Run your own functions and animations within select events. State is an object with reference to variable stores that
-retain an awesome amount of data for you to access for your functions. 
+## Run your own functions and animations within select events. They take no input, but 'state' is accessible, see below 
 
 
 ### When stream event triggers (both local and remote streams accessible) 
@@ -85,8 +84,7 @@ mirage.on('onMessage', (state) => {
 
 ## States
 
-### As of now there are five states, each of which are properties on a state object that is accessible within the event
-methods
+### As of now there are five states, which are properties on a state object that is accessible within the event methods
 
 ### Filter State
 ```bash
