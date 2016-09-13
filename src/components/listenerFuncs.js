@@ -62,16 +62,15 @@ function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, ar
 
   canvas.addEventListener('click', channelAnime, false);
   return channelAnime;
+}
 
 function clearListener(channel, func, clearButton, animeSt, mediaSt) {
   clearButton.addEventListener('click', (event) => {
     func(animeSt, mediaSt);
     channel.send(JSON.stringify({'type' : 'clear'}));
   }, false);
-
-  //send to other client to run clear function
 }
-
+//send to other client to run clear function
 export {
   filterListener,
   animationListener,
