@@ -65,6 +65,9 @@ export function createMirage() {
 
   const mirageComponent = {};
 
+  mirageComponent.putFilters = null;
+  mirageComponent.putImages = null;
+
   mirageComponent.events = {
     stream: null,
     onMessage: null,
@@ -168,17 +171,16 @@ export function createMirage() {
 
     joinButton.addEventListener('click', () => {
 
-      //room selection
-      roomState = null;
-      mediaState = null;
-      filterState = null;
-      animeState = null;
-      rtcState = null;
-      roomState = roomStore(window.URL);
-      mediaState = mediaStore('MRGmyBooth', 'MRGpeerBooth');
-      filterState = filterStore('MRGfilterDisp', 'MRGfilter');
-      animeState = animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
-      rtcState = rtcStore();
+      roomState = new roomStore(window.URL);
+      mediaState = new mediaStore('MRGmyBooth', 'MRGpeerBooth');
+      filterState = new filterStore('MRGfilterDisp', 'MRGfilter');
+      animeState = new animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
+      rtcState = new rtcStore();
+
+      //add input filters or images
+      filterState.addFilters(mirageComponent.putFilters);
+      animeState.addEmoji(mirageComponent.putImages);
+
       const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
       roomState.roomID = document.getElementById('MRGroom-id-input').value;
       appendConnectButtons();
@@ -341,7 +343,6 @@ export function createMirage() {
               channel.onmessage = event => {
 
                 let data = event.data;
-
                   //conditionally apply or remove filter
                 let dataObj = JSON.parse(data);
 
@@ -383,16 +384,16 @@ export function createMirage() {
                 if (dataObj.type === 'clear') {
                   clearFunc(animeState, mediaState);
                 }
-              };
 
-              mirageComponent.events.onMessage({
+                mirageComponent.events.onMessage({
+                  dataMsg: dataObj,    
                   mediaState: mediaState, 
                   filterState: filterState, 
                   roomState: roomState, 
                   animeState: animeState, 
                   rtcState: rtcState
                 });
-
+              };
             }
 
 
