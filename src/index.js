@@ -122,11 +122,11 @@ export function createMirage() {
     });
 
     materialBtn.addEventListener('drag', (event) => {
-      console.log(event); 
+      // console.log(event); 
     });
 
     materialBtn.addEventListener('dragend', (event) => {
-      console.log('drag over', event.clientX);
+      // console.log('drag over', event.clientX);
       materialBtn.style.left = event.clientX + 'px';
       materialBtn.style.top = (event.clientY - 60) + 'px';
     });
@@ -271,7 +271,7 @@ export function createMirage() {
                 //data channel stuff
               channel.onopen = () => {
 
-                console.log('data channel onopen method triggered');
+                // console.log('data channel onopen method triggered');
                 mediaState.peerCanvasListeners.push(animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], channel, false, getCursorPosition, animeState.rafObj)); //remote
 
                 mediaState.myCanvasListeners.push(animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafObj)); //local
@@ -481,11 +481,3 @@ export function createMirage() {
   return mirageComponent;
 }
 
-function userEventFuncs(eventObj, state) {
-  let userFuncs = eventObj;
-  console.log('userFuncs', userFuncs);
-  for (let k in userFuncs) {
-    console.log(userFuncs[k]);
-    userFuncs[k](state);
-  }
-}

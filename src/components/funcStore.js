@@ -297,7 +297,6 @@ function classToggle(btnEleId, classType) {
   } else {
     document.getElementById(btnEleId).classList.add(classType);
   }
-  // console.log(document.getElementById(btnEleId).style.zIndex);
 }
 
 function appendConnectButtons() {
