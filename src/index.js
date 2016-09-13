@@ -65,49 +65,14 @@ export function createMirage() {
 
   const mirageComponent = {};
 
-  mirageComponent.localStreamEventObj = {};
-  mirageComponent.onOpenDataEventObj = {};
-  mirageComponent.onMessageDataEventObj = {};
-  mirageComponent.remoteStreamEventObj = {};
-
-  mirageComponent.localStreamStore = (array) => {
-    // let args = [...arguments]; 
-    array.forEach((ele, idx) => {
-      for (let k in ele) {
-        //needs check to validate functions
-        mirageComponent.localStreamEventObj[k] = ele[k];
-      }
-    });
+  mirageComponent.events = {
+    stream: null,
+    onMessage: null,
+    onData: null
   };
 
-  mirageComponent.onOpenDataStore = (array) => {
-    // let args = [...arguments]; 
-    array.forEach((ele, idx) => {
-      for (let k in ele) {
-        //needs check to validate functions
-        mirageComponent.onOpenDataEventObj[k] = ele[k];
-      }
-    });
-  };
-
-  mirageComponent.onMessageDataStore = (array) => {
-    // let args = [...arguments]; 
-    array.forEach((ele, idx) => {
-      for (let k in ele) {
-        //needs check to validate functions
-        mirageComponent.onMessageDataEventObj[k] = ele[k];
-      }
-    });
-  };
-
-  mirageComponent.remoteStreamStore = (array) => {
-    // let args = [...arguments]; 
-    array.forEach((ele, idx) => {
-      for (let k in ele) {
-        //needs check to validate functions
-        mirageComponent.remoteStreamEventObj[k] = ele[k];
-      }
-    });
+  mirageComponent.on = (event, func) => {
+    mirageComponent.events[event] = func;
   };
 
   mirageComponent.insertCss = () => {
@@ -298,8 +263,6 @@ export function createMirage() {
                 }
               });
 
-              userEventFuncs(mirageComponent.localStreamEventObj, mediaState);
-
             }); //end of socket.on('initiated')
 
             function onDataChannelCreated(channel) {
@@ -349,7 +312,13 @@ export function createMirage() {
                   }, false);
                 });
 
-                userEventFuncs(mirageComponent.onOpenDataEventObj, mediaState);
+                mirageComponent.events.onData({
+                  mediaState: mediaState, 
+                  filterState: filterState, 
+                  roomState: roomState, 
+                  animeState: animeState, 
+                  rtcState: rtcState
+                });
               }; //end onopen method
 
                 // for messaging if we want to integrate later
@@ -371,7 +340,6 @@ export function createMirage() {
                 //on data event
               channel.onmessage = event => {
 
-                userEventFuncs(mirageComponent.onMessageDataEventObj, mediaState);
                 let data = event.data;
 
                   //conditionally apply or remove filter
@@ -416,6 +384,15 @@ export function createMirage() {
                   clearFunc(animeState, mediaState);
                 }
               };
+
+              mirageComponent.events.onMessage({
+                  mediaState: mediaState, 
+                  filterState: filterState, 
+                  roomState: roomState, 
+                  animeState: animeState, 
+                  rtcState: rtcState
+                });
+
             }
 
 
@@ -431,7 +408,13 @@ export function createMirage() {
               toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
               hiddenToggle('MRGconnect', 'MRGdisconnect');
 
-              userEventFuncs(mirageComponent.remoteStreamEventObj, mediaState);
+              mirageComponent.events.stream({
+                  mediaState: mediaState, 
+                  filterState: filterState, 
+                  roomState: roomState, 
+                  animeState: animeState, 
+                  rtcState: rtcState
+                });
             } ///end on stream added event///
 
             function activateAnime() {

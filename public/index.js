@@ -14,34 +14,20 @@ domReady(() => {
 
   // mount mirage chunk on DOM
   mirage.insertChunk();
+  
+  mirage.on('stream', (state) => {
+    console.log(state);
+  });
 
+  mirage.on('onData', (state) => {
+    console.log(state);
+  });
 
-  mirage.localStreamStore([{
-    locStreamOutput: function(state) {
-      console.log('local stream event Im in it', state);
-    }
-  }]);
+  mirage.on('onMessage', (state) => {
+    console.log(state);
+  });
 
-  mirage.remoteStreamStore([{
-    locStreamOutput: function(state) {
-      console.log('remote stream event Im in it', state);
-    }
-  }]);
-
-
-  mirage.onMessageDataStore([{
-    locStreamOutput: function(state) {
-      console.log('onMessage event Im in it', state);
-    }
-  }]);
-
-  mirage.onOpenDataStore([{
-    output: function(state) {
-      console.log('onData event Im in it', state);
-    }
-  }]);
   // start mirage logic
   mirage.startApp();
-
 
 });
