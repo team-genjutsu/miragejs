@@ -16,8 +16,8 @@ let cssChunk = `<style>
   z-index: 2147483647;
   position: fixed;
   overflow: visible;
-  bottom: 10px;
-  right: 20px;
+  top: 92%;
+  left: 95%;
   background:
     radial-gradient(
       circle closest-side,
@@ -66,7 +66,7 @@ let cssChunk = `<style>
   display: inline-flex;
   width: 100%;
   margin: 1%;
-  height: 8%;
+  height: 6%;
 }
 
 #MRGanimeBtn {

@@ -132,6 +132,8 @@ export function createMirage() {
     let clearButton = document.getElementById('MRGclear');
     // room buttons
     let joinButton = document.getElementById('MRGjoin-button');
+    // mirage component button
+    let materialBtn = document.getElementById('MRGmaterialBtn');
 
     //turn server to use
     //if (location.hostname != 'localhost') {
@@ -141,14 +143,24 @@ export function createMirage() {
     //}
 
 
-    document.getElementById('MRGmaterialBtn').addEventListener('click', () => {
-      var demo = document.getElementById('MRGdemo');
-      var matBtn = document.getElementById('MRGmaterialBtn');
+    materialBtn.addEventListener('click', () => {
+      let demo = document.getElementById('MRGdemo');
+      let matBtn = document.getElementById('MRGmaterialBtn');
 
       // need to parse through stylesheets and set z-indexes of elements to -1 with
       // each toggle
       demo.classList.toggle('MRGhidden');
       toggleZindex();
+    });
+
+    materialBtn.addEventListener('drag', (event) => {
+      console.log(event); 
+    });
+
+    materialBtn.addEventListener('dragend', (event) => {
+      console.log('drag over', event.clientX);
+      materialBtn.style.left = event.clientX + 'px';
+      materialBtn.style.top = (event.clientY - 60) + 'px';
     });
 
     let promisifiedOldGUM = function(constraints) {
@@ -414,6 +426,7 @@ export function createMirage() {
               mediaState.peerVideo = mediaState.peerMedia.video;
               mediaState.peerCanvas = mediaState.peerMedia.canvas;
               mediaState.peerContext = mediaState.peerMedia.context;
+              mediaState.peerCanvas.classList.add('MRGpointerToggle');
 
               toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
               hiddenToggle('MRGconnect', 'MRGdisconnect');
