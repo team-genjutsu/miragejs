@@ -22,7 +22,7 @@ function filterStore(filterDispId, filterBtnId) {
     addFilter: (filterArr) => {
       if (filterArr != undefined || filterArr.length > 0) {
         filterArr.forEach((ele, idx) => {
-          ele.push(filter);
+          // ele.push(filter);
         });
       }
     }
@@ -72,18 +72,18 @@ function animeStore(animeBtnId, animeDispId, emojiClass, functionArray) {
     rafObj: {},
     emoImg: new Image(),
     currentImg: null,
-    emojis: ["https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4a9.png",
-     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4af.png",
-     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f354.png",
-     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f436.png",
-     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f414.png",
-     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f389.png",
-     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f60d.png",
-     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4b8.png",
-     "https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f951.png" 
+    emojis: ['https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4a9.png',
+     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4af.png',
+     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f354.png',
+     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f436.png',
+     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f414.png',
+     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f389.png',
+     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f60d.png',
+     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4b8.png',
+     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f951.png' 
      ],
     emoBtns: document.getElementsByClassName(emojiClass)
-  }
+  };
 }
 
 function rtcStore() {
@@ -105,10 +105,19 @@ function rtcStore() {
     //stun server to use
     pcConfig: {
       'iceServers': [{
+        //public stun server to use, change to local if preferred
         'url': 'stun:stun.l.google.com:19302'
-      }]
+      },
+      {
+        //public turn server to use, change to local if preferred
+        url: 'turn:numb.viagenie.ca',
+        credential: 'muazkh',
+        username: 'webrtc@live.com'
+      }
+    ]
+
     }
-  }
+  };
 }
 
 export {
@@ -117,4 +126,4 @@ export {
   mediaStore,
   animeStore,
   rtcStore
-}
+};

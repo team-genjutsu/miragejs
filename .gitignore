@@ -1,6 +1,5 @@
 .DS_Store
 /node_modules
-
 /*.env
 npm-debug.log
 /
@@ -8,4 +7,3 @@ npm-debug.log
 # IntelliJ
 *.iml
 /.idea
-

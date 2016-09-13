@@ -4,12 +4,11 @@ function connectEvents(rtcState, roomState, func1, func2, socket) {
   console.log('connectEvent function: ' + rtcState);
   startSetup(rtcState, roomState, func1, socket);
   //data channel creation
-  // console.log('init creating data channel')
+
   //create data channel
   rtcState.dataChannel = rtcState.peerConn.createDataChannel('interact');
-  // console.log(state.dataChannel)
   // audio/video creation
-  console.log(rtcState.peerConn)
+  console.log(rtcState.peerConn);
   func2(rtcState.dataChannel);
   doCall(rtcState, roomState, socket);
 }
@@ -17,7 +16,7 @@ function connectEvents(rtcState, roomState, func1, func2, socket) {
 function startSetup(rtcState, roomState, func, socket) {
   console.log('startSetup? ', rtcState.isStarted, rtcState.localStream);
   if (!rtcState.isStarted && typeof rtcState.localStream !== 'undefined') {
-    console.log('creating peer connection')
+    console.log('creating peer connection');
     createPeerConnection(rtcState, roomState, func, socket);
     rtcState.peerConn.addStream(rtcState.localStream);
     rtcState.isStarted = true;
@@ -26,9 +25,9 @@ function startSetup(rtcState, roomState, func, socket) {
 
 function createPeerConnection(rtcState, roomState, func, socket) {
   try {
-    rtcState.peerConn = new RTCPeerConnection(rtcState.pcConfig)
+    rtcState.peerConn = new RTCPeerConnection(rtcState.pcConfig);
     rtcState.peerConn.onicecandidate = () => handleIceCandidate(event, roomState, socket);
-    rtcState.peerConn.onaddstream = func //handleRemoteStreamAdded;
+    rtcState.peerConn.onaddstream = func; //handleRemoteStreamAdded;
     rtcState.peerConn.onremovestream = handleRemoteStreamRemoved;
     rtcState.peerConn.oniceconnectionstatechange = () => handleIceConnStateChange(event, rtcState);
   } catch (err) {
@@ -48,7 +47,7 @@ function otherDataChannel(event, state, func1, func2) {
     state.dataChannel = event.channel;
     func1(state.dataChannel);
     func2();
-  }
+  };
 }
 
 //misc webRTC helper functions
@@ -58,7 +57,7 @@ function sendMessage(data, who, state, socket) {
     roomID: state.roomID,
     who: who,
     data: data
-  }
+  };
   console.log('Client Sending Message: ', message);
   socket.emit('message', message);
 }
@@ -73,7 +72,7 @@ function handleIceCandidate(event, roomState, socket) {
       candidate: event.candidate.candidate
     }, 'other', roomState, socket);
   } else {
-    console.log('End of candidates.');
+    console.log('Finished adding candidates');
   }
 }
 
@@ -98,7 +97,7 @@ function handleRemoteStreamRemoved(event) {
 function doCall(rtcState, roomState, socket) {
   console.log('sending offer to peer', 'state in doCall: ' + rtcState.peerConn);
   rtcState.peerConn.createOffer().then( (result) => {
-    setLocalAndSendMessage(result, rtcState, roomState, socket)
+    setLocalAndSendMessage(result, rtcState, roomState, socket);
   }).catch(err => {
     console.log('create offer error: ' + err);
   });
@@ -107,7 +106,7 @@ function doCall(rtcState, roomState, socket) {
 function doAnswer(rtcState, roomState, socket) {
   console.log('Sending answer to peer.');
   rtcState.peerConn.createAnswer().then((result) => {
-    setLocalAndSendMessage(result, rtcState, roomState, socket)
+    setLocalAndSendMessage(result, rtcState, roomState, socket);
   }).catch(err => {
     console.log('create offer error: ' + err);
   });
