@@ -9,7 +9,11 @@ npm-debug.log
 *.iml
 /.idea
 
+<<<<<<< HEAD
+/public/index.html
+=======
 /public
+>>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 
 .babelrc
 .eslintrc.js

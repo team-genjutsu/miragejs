@@ -2,7 +2,6 @@ let mirageChunk = `<div id='MRGfixed' class='MRGfixPos'>
     <div id='MRGmaterialBtn' draggable='true'></div>
     <!-- Video demo area -->
     <section id='MRGdemo' class='MRGhidden'>
-
       <div id='MRGroomApp' class='MRGroom'>
         <div id='MRGroom-selection'>
           <h1>Choose a room!</h1>
@@ -23,7 +22,6 @@ let mirageChunk = `<div id='MRGfixed' class='MRGfixPos'>
         </div>
       </div>
       <!-- End room container-->
-
       <div id='MRGboothApp' class='MRGhidden'>
         <div id='MRGbooth'>
           <div id='MRGvidContainer'>
@@ -32,27 +30,23 @@ let mirageChunk = `<div id='MRGfixed' class='MRGfixPos'>
           </div>
         </div>
         <!-- end booth -->
-
         <div id='MRGoptionBtns'>
-
           <div id='MRGconnectivityBtns'></div>
-
           <div id='MRGfilterBtns'>
             <button id='MRGfilter' class='MRGbtn'>filter: <span id='MRGfilterDisp'></span></button>
             <button id='MRGmyFilter' class='MRGbtn'>filter me!</button>
-            <button id='MRGpeerFilter' class='MRGbtn'>filter them!</button><br/>
-            <button id='MRGvideoToggle' class='MRGbtn'>Toggle video!</button><br/>
+            <button id='MRGpeerFilter' class='MRGbtn'>filter them!</button>
+            <button id='MRGmyTracking' class="MRGbtn">track me!</button>
+            <button id='MRGpeerTracking' class="MRGbtn">track them!</button>
+            <button id='MRGvideoToggle' class='MRGbtn'>Toggle video!</button>
           </div>
-
           <div id='MRGanimeBtn'>
             <button id='MRGclear' class='MRGbtn'>clear</button>
             <button id='MRGanimation' class='MRGbtn'>animation: <span id='MRGanimateDisp'>paste</span></button>
           </div>
         </div>
         <div id='MRGemojiButtons'></div>
-
       </div>
-
     </section>
     <!--close section demo-->
  </div>`;

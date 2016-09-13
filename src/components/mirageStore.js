@@ -75,7 +75,7 @@ function animeStore(animeBtnId, animeDispId, emojiClass, functionArray) {
      'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f389.png',
      'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f60d.png',
      'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f4b8.png',
-     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f951.png' 
+     'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/assets/png/1f951.png'
      ];
   this.emojiSpillOver = [];
   this.addEmoji = (emojiArr) => {
@@ -127,4 +127,5 @@ export {
   mediaStore,
   animeStore,
   rtcStore
+
 };

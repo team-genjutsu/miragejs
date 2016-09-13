@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 
+
 describe('functions should exist', () => {
   it('paste should exist', () => {
     expect(typeof funcStore.paste).to.equal('function');
@@ -29,6 +30,7 @@ describe('functions should exist', () => {
   it('angularVelocity should exist', () => {
     expect(typeof funcStore.angularVelocity).to.equal('function');
   });
+
   it('appendConnectButtons should exist', () => {
     expect(typeof funcStore.appendConnectButtons).to.equal('function');
   });
@@ -68,11 +70,13 @@ describe('paste functionality', () => {
     let pasteSpy = sandbox.spy(funcStore, 'paste');
     funcStore.paste(canvas, context, event, position, emoImg);
     expect(pasteSpy.called).to.be.true;
+
   });
   it('should not throw an error', () => {
     let pasteSpy = sandbox.spy(funcStore, 'paste');
     funcStore.paste(canvas, context, event, position, emoImg);
     expect(pasteSpy.threw()).to.be.false;
+
   });
 });
 
