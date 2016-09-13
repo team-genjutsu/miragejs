@@ -65,9 +65,50 @@ export function createMirage() {
 
   const mirageComponent = {};
 
-  // mirageComponent.store = (obj) => {
+  mirageComponent.localStreamEventObj = {};
+  mirageComponent.onOpenDataEventObj = {};
+  mirageComponent.onMessageDataEventObj = {};
+  mirageComponent.remoteStreamEventObj = {};
 
-  // };
+  mirageComponent.localStreamStore = (array) => {
+    // let args = [...arguments]; 
+    array.forEach((ele, idx) => {
+      for (let k in ele) {
+        //needs check to validate functions
+        mirageComponent.localStreamEventObj[k] = ele[k];
+      }
+    });
+  };
+
+  mirageComponent.onOpenDataStore = (array) => {
+    // let args = [...arguments]; 
+    array.forEach((ele, idx) => {
+      for (let k in ele) {
+        //needs check to validate functions
+        mirageComponent.onOpenDataEventObj[k] = ele[k];
+      }
+    });
+  };
+
+  mirageComponent.onMessageDataStore = (array) => {
+    // let args = [...arguments]; 
+    array.forEach((ele, idx) => {
+      for (let k in ele) {
+        //needs check to validate functions
+        mirageComponent.onMessageDataEventObj[k] = ele[k];
+      }
+    });
+  };
+
+  mirageComponent.remoteStreamStore = (array) => {
+    // let args = [...arguments]; 
+    array.forEach((ele, idx) => {
+      for (let k in ele) {
+        //needs check to validate functions
+        mirageComponent.remoteStreamEventObj[k] = ele[k];
+      }
+    });
+  };
 
   mirageComponent.insertCss = () => {
     document.head.insertAdjacentHTML('beforeend', cssChunk);
@@ -110,11 +151,43 @@ export function createMirage() {
       toggleZindex();
     });
 
-    // vendor media objects//
-    navigator.getMedia = navigator.mediaDevices.getUserMedia ||
-      navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia; //end vendor media objects//
+    let promisifiedOldGUM = function(constraints) {
 
+      // First get ahold of getUserMedia, if present
+      let getUserMedia = (navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia);
+
+      // Some browsers just don't implement it - return a rejected promise with an error
+      // to keep a consistent interface
+      if (!getUserMedia) {
+        return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+      }
+
+      // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+      return new Promise(function(resolve, reject) {
+        getUserMedia.call(navigator, constraints, resolve, reject);
+      });
+
+    };
+
+    // Older browsers might not implement mediaDevices at all, so we set an empty object first
+    if (navigator.mediaDevices === undefined) {
+      navigator.mediaDevices = {};
+    }
+
+    // Some browsers partially implement mediaDevices. We can't just assign an object
+    // with getUserMedia as it would overwrite existing properties.
+    // Here, we will just add the getUserMedia property if it's missing.
+    if (navigator.mediaDevices.getUserMedia === undefined) {
+      navigator.mediaDevices.getUserMedia = promisifiedOldGUM;
+    }
+
+    // Prefer camera resolution nearest to 1280x720.
+    var constraints = {
+      audio: false,
+      video: true
+    };
 
     joinButton.addEventListener('click', () => {
 
@@ -153,11 +226,9 @@ export function createMirage() {
         } else {
           hiddenToggle('MRGroomApp', 'MRGboothApp');
           //begin streaming!//
-          navigator.getMedia({
-            video: true,
-            audio: false
-          }).then(stream => {
-
+          navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+          
               //make initiate event happen automatically when streaming begins
             socket.emit('initiate', JSON.stringify({
               streamId: stream.id,
@@ -215,12 +286,12 @@ export function createMirage() {
                 }
               });
 
+              userEventFuncs(mirageComponent.localStreamEventObj, mediaState);
+
             }); //end of socket.on('initiated')
 
-
-              //data channel stuff
             function onDataChannelCreated(channel) {
-
+                //data channel stuff
               channel.onopen = () => {
 
                 console.log('data channel onopen method triggered');
@@ -234,12 +305,9 @@ export function createMirage() {
 
                 clearListener(channel, clearFunc, clearButton, animeState, mediaState);
 
-                  //this would work, or store these dom elements as variables or don't use anon functions to remove listeners on end
-
                 document.getElementById('MRGvideoToggle').addEventListener('click', () => {
                   toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
                 });
-
 
                   // changing this because the multi event listener is retogglei
                 disableToggle('MRGconnect', 'MRGdisconnect');
@@ -269,6 +337,7 @@ export function createMirage() {
                   }, false);
                 });
 
+                userEventFuncs(mirageComponent.onOpenDataEventObj, mediaState);
               }; //end onopen method
 
                 // for messaging if we want to integrate later
@@ -290,6 +359,7 @@ export function createMirage() {
                 //on data event
               channel.onmessage = event => {
 
+                userEventFuncs(mirageComponent.onMessageDataEventObj, mediaState);
                 let data = event.data;
 
                   //conditionally apply or remove filter
@@ -348,6 +418,7 @@ export function createMirage() {
               toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
               hiddenToggle('MRGconnect', 'MRGdisconnect');
 
+              userEventFuncs(mirageComponent.remoteStreamEventObj, mediaState);
             } ///end on stream added event///
 
             function activateAnime() {
@@ -411,4 +482,13 @@ export function createMirage() {
 
   };
   return mirageComponent;
+}
+
+function userEventFuncs(eventObj, state) {
+  let userFuncs = eventObj;
+  console.log('userFuncs', userFuncs);
+  for (let k in userFuncs) {
+    console.log(userFuncs[k]);
+    userFuncs[k](state);
+  }
 }
