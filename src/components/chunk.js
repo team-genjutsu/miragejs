@@ -40,8 +40,10 @@ let mirageChunk = `<div id='MRGfixed' class='MRGfixPos'>
           <div id='MRGfilterBtns'>
             <button id='MRGfilter' class='MRGbtn'>filter: <span id='MRGfilterDisp'></span></button>
             <button id='MRGmyFilter' class='MRGbtn'>filter me!</button>
-            <button id='MRGpeerFilter' class='MRGbtn'>filter them!</button><br/>
-            <button id='MRGvideoToggle' class='MRGbtn'>Toggle video!</button><br/>
+            <button id='MRGpeerFilter' class='MRGbtn'>filter them!</button>
+            <button id='MRGmyTracking' class='MRGbtn'>track me!</button>
+            <button id='MRGpeerTracking' class='MRGbtn'>track them!</button>
+            <button id='MRGvideoToggle' class='MRGbtn'>Toggle video!</button>
           </div>
 
           <div id='MRGanimeBtn'>
