@@ -193,31 +193,24 @@ function resizeMedia(win, state, container, func1, func2, func3) {
 function toggleVidSize(win, state, func1, func2, func3) {
   let arr,
     styleWidth1 = func1(state.myVideo, win).vidWidth,
-    styleWidth2 = func1(state.peerVideo, win).vidWidth;
+    styleWidth2 = func1(state.peerVideo, win).vidWidth,
+    booths = ['MRGmyCanvas', 'MRGpeerCanvas'];
 
   if (styleWidth1 >= styleWidth2) {
     let dims = func2(state.myVideo, win);
     setSizes(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, dims);
     arr = [state.myVideo, state.myCanvas, state.peerVideo, state.peerCanvas];
-    // func3(state.myBooth, 'MRGpointerToggle');
-    // state.myCanvasListeners.forEach( (ele) => {
-      // state.myCanvas.removeEventListener(ele);
-    // });
-    // state.peerCanvasListeners.forEach( (ele) => {
-      // state.peerCanvas.addEventListener(ele);
-    // });
+    booths.forEach( (ele, idx) => {
+      func3(ele, 'MRGpointerToggle');
+    });
 
   } else {
     let dims = func2(state.peerVideo, win);
     setSizes(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, dims);
     arr = [state.peerVideo, state.peerCanvas, state.myVideo, state.myCanvas];
-    // state.peerCanvasListeners.forEach( (ele) => {
-      // state.peerCanvas.removeEventListener(ele);
-    // });
-    // state.myCanvasListeners.forEach( (ele) => {
-      // state.myCanvas.addEventListener(ele);
-    // });
-    // func3(state.peerBooth, 'MRGpointerToggle');
+    booths.forEach( (ele, idx) => {
+      func3(ele, 'MRGpointerToggle');
+    });
   }
 
   arr.forEach((ele, idx) => {
@@ -304,6 +297,7 @@ function classToggle(btnEleId, classType) {
   } else {
     document.getElementById(btnEleId).classList.add(classType);
   }
+  // console.log(document.getElementById(btnEleId).style.zIndex);
 }
 
 function appendConnectButtons() {
@@ -338,7 +332,6 @@ function clearFunc(animeSt, mediaSt) {
   for (let rafID in animeSt.rafObj) {
     cancelAnimationFrame(animeSt.rafObj[rafID]);
   }
-
   mediaSt.myContext.clearRect(0, 0, 10000, 10000);
   mediaSt.peerContext.clearRect(0, 0, 10000, 10000);
 }
