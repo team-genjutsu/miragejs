@@ -24,7 +24,11 @@
   background: #F44336;
   border: none;
   outline: none;
+<<<<<<< HEAD
   color: #;
+=======
+  color: #FFF;
+>>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   font-size: 36px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   /* transition: .3s; */

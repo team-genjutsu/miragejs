@@ -1,10 +1,18 @@
+<<<<<<< HEAD
 import * as funcStore from '../../components/funcStore';
+=======
+import * as funcStore from '../../src/components/funcStore';
+>>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 import { expect } from 'chai';
 // import fs from 'fs';
 import sinon from 'sinon';
 
 
+<<<<<<< HEAD
 describe("functions should exist", () => {
+=======
+describe('functions should exist', () => {
+>>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   it('paste should exist', () => {
     expect(typeof funcStore.paste).to.equal('function');
   });
@@ -29,6 +37,21 @@ describe("functions should exist", () => {
   it('angularVelocity should exist', () => {
     expect(typeof funcStore.angularVelocity).to.equal('function');
   });
+<<<<<<< HEAD
+=======
+  it('appendConnectButtons should exist', () => {
+    expect(typeof funcStore.appendConnectButtons).to.equal('function');
+  });
+  it('removeChildren should exist', () => {
+    expect(typeof funcStore.removeChildren).to.equal('function');
+  });
+  it('clearFunc should exist', () => {
+    expect(typeof funcStore.clearFunc).to.equal('function');
+  });
+  it('toggleZindex should exist', () => {
+    expect(typeof funcStore.toggleZindex).to.equal('function');
+  });
+>>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
 });
 
 describe('paste functionality', () => {
@@ -46,6 +69,7 @@ describe('paste functionality', () => {
 
     //new sandbox
     sandbox = sinon.sandbox.create();
+<<<<<<< HEAD
 
 
     afterEach(function () {
@@ -53,16 +77,156 @@ describe('paste functionality', () => {
         sandbox.restore();
     });
   });
+=======
+    afterEach(function () {
+    //clear spies
+      sandbox.restore();
+    });
+  });
+
+>>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   it('should be callable', () => {
     let pasteSpy = sandbox.spy(funcStore, 'paste');
     funcStore.paste(canvas, context, event, position, emoImg);
     expect(pasteSpy.called).to.be.true;
+<<<<<<< HEAD
   })
 
+=======
+  });
+>>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
   it('should not throw an error', () => {
     let pasteSpy = sandbox.spy(funcStore, 'paste');
     funcStore.paste(canvas, context, event, position, emoImg);
     expect(pasteSpy.threw()).to.be.false;
+<<<<<<< HEAD
   })
 
 })
+=======
+  });
+});
+
+describe('appendConnectButtons functionality', () => {
+  let MRGconnectivityBtns, sandbox, conButton, disconButton;
+  beforeEach(() => {
+    MRGconnectivityBtns = document.createElement('div');
+    MRGconnectivityBtns.setAttribute('id', 'MRGconnectivityBtns');
+    document.body.appendChild(MRGconnectivityBtns);
+
+    //new sandbox
+    sandbox = sinon.sandbox.create();
+  });
+  afterEach(function () {
+    document.body.removeChild(MRGconnectivityBtns);
+  //clear spies
+    sandbox.restore();
+  });
+
+  it('should add elements to the dom', () => {
+    //there should be none of these buttons on dom before appendConnectButtons is called
+    expect(document.getElementById('MRGconnect')).to.equal(null);
+    expect(document.getElementById('MRGdisconnect')).to.equal(null);
+    funcStore.appendConnectButtons();
+    expect(document.getElementById('MRGconnect')).to.not.equal(null);
+    expect(document.getElementById('MRGdisconnect')).to.not.equal(null);
+  });
+  it('should create elements with button type', () => {
+    funcStore.appendConnectButtons();
+    expect(document.getElementById('MRGconnect').nodeName).to.equal('BUTTON');
+    expect(document.getElementById('MRGdisconnect').nodeName).to.equal('BUTTON');
+  });
+  it('should set the buttons initially as disabled', () => {
+    funcStore.appendConnectButtons();
+    expect(document.getElementById('MRGconnect').disabled).to.be.true;
+    expect(document.getElementById('MRGdisconnect').disabled).to.be.true;
+  });
+});
+
+describe('removeChildren functionality', () => {
+  let MRGconnectivityBtns, sandbox, conButton, disconButton;
+  beforeEach(() => {
+    MRGconnectivityBtns = document.createElement('div');
+    MRGconnectivityBtns.setAttribute('id', 'MRGconnectivityBtns');
+    conButton = document.createElement('button');
+    conButton.setAttribute('id', 'conButton');
+    disconButton = document.createElement('button');
+    disconButton.setAttribute('id', 'disconButton');
+    MRGconnectivityBtns.appendChild(conButton);
+    MRGconnectivityBtns.appendChild(disconButton);
+    document.body.appendChild(MRGconnectivityBtns);
+  });
+  afterEach(() => {
+    document.body.removeChild(MRGconnectivityBtns);
+  });
+
+  it('should remove one child if it exists', () => {
+    expect(document.getElementById('conButton')).to.not.equal(null);
+    funcStore.removeChildren('MRGconnectivityBtns');
+    expect(document.getElementById('conButton')).to.equal(null);
+  });
+  it('should remove two child if it exists', () => {
+    expect(document.getElementById('conButton')).to.not.equal(null);
+    expect(document.getElementById('disconButton')).to.not.equal(null);
+    funcStore.removeChildren('MRGconnectivityBtns');
+    expect(document.getElementById('conButton')).to.equal(null);
+    expect(document.getElementById('disconButton')).to.equal(null);
+  });
+  it('should work if the children does not exist', () => {
+    //first to remove existing children
+    funcStore.removeChildren('MRGconnectivityBtns');
+    funcStore.removeChildren('MRGconnectivityBtns');
+    expect(true).to.be.true;
+  });
+});
+
+describe('clearFunc functionality', () => {
+  it ('should stop all raf', () => {
+    //generic code to generate a raf id to clear.
+    let requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                            window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+    let cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
+    let start = window.mozAnimationStartTime;  // Only supported in FF. Other browsers can use something like Date.now().
+    let animeSt = {};
+    let mediaSt = {};
+
+    mediaSt.myContext = document.createElement('canvas').getContext('2d');
+    mediaSt.peerContext = document.createElement('canvas').getContext('2d');
+
+    function step(timestamp) {
+      let progress = timestamp - start;
+      if (progress < 2000) {
+        animeSt.myReq = requestAnimationFrame(step);
+      }
+    }
+    animeSt.myReq = requestAnimationFrame(step);
+    funcStore.clearFunc(animeSt, mediaSt);
+  });
+});
+
+describe('toggleZindex functionality', () => {
+  beforeEach(() => {
+    let mirageEl = document.createElement('div');
+    mirageEl.setAttribute('id', 'MRG-hello');
+    let nonMirageEl = document.createElement('div');
+    nonMirageEl.setAttribute('id', 'hello');
+    document.body.appendChild(mirageEl);
+    document.body.appendChild(nonMirageEl);
+  });
+  afterEach(() => {
+    document.body.removeChild(document.getElementById('MRG-hello'));
+    document.body.removeChild(document.getElementById('hello'));
+  });
+
+  it('should add the notMirage class if class does not contain MRG', () => {
+    expect(document.getElementById('hello').classList.contains('notMirage')).to.be.false;
+    funcStore.toggleZindex();
+    expect(document.getElementById('hello').classList.contains('notMirage')).to.be.true;
+  });
+  it('should not add the notMirage class if class does not contain MRG', () => {
+    expect(document.getElementById('MRG-hello').classList.contains('notMirage')).to.be.false;
+    funcStore.toggleZindex();
+    expect(document.getElementById('MRG-hello').classList.contains('notMirage')).to.be.false;
+  });
+});
+>>>>>>> 81730e407dd4956e4f4a55fd3982a0c99db59e51
