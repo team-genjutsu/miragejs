@@ -12,21 +12,21 @@ function filterListener(vid, whoisFilter, currFilter, whoisBool, channel, func) 
   }, false);
 }
 
-function peerTrackingListener(vid, cv, ctx, img, channel, faceTrack, trackingObj, videoStream) {
+function peerTrackingListener(vid, cv, ctx, img, channel, trackFace, trackingObj, videoStream) {
   document.getElementById('MRGpeerTracking').addEventListener('click', () => {
     let emoji = img;
     //console.log(trackingObj);
-    faceTrack(vid, cv, ctx, trackingObj, videoStream, emoji, channel);
+    trackFace(vid, cv, ctx, trackingObj, videoStream, emoji, channel);
   }, false);
 }
 
 
-function myTrackingListener(vid, cv, ctx, img, channel, trackingObj) {
+function myTrackingListener(vid, cv, ctx, img, trackingObj) {
   document.getElementById('MRGmyTracking').addEventListener('click', () => {
     let trackingDataObj;
+    console.log(channel.readyState);
     trackingDataObj = JSON.stringify({
-      myTrack: vid,
-      channel: channel,
+      myTrack: vid.id,
       image: img,
       tracking: trackingObj
     });

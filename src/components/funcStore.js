@@ -450,5 +450,7 @@ export {
   clearFunc,
   toggleZindex,
   resizeMedia,
-  setSizes
+  setSizes,
+  trackFace,
+  hat
 };

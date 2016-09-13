@@ -3,7 +3,9 @@ import io from 'socket.io-client';
 import {
   filterListener,
   animationListener,
-  clearListener
+  clearListener,
+  myTrackingListener,
+  peerTrackingListener
 } from './components/listenerFuncs';
 import {
   toggleVidSize,
@@ -285,7 +287,7 @@ export function createMirage() {
 
                 clearListener(channel, clearFunc, clearButton, animeState, mediaState);
 
-                myTrackingListener(mediaState.myVideo, mediaState.myCanvas, mediaState.myContext, animeState.emoImg, channel, tracking);
+                myTrackingListener(mediaState.myVideo, mediaState.myCanvas, mediaState.myContext, animeState.emoImg, tracking);
 
                 peerTrackingListener(mediaState.peerVideo, mediaState.peerCanvas, mediaState.peerContext, animeState.emoImg, channel, trackFace, tracking, rtcState.remoteStream);
 
@@ -388,9 +390,43 @@ export function createMirage() {
 
                   }
                 }
-                if (dataObj.type === 'clear') {
-                  clearFunc(animeState, mediaState);
-                }
+                if (dataObj.hasOwnProperty('tracking')) {
+                    mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
+
+
+                  if(dataObj.tracking === 'yes') {
+                    mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
+                    var emoji = new Image();
+                    emoji.src = dataObj.image;
+                    console.log(emoji);
+                      //console.log(dataObj.faceRect);
+                    var adjustedRect = {
+                      x: dataObj.faceRect.x,
+                      y: dataObj.faceRect.y,
+                      width: dataObj.faceRect.width/2,
+                      height: dataObj.faceRect.height/2
+                    };
+                      hat(mediaState.myCanvas, mediaState.myContext, adjustedRect, emoji);
+                    }
+
+                  }
+
+                  if (dataObj.hasOwnProperty('myTrack')) {
+                    if(dataObj.myTrack === mediaState.myVideo) {
+                      //console.log("track me fired off");
+                      var myEmoji = new Image();
+                      myEmoji.src = dataObj.image;
+                      var tracking = dataObj.tracking;
+                      var channel = dataObj.channel;
+                      //console.log(tracking, channel);
+                      //mediaState.peerContext
+                      trackFace(mediaState.peerCanvas, mediaState.peerContext, tracking, rtcState.remoteStream, myEmoji, channel);
+                    }
+                  }
+
+                  if (dataObj.type === 'clear') {
+                    clearFunc(animeState, mediaState);
+                  }
 
                 mirageComponent.events.onMessage({
                   dataMsg: dataObj,
