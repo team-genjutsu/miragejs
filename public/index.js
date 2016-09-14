@@ -19,13 +19,13 @@ domReady(() => {
 
   mirage.on('onData', (state) => {
     // console.log(state);
-    state.rtcState.dataChannel.send(JSON.stringify({onData: "yo you're up in the data channels"}));
+    // state.rtcState.dataChannel.send(JSON.stringify({onData: "yo you're up in the data channels"}));
   });
 
   mirage.on('onMessage', (state) => {
     // console.log(state);
     if(state.hasOwnProperty('dataMsg')){
-      console.log(state.dataMsg);
+      // console.log(state.dataMsg);
     } 
   });
 

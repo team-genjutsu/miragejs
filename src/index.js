@@ -135,14 +135,7 @@ export function createMirage() {
       materialBtn.style.top = (event.clientY - 60) + 'px';
     });
     
-    boothComponent.addEventListener('drag', (event) => {
-      
-    });
-
-    boothComponent.addEventListener('dragend', (event) => {
-      fixedComponent.style.left = event.clientX + 'px';
-      fixedComponent.style.top = event.clientY + 'px';
-    });
+    
 
 
     let promisifiedOldGUM = function(constraints) {
@@ -222,6 +215,15 @@ export function createMirage() {
           navigator.mediaDevices.getUserMedia(constraints)
             .then(stream => {
 
+            boothComponent.addEventListener('drag', (event) => {
+      
+            });
+
+            boothComponent.addEventListener('dragend', (event) => {
+              fixedComponent.style.left = event.clientX + 'px';
+              fixedComponent.style.top = event.clientY + 'px';
+            });
+
               //make initiate event happen automatically when streaming begins
             socket.emit('initiate', JSON.stringify({
               streamId: stream.id,
@@ -252,7 +254,9 @@ export function createMirage() {
                 roomState.chatterThisClient = member.id;
               }
 
-              //instantiate peer objects and finish signaling for webRTC data and video channels
+              //NB: animation and filter listeners needed in this particular context
+              //in order for animation and filters to be option for a user before
+              //connecting to a peer
 
               document.getElementById('MRGconnect').addEventListener('click', () => {
                 connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket);
@@ -286,9 +290,10 @@ export function createMirage() {
               channel.onopen = () => {
 
                 // console.log('data channel onopen method triggered');
-                mediaState.peerCanvasListeners.push(animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], channel, false, getCursorPosition, animeState.rafObj)); //remote
+                
+                animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], channel, false, getCursorPosition, animeState.rafObj); //remote
 
-                mediaState.myCanvasListeners.push(animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafObj)); //local
+                animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafObj); //local
 
                 filterListener(mediaState.myVideo, 'MRGmyFilter', filterState.currFilter, true, channel, setVendorCss);
 
@@ -296,7 +301,7 @@ export function createMirage() {
 
                 clearListener(channel, clearFunc, clearButton, animeState, mediaState);
 
-                myTrackingListener(mediaState.myVideo, mediaState.myCanvas, mediaState.myContext, animeState.emoImg, tracking);
+                myTrackingListener(mediaState.myVideo, mediaState.myCanvas, mediaState.myContext, animeState.emoImg, tracking, channel);
 
                 peerTrackingListener(mediaState.peerVideo, mediaState.peerCanvas, mediaState.peerContext, animeState.emoImg, channel, trackFace, tracking, rtcState.remoteStream);
 
@@ -407,7 +412,7 @@ export function createMirage() {
                     mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
                     var emoji = new Image();
                     emoji.src = dataObj.image;
-                    console.log(emoji);
+                    // console.log(emoji);
                       //console.log(dataObj.faceRect);
                     var adjustedRect = {
                       x: dataObj.faceRect.x,

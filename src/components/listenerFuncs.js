@@ -21,12 +21,12 @@ function peerTrackingListener(vid, cv, ctx, img, channel, trackFace, trackingObj
 }
 
 
-function myTrackingListener(vid, cv, ctx, img, trackingObj) {
+function myTrackingListener(vid, cv, ctx, img, trackingObj, channel) {
   document.getElementById('MRGmyTracking').addEventListener('click', () => {
     let trackingDataObj;
-    console.log(channel.readyState);
+    // console.log(channel.readyState);
     trackingDataObj = JSON.stringify({
-      myTrack: vid.id,
+      myTrack: vid,
       image: img,
       tracking: trackingObj
     });

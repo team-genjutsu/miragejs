@@ -86,7 +86,7 @@ function trackFace(video, canvas, context, trackingObj, videoStream, img, channe
   } else {
     emoji.src = img.src;
   }
-  console.log(emoji);
+  // console.log(emoji);
   var tracker = new trackingObj.ObjectTracker('face');
   tracker.canvasOverlay = canvas;
   var faceRect = {x: 100, y: 100, width: emoji.width * 3, height: emoji.height * 3};

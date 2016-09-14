@@ -6,7 +6,7 @@ let cssChunk = `<style>
 #MRGfixed {
   position: fixed;
   width: 50%;
-  height: 70%;
+  height: 75%;
   top: 23%;
   left: 45%;
 }
