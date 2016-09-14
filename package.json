@@ -1,7 +1,7 @@
 {
   "name": "mirage-js",
 
-  "version": "1.0.10",
+  "version": "1.0.12",
   "description": "Allows developers access to a customizable video chat component",
   "main": "./lib/index.js",
   "scripts": {
