@@ -3,7 +3,9 @@ import io from 'socket.io-client';
 import {
   filterListener,
   animationListener,
-  clearListener
+  clearListener,
+  myTrackingListener,
+  peerTrackingListener
 } from './components/listenerFuncs';
 import {
   toggleVidSize,
@@ -28,7 +30,9 @@ import {
   clearFunc,
   toggleZindex,
   resizeMedia,
-  setSizes
+  setSizes,
+  trackFace,
+  hat
 } from './components/funcStore';
 import {
   mediaGenerator
@@ -58,6 +62,7 @@ import {
 import {
   cssChunk
 } from './components/cssChunk';
+require('public/tracking');
 
 
 
@@ -122,7 +127,7 @@ export function createMirage() {
     });
 
     materialBtn.addEventListener('drag', (event) => {
-      // console.log(event); 
+      // console.log(event);
     });
 
     materialBtn.addEventListener('dragend', (event) => {
@@ -207,7 +212,7 @@ export function createMirage() {
           //begin streaming!//
           navigator.mediaDevices.getUserMedia(constraints)
             .then(stream => {
-          
+
               //make initiate event happen automatically when streaming begins
             socket.emit('initiate', JSON.stringify({
               streamId: stream.id,
@@ -282,6 +287,10 @@ export function createMirage() {
 
                 clearListener(channel, clearFunc, clearButton, animeState, mediaState);
 
+                myTrackingListener(mediaState.myVideo, mediaState.myCanvas, mediaState.myContext, animeState.emoImg, tracking);
+
+                peerTrackingListener(mediaState.peerVideo, mediaState.peerCanvas, mediaState.peerContext, animeState.emoImg, channel, trackFace, tracking, rtcState.remoteStream);
+
                 document.getElementById('MRGvideoToggle').addEventListener('click', () => {
                   toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
                 });
@@ -315,10 +324,10 @@ export function createMirage() {
                 });
 
                 mirageComponent.events.onData({
-                  mediaState: mediaState, 
-                  filterState: filterState, 
-                  roomState: roomState, 
-                  animeState: animeState, 
+                  mediaState: mediaState,
+                  filterState: filterState,
+                  roomState: roomState,
+                  animeState: animeState,
                   rtcState: rtcState
                 });
               }; //end onopen method
@@ -381,16 +390,50 @@ export function createMirage() {
 
                   }
                 }
-                if (dataObj.type === 'clear') {
-                  clearFunc(animeState, mediaState);
-                }
+                if (dataObj.hasOwnProperty('tracking')) {
+                    mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
+
+
+                  if(dataObj.tracking === 'yes') {
+                    mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
+                    var emoji = new Image();
+                    emoji.src = dataObj.image;
+                    console.log(emoji);
+                      //console.log(dataObj.faceRect);
+                    var adjustedRect = {
+                      x: dataObj.faceRect.x,
+                      y: dataObj.faceRect.y,
+                      width: dataObj.faceRect.width/2,
+                      height: dataObj.faceRect.height/2
+                    };
+                      hat(mediaState.myCanvas, mediaState.myContext, adjustedRect, emoji);
+                    }
+
+                  }
+
+                  if (dataObj.hasOwnProperty('myTrack')) {
+                    if(dataObj.myTrack === mediaState.myVideo) {
+                      //console.log("track me fired off");
+                      var myEmoji = new Image();
+                      myEmoji.src = dataObj.image;
+                      var tracking = dataObj.tracking;
+                      var channel = dataObj.channel;
+                      //console.log(tracking, channel);
+                      //mediaState.peerContext
+                      trackFace(mediaState.peerCanvas, mediaState.peerContext, tracking, rtcState.remoteStream, myEmoji, channel);
+                    }
+                  }
+
+                  if (dataObj.type === 'clear') {
+                    clearFunc(animeState, mediaState);
+                  }
 
                 mirageComponent.events.onMessage({
-                  dataMsg: dataObj,    
-                  mediaState: mediaState, 
-                  filterState: filterState, 
-                  roomState: roomState, 
-                  animeState: animeState, 
+                  dataMsg: dataObj,
+                  mediaState: mediaState,
+                  filterState: filterState,
+                  roomState: roomState,
+                  animeState: animeState,
                   rtcState: rtcState
                 });
               };
@@ -410,10 +453,10 @@ export function createMirage() {
               hiddenToggle('MRGconnect', 'MRGdisconnect');
 
               mirageComponent.events.stream({
-                  mediaState: mediaState, 
-                  filterState: filterState, 
-                  roomState: roomState, 
-                  animeState: animeState, 
+                  mediaState: mediaState,
+                  filterState: filterState,
+                  roomState: roomState,
+                  animeState: animeState,
                   rtcState: rtcState
                 });
             } ///end on stream added event///
@@ -480,4 +523,3 @@ export function createMirage() {
   };
   return mirageComponent;
 }
-

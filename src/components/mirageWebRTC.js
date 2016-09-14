@@ -43,6 +43,7 @@ function createPeerConnection(rtcState, roomState, func, socket) {
 
 function otherDataChannel(event, state, func1, func2) {
   state.peerConn.ondatachannel = (event) => {
+
     console.log('not initiator data channel start', event.channel);
     state.dataChannel = event.channel;
     func1(state.dataChannel);
@@ -72,6 +73,7 @@ function handleIceCandidate(event, roomState, socket) {
       candidate: event.candidate.candidate
     }, 'other', roomState, socket);
   } else {
+
     console.log('Finished adding candidates');
   }
 }
@@ -80,13 +82,12 @@ function handleIceConnStateChange(event, rtcState) {
   if (rtcState.peerConn.iceConnectionState === 'disconnected') {
     console.log('Disconnected');
     rtcState.peerConn.close();
+
     console.log('iceConn state change remove rtc', rtcState.peerConn);
   }
 }
-
 //another gap, handleRemoteStreamAdded function usually lives here,
 //it has a lot of depended functions in it right now
-
 
 function handleRemoteStreamRemoved(event) {
   console.log('Remote Stream removed, event: ', event);

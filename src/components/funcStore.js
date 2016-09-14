@@ -73,6 +73,80 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
 
 } //end velocity//
 
+function trackFace(video, canvas, context, trackingObj, videoStream, img, channel) {
+  //console.log("data channel", channel);
+
+  var video = video;
+  var canvas = canvas;
+  var context = context;
+  //console.log("tracking object", trackingObj);
+  var emoji = new Image();
+  if (img.src === undefined) {
+    emoji.src = img;
+  } else {
+    emoji.src = img.src;
+  }
+  console.log(emoji);
+  var tracker = new trackingObj.ObjectTracker('face');
+  tracker.canvasOverlay = canvas;
+  var faceRect = {x: 100, y: 100, width: emoji.width * 3, height: emoji.height * 3};
+
+  //console.log('face track has been called');
+  tracker.setInitialScale(4);
+  tracker.setStepSize(2);
+  tracker.setEdgesDensity(0.1);
+  tracker.canvasOverlay = canvas;
+  tracker.canvasContext = context;
+
+  // if(isTrackingBool) {
+
+  trackingObj.track(video, tracker, {camera: true});
+  tracker.on('track', function(event) {
+    context.clearRect(faceRect.x - 50, faceRect.y - img.height * 3 - 50, faceRect.width + 50, faceRect.height + img.width * 3 + 50);
+    //mediaState.myContext.clearRect
+    event.data.forEach(function(rect) {
+      //console.log("rect", rect, "emoji", emoji);
+      faceRect.x = rect.x;
+      faceRect.y = rect.y;
+      hat(canvas, context, faceRect, emoji);
+
+      let trackingDataObj = JSON.stringify({
+        tracking: 'yes',
+        image: emoji.src,
+        faceRect: faceRect
+      });
+      channel.send(trackingDataObj);
+    });
+  });
+}
+
+// var pastRect = (function() {
+//   var store = {x:0, y:0, width: 100, height: 100};
+//   function rememberFace(rect) {
+//     store.x = rect.x;
+//     store.y = rect.y;
+//     store.width = rect.width;
+//     store.height = rect.height;
+//   }
+//   return {
+//     previous: function() {
+//       console.log("store inside of previous", store);
+//       return store;
+//     },
+//     updateStore: function(faceRect) {
+//       console.log("store was updated");
+//       rememberFace(faceRect);
+//     }
+//   };
+// })();
+
+function hat(cv, ctx, rect, img) {
+    //console.log("rect in hat", rect, "cv in hat", cv);
+  ctx.clearRect(0, 0, 20000, 20000);
+  ctx.drawImage(img, rect.x, rect.y - 5, rect.height, rect.width);
+
+}
+
 //doesnt work yet, but would provide a way to erase drawn
 //objects in circular fashion rather than rectangular
 function cutCircle(context, x, y, radius) {
@@ -195,7 +269,6 @@ function toggleVidSize(win, state, func1, func2, func3) {
     styleWidth1 = func1(state.myVideo, win).vidWidth,
     styleWidth2 = func1(state.peerVideo, win).vidWidth,
     booths = ['MRGmyCanvas', 'MRGpeerCanvas'];
-
   if (styleWidth1 >= styleWidth2) {
     let dims = func2(state.myVideo, win);
     setSizes(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, dims);
@@ -208,6 +281,7 @@ function toggleVidSize(win, state, func1, func2, func3) {
     let dims = func2(state.peerVideo, win);
     setSizes(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, dims);
     arr = [state.peerVideo, state.peerCanvas, state.myVideo, state.myCanvas];
+
     booths.forEach( (ele, idx) => {
       func3(ele, 'MRGpointerToggle');
     });
@@ -240,7 +314,6 @@ function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, 
   downCanvas.height = dims.smallVidHeight;
   downContext.scale(.25, .25);
   downContext.strokeRect(0, 0, downCanvas.width, downCanvas.height);
-
 }
 
 function generateDims(container, win) {
@@ -298,7 +371,6 @@ function classToggle(btnEleId, classType) {
     document.getElementById(btnEleId).classList.add(classType);
   }
 }
-
 function appendConnectButtons() {
   //creating buttons will replace everytime so eventlistener is good. Will pull out of file
   let connectivityBtns = document.getElementById('MRGconnectivityBtns');
@@ -326,11 +398,14 @@ function removeChildren(el) {
   }
 }
 
+
 //this should stop the request animation frame recursive calls and also clear the canvas
 function clearFunc(animeSt, mediaSt) {
   for (let rafID in animeSt.rafObj) {
     cancelAnimationFrame(animeSt.rafObj[rafID]);
   }
+
+
   mediaSt.myContext.clearRect(0, 0, 10000, 10000);
   mediaSt.peerContext.clearRect(0, 0, 10000, 10000);
 }
@@ -341,6 +416,7 @@ function toggleZindex() {
   if (document.querySelectorAll) {
     let domElements = document.body.getElementsByTagName('*');
     for (let i = 0; i < domElements.length; i++) {
+
       if (domElements[i].id.substring(0, 3) !== 'MRG') {
         //give fixed elements z index of 1 and non fixed elements z index of -1 to keep positionality
         window.getComputedStyle(domElements[i]).getPropertyValue('position') === 'fixed' ? domElements[i].classList.toggle('notMirageFixed') : domElements[i].classList.toggle('notMirage');
@@ -374,5 +450,7 @@ export {
   clearFunc,
   toggleZindex,
   resizeMedia,
-  setSizes
+  setSizes,
+  trackFace,
+  hat
 };
