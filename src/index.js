@@ -101,12 +101,14 @@ export function createMirage() {
     let animeState;
     let rtcState;
 
-    // clear canvas
+    // DOM elements
     let clearButton = document.getElementById('MRGclear');
-    // room buttons
     let joinButton = document.getElementById('MRGjoin-button');
-    // mirage component button
     let materialBtn = document.getElementById('MRGmaterialBtn');
+    let demo = document.getElementById('MRGdemo');
+    let fixedComponent = document.getElementById('MRGfixed');
+    let boothComponent = document.getElementById('MRGbooth');
+
 
     //turn server to use
     //if (location.hostname != 'localhost') {
@@ -117,9 +119,6 @@ export function createMirage() {
 
 
     materialBtn.addEventListener('click', () => {
-      let demo = document.getElementById('MRGdemo');
-      let matBtn = document.getElementById('MRGmaterialBtn');
-
       // need to parse through stylesheets and set z-indexes of elements to -1 with
       // each toggle
       demo.classList.toggle('MRGhidden');
@@ -135,6 +134,16 @@ export function createMirage() {
       materialBtn.style.left = event.clientX + 'px';
       materialBtn.style.top = (event.clientY - 60) + 'px';
     });
+    
+    boothComponent.addEventListener('drag', (event) => {
+      
+    });
+
+    boothComponent.addEventListener('dragend', (event) => {
+      fixedComponent.style.left = event.clientX + 'px';
+      fixedComponent.style.top = event.clientY + 'px';
+    });
+
 
     let promisifiedOldGUM = function(constraints) {
 
