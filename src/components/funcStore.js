@@ -94,7 +94,6 @@ function hiddenToggle(ele1, ele2) {
   });
 }
 
-
 //paste object to canvas
 // function pasteImg(video, context, width, height, x, y, source) {
 // context.drawImage(video, 0, 0, width, height);

@@ -7,7 +7,7 @@ const express = require('express');
 const app = express();
 const favicon = require('serve-favicon');
 const path = require('path');
-const startSockets = require('./sockLogic.js');
+const mirageSockets = require('./mirageSockets.js');
 
 let env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 let httpPort = process.env.PORT || 8000;
@@ -44,4 +44,4 @@ app.use(favicon(path.join(__dirname,'public','favicon.ico')));
   // console.log('Also listening on ' + httpsPort);
 // });
 
-startSockets(server);
+mirageSockets(server);

@@ -41,6 +41,33 @@ describe('functions should exist', () => {
   it('toggleZindex should exist', () => {
     expect(typeof funcStore.toggleZindex).to.equal('function');
   });
+  it('toggleVidSize should exist', () => {
+    expect(typeof funcStore.toggleVidSize).to.equal('function');
+  });
+  it('vidDims should exist', () => {
+    expect(typeof funcStore.vidDims).to.equal('function');
+  });
+  it('generateDims should exist', () => {
+    expect(typeof funcStore.generateDims).to.equal('function');
+  });
+  it('scaleToFill should exist', () => {
+    expect(typeof funcStore.scaleToFill).to.equal('function');
+  });
+  it('scaleElement should exist', () => {
+    expect(typeof funcStore.scaleElement).to.equal('function');
+  });
+  it('classToggle should exist', () => {
+    expect(typeof funcStore.classToggle).to.equal('function');
+  });
+  it('cutCircle should exist', () => {
+    expect(typeof funcStore.cutCircle).to.equal('function');
+  });
+  it('resizeMedia should exist', () => {
+    expect(typeof funcStore.resizeMedia).to.equal('function');
+  });
+  it('setSizes should exist', () => {
+    expect(typeof funcStore.setSizes).to.equal('function');
+  });
 });
 
 describe('paste functionality', () => {
@@ -196,5 +223,71 @@ describe('toggleZindex functionality', () => {
     expect(document.getElementById('MRG-hello').classList.contains('notMirage')).to.be.false;
     funcStore.toggleZindex();
     expect(document.getElementById('MRG-hello').classList.contains('notMirage')).to.be.false;
+  });
+});
+
+describe('classToggle functionality', () => {
+  beforeEach(() => {
+    let mirageEl = document.createElement('div');
+    mirageEl.setAttribute('id', 'MRG-hello');
+    mirageEl.setAttribute('class', 'MRG-hello-class');
+    let nonMirageEl = document.createElement('div');
+    nonMirageEl.setAttribute('id', 'hello');
+    document.body.appendChild(mirageEl);
+    document.body.appendChild(nonMirageEl);
+  });
+  afterEach(() => {
+    document.body.removeChild(document.getElementById('MRG-hello'));
+    document.body.removeChild(document.getElementById('hello'));
+  });
+
+  it('should remove the MRG-hello class if contains it first time', () => {
+    expect(document.getElementById('MRG-hello').classList.contains('MRG-hello-class')).to.be.true;
+    funcStore.classToggle('MRG-hello', 'MRG-hello-class');
+    expect(document.getElementById('MRG-hello').classList.contains('MRG-hello-class')).to.be.false;
+  });
+  it('should re-add the MRG-hello class after 2 calls if contains it first time', () => {
+    expect(document.getElementById('MRG-hello').classList.contains('MRG-hello-class')).to.be.true;
+    funcStore.classToggle('MRG-hello', 'MRG-hello-class');
+    expect(document.getElementById('MRG-hello').classList.contains('MRG-hello-class')).to.be.false;
+    funcStore.classToggle('MRG-hello', 'MRG-hello-class');
+    expect(document.getElementById('MRG-hello').classList.contains('MRG-hello-class')).to.be.true;
+  });
+  it('should remove the MRG-hello class after 3 calls if contains it first time', () => {
+    expect(document.getElementById('MRG-hello').classList.contains('MRG-hello-class')).to.be.true;
+    funcStore.classToggle('MRG-hello', 'MRG-hello-class');
+    expect(document.getElementById('MRG-hello').classList.contains('MRG-hello-class')).to.be.false;
+    funcStore.classToggle('MRG-hello', 'MRG-hello-class');
+    expect(document.getElementById('MRG-hello').classList.contains('MRG-hello-class')).to.be.true;
+    funcStore.classToggle('MRG-hello', 'MRG-hello-class');
+    expect(document.getElementById('MRG-hello').classList.contains('MRG-hello-class')).to.be.false;
+  });
+});
+
+
+describe('setVendorCss functionality', () => {
+  beforeEach(() => {
+    // let mirageEl = document.createElement('div');
+    // mirageEl.setAttribute('id', 'MRG-hello');
+    // document.body.appendChild(mirageEl);
+  });
+  afterEach(() => {
+    // document.body.removeChild(document.getElementById('MRG-hello'));
+  });
+
+  it('should set style.webkitfilter to passed in style', () => {
+    let mirageEl = document.createElement('div')
+    mirageEl.setAttribute('id', 'MRG-hello');
+
+    funcStore.setVendorCss(mirageEl,'contrast(200%)');
+    expect(mirageEl.style.mozFilter).to.equal('contrast(200%)');
+  });
+  it('should set style.webkitFilter and style.mozFilter to passed in style', () => {
+    let mirageEl = document.createElement('div')
+    mirageEl.setAttribute('id', 'MRG-hello');
+
+    funcStore.setVendorCss(mirageEl,'contrast(200%)');
+    expect(mirageEl.style.webkitFilter).to.equal('contrast(200%)');
+    expect(mirageEl.style.mozFilter).to.equal('contrast(200%)');
   });
 });
