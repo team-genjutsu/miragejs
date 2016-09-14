@@ -41,6 +41,7 @@ app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
 
 // let httpsServer = https.createServer(options, app).listen(httpsPort, function(){
+
   // console.log('Also listening on ' + httpsPort);
 // });
 

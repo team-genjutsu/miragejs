@@ -7,13 +7,30 @@ domReady(() => {
   // instantiate mirage object
   const mirage = createMirage();
 
-  // mount styles on DOM for component
-  mirage.insertCss();
+  mirage.insertCss(); //mount styles on DOM for component
 
-  // mount mirage chunk on DOM
-  mirage.insertChunk();
+  mirage.insertChunk(); // mount mirage chunk on DOM
 
-  // start mirage logic
-  mirage.startApp();
+  mirage.on('stream', (state) => {
+    // console.log(state);
+  });
+
+  mirage.on('onData', (state) => {
+    // console.log(state);
+    state.rtcState.dataChannel.send(JSON.stringify({onData: "yo you're up in the data channels"}));
+  });
+
+  mirage.on('onMessage', (state) => {
+    // console.log(state);
+    if(state.hasOwnProperty('dataMsg')){
+      console.log(state.dataMsg);
+    }
+  });
+
+  mirage.putFilters = []; //add filters
+  mirage.putImages = []; //add images
+
+  mirage.startApp(); // start mirage logic
+
 
 });

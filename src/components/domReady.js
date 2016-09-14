@@ -1,4 +1,5 @@
 let domReady = function(callback) {
+
   let ready = false;
 
   let detach = function() {

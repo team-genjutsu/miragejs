@@ -3,7 +3,9 @@ import io from 'socket.io-client';
 import {
   filterListener,
   animationListener,
-  clearListener
+  clearListener,
+  myTrackingListener,
+  peerTrackingListener
 } from './components/listenerFuncs';
 import {
   toggleVidSize,
@@ -28,7 +30,9 @@ import {
   clearFunc,
   toggleZindex,
   resizeMedia,
-  setSizes
+  setSizes,
+  trackFace,
+  hat
 } from './components/funcStore';
 import {
   mediaGenerator
@@ -58,6 +62,7 @@ import {
 import {
   cssChunk
 } from './components/cssChunk';
+require('public/tracking');
 
 
 
@@ -65,9 +70,18 @@ export function createMirage() {
 
   const mirageComponent = {};
 
-  // mirageComponent.store = (obj) => {
+  mirageComponent.putFilters = null;
+  mirageComponent.putImages = null;
 
-  // };
+  mirageComponent.events = {
+    stream: null,
+    onMessage: null,
+    onData: null
+  };
+
+  mirageComponent.on = (event, func) => {
+    mirageComponent.events[event] = func;
+  };
 
   mirageComponent.insertCss = () => {
     document.head.insertAdjacentHTML('beforeend', cssChunk);
@@ -91,6 +105,8 @@ export function createMirage() {
     let clearButton = document.getElementById('MRGclear');
     // room buttons
     let joinButton = document.getElementById('MRGjoin-button');
+    // mirage component button
+    let materialBtn = document.getElementById('MRGmaterialBtn');
 
     //turn server to use
     //if (location.hostname != 'localhost') {
@@ -100,9 +116,9 @@ export function createMirage() {
     //}
 
 
-    document.getElementById('MRGmaterialBtn').addEventListener('click', () => {
-      var demo = document.getElementById('MRGdemo');
-      var matBtn = document.getElementById('MRGmaterialBtn');
+    materialBtn.addEventListener('click', () => {
+      let demo = document.getElementById('MRGdemo');
+      let matBtn = document.getElementById('MRGmaterialBtn');
 
       // need to parse through stylesheets and set z-indexes of elements to -1 with
       // each toggle
@@ -110,25 +126,66 @@ export function createMirage() {
       toggleZindex();
     });
 
-    // vendor media objects//
-    navigator.getMedia = navigator.mediaDevices.getUserMedia ||
-      navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia; //end vendor media objects//
+    materialBtn.addEventListener('drag', (event) => {
+      // console.log(event);
+    });
 
+    materialBtn.addEventListener('dragend', (event) => {
+      // console.log('drag over', event.clientX);
+      materialBtn.style.left = event.clientX + 'px';
+      materialBtn.style.top = (event.clientY - 60) + 'px';
+    });
+
+    let promisifiedOldGUM = function(constraints) {
+
+      // First get ahold of getUserMedia, if present
+      let getUserMedia = (navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia);
+
+      // Some browsers just don't implement it - return a rejected promise with an error
+      // to keep a consistent interface
+      if (!getUserMedia) {
+        return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+      }
+
+      // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+      return new Promise(function(resolve, reject) {
+        getUserMedia.call(navigator, constraints, resolve, reject);
+      });
+
+    };
+
+    // Older browsers might not implement mediaDevices at all, so we set an empty object first
+    if (navigator.mediaDevices === undefined) {
+      navigator.mediaDevices = {};
+    }
+
+    // Some browsers partially implement mediaDevices. We can't just assign an object
+    // with getUserMedia as it would overwrite existing properties.
+    // Here, we will just add the getUserMedia property if it's missing.
+    if (navigator.mediaDevices.getUserMedia === undefined) {
+      navigator.mediaDevices.getUserMedia = promisifiedOldGUM;
+    }
+
+    // Prefer camera resolution nearest to 1280x720.
+    var constraints = {
+      audio: false,
+      video: true
+    };
 
     joinButton.addEventListener('click', () => {
 
-      //room selection
-      roomState = null;
-      mediaState = null;
-      filterState = null;
-      animeState = null;
-      rtcState = null;
-      roomState = roomStore(window.URL);
-      mediaState = mediaStore('MRGmyBooth', 'MRGpeerBooth');
-      filterState = filterStore('MRGfilterDisp', 'MRGfilter');
-      animeState = animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
-      rtcState = rtcStore();
+      roomState = new roomStore(window.URL);
+      mediaState = new mediaStore('MRGmyBooth', 'MRGpeerBooth');
+      filterState = new filterStore('MRGfilterDisp', 'MRGfilter');
+      animeState = new animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
+      rtcState = new rtcStore();
+
+      //add input filters or images
+      filterState.addFilters(mirageComponent.putFilters);
+      animeState.addEmoji(mirageComponent.putImages);
+
       const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
       roomState.roomID = document.getElementById('MRGroom-id-input').value;
       appendConnectButtons();
@@ -153,10 +210,8 @@ export function createMirage() {
         } else {
           hiddenToggle('MRGroomApp', 'MRGboothApp');
           //begin streaming!//
-          navigator.getMedia({
-            video: true,
-            audio: false
-          }).then(stream => {
+          navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
 
               //make initiate event happen automatically when streaming begins
             socket.emit('initiate', JSON.stringify({
@@ -217,13 +272,11 @@ export function createMirage() {
 
             }); //end of socket.on('initiated')
 
-
-              //data channel stuff
             function onDataChannelCreated(channel) {
-
+                //data channel stuff
               channel.onopen = () => {
 
-                console.log('data channel onopen method triggered');
+                // console.log('data channel onopen method triggered');
                 mediaState.peerCanvasListeners.push(animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], channel, false, getCursorPosition, animeState.rafObj)); //remote
 
                 mediaState.myCanvasListeners.push(animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafObj)); //local
@@ -234,12 +287,13 @@ export function createMirage() {
 
                 clearListener(channel, clearFunc, clearButton, animeState, mediaState);
 
-                  //this would work, or store these dom elements as variables or don't use anon functions to remove listeners on end
+                myTrackingListener(mediaState.myVideo, mediaState.myCanvas, mediaState.myContext, animeState.emoImg, tracking);
+
+                peerTrackingListener(mediaState.peerVideo, mediaState.peerCanvas, mediaState.peerContext, animeState.emoImg, channel, trackFace, tracking, rtcState.remoteStream);
 
                 document.getElementById('MRGvideoToggle').addEventListener('click', () => {
                   toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
                 });
-
 
                   // changing this because the multi event listener is retogglei
                 disableToggle('MRGconnect', 'MRGdisconnect');
@@ -269,6 +323,13 @@ export function createMirage() {
                   }, false);
                 });
 
+                mirageComponent.events.onData({
+                  mediaState: mediaState,
+                  filterState: filterState,
+                  roomState: roomState,
+                  animeState: animeState,
+                  rtcState: rtcState
+                });
               }; //end onopen method
 
                 // for messaging if we want to integrate later
@@ -291,7 +352,6 @@ export function createMirage() {
               channel.onmessage = event => {
 
                 let data = event.data;
-
                   //conditionally apply or remove filter
                 let dataObj = JSON.parse(data);
 
@@ -330,9 +390,52 @@ export function createMirage() {
 
                   }
                 }
-                if (dataObj.type === 'clear') {
-                  clearFunc(animeState, mediaState);
-                }
+                if (dataObj.hasOwnProperty('tracking')) {
+                    mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
+
+
+                  if(dataObj.tracking === 'yes') {
+                    mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
+                    var emoji = new Image();
+                    emoji.src = dataObj.image;
+                    console.log(emoji);
+                      //console.log(dataObj.faceRect);
+                    var adjustedRect = {
+                      x: dataObj.faceRect.x,
+                      y: dataObj.faceRect.y,
+                      width: dataObj.faceRect.width/2,
+                      height: dataObj.faceRect.height/2
+                    };
+                      hat(mediaState.myCanvas, mediaState.myContext, adjustedRect, emoji);
+                    }
+
+                  }
+
+                  if (dataObj.hasOwnProperty('myTrack')) {
+                    if(dataObj.myTrack === mediaState.myVideo) {
+                      //console.log("track me fired off");
+                      var myEmoji = new Image();
+                      myEmoji.src = dataObj.image;
+                      var tracking = dataObj.tracking;
+                      var channel = dataObj.channel;
+                      //console.log(tracking, channel);
+                      //mediaState.peerContext
+                      trackFace(mediaState.peerCanvas, mediaState.peerContext, tracking, rtcState.remoteStream, myEmoji, channel);
+                    }
+                  }
+
+                  if (dataObj.type === 'clear') {
+                    clearFunc(animeState, mediaState);
+                  }
+
+                mirageComponent.events.onMessage({
+                  dataMsg: dataObj,
+                  mediaState: mediaState,
+                  filterState: filterState,
+                  roomState: roomState,
+                  animeState: animeState,
+                  rtcState: rtcState
+                });
               };
             }
 
@@ -344,10 +447,18 @@ export function createMirage() {
               mediaState.peerVideo = mediaState.peerMedia.video;
               mediaState.peerCanvas = mediaState.peerMedia.canvas;
               mediaState.peerContext = mediaState.peerMedia.context;
+              mediaState.peerCanvas.classList.add('MRGpointerToggle');
 
               toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
               hiddenToggle('MRGconnect', 'MRGdisconnect');
 
+              mirageComponent.events.stream({
+                  mediaState: mediaState,
+                  filterState: filterState,
+                  roomState: roomState,
+                  animeState: animeState,
+                  rtcState: rtcState
+                });
             } ///end on stream added event///
 
             function activateAnime() {

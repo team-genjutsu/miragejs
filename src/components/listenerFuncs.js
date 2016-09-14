@@ -12,6 +12,28 @@ function filterListener(vid, whoisFilter, currFilter, whoisBool, channel, func) 
   }, false);
 }
 
+function peerTrackingListener(vid, cv, ctx, img, channel, trackFace, trackingObj, videoStream) {
+  document.getElementById('MRGpeerTracking').addEventListener('click', () => {
+    let emoji = img;
+    //console.log(trackingObj);
+    trackFace(vid, cv, ctx, trackingObj, videoStream, emoji, channel);
+  }, false);
+}
+
+
+function myTrackingListener(vid, cv, ctx, img, trackingObj) {
+  document.getElementById('MRGmyTracking').addEventListener('click', () => {
+    let trackingDataObj;
+    console.log(channel.readyState);
+    trackingDataObj = JSON.stringify({
+      myTrack: vid.id,
+      image: img,
+      tracking: trackingObj
+    });
+    channel.send(trackingDataObj);
+  }, false);
+}
+
 
 function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, array, channel, local, func, rafObj) {
 
@@ -20,7 +42,6 @@ function animationListener(canvas, img, animeObj, animeEle, context, reqAnim, ar
     let position = func(canvas, event);
     let emoImage = new Image();
     emoImage.src = img.src;
-
     // let currImg =
     let animation = animeObj[animeEle.innerHTML];
     //animation for local display and data transmission to peer
@@ -48,12 +69,12 @@ function clearListener(channel, func, clearButton, animeSt, mediaSt) {
     func(animeSt, mediaSt);
     channel.send(JSON.stringify({'type' : 'clear'}));
   }, false);
-
-  //send to other client to run clear function
 }
-
+//send to other client to run clear function
 export {
   filterListener,
   animationListener,
-  clearListener
+  clearListener,
+  peerTrackingListener,
+  myTrackingListener
 };
