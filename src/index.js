@@ -62,7 +62,7 @@ import {
 import {
   cssChunk
 } from './components/cssChunk';
-require('public/tracking');
+require('./components/tracking');
 
 
 
