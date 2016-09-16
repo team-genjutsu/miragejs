@@ -76,9 +76,9 @@ function orbit(cv, ctx, evt, pos, emoImg, animate, array, rafObj) {
 function trackFace(video, canvas, context, trackingObj, videoStream, img, channel) {
   //console.log("data channel", channel);
 
-  var video = video;
-  var canvas = canvas;
-  var context = context;
+  // var video = video;
+  // var canvas = canvas;
+  // var context = context;
   //console.log("tracking object", trackingObj);
   var emoji = new Image();
   if (img.src === undefined) {

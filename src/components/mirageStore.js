@@ -1,17 +1,3 @@
-//allows inputs for client to hook DOM elements
-//concerning filters. Preset filters for now, will be dynamic
-//in future
-// import {
-// cutCircle,
-// angularVelocity,
-// velocity,
-// drawVideo,
-// setVendorCss,
-// getCursorPosition,
-// orbit,
-// paste,
-// bounce
-// } from './funcStore';
 
 function filterStore(filterDispId, filterBtnId) {
   this.currFilter = document.getElementById(filterDispId);
@@ -127,5 +113,4 @@ export {
   mediaStore,
   animeStore,
   rtcStore
-
 };
