@@ -1,18 +1,18 @@
-import { createMirage } from './../src/index';
+import { Mirage } from './../src/index';
 import { domReady } from './../src/components/domReady';
 
 // wait for dom to load
 domReady(() => {
 
   // instantiate mirage object
-  const mirage = createMirage();
+  const mirage = new Mirage();
 
   mirage.insertCss(); //mount styles on DOM for component
 
   mirage.insertChunk(); // mount mirage chunk on DOM
 
   mirage.on('stream', (state) => {
-    // console.log(state);
+    console.log('stream trigger', state);
   });
 
   mirage.on('onData', (state) => {
@@ -21,7 +21,7 @@ domReady(() => {
   });
 
   mirage.on('onMessage', (state) => {
-    // console.log(state);
+    // console.log('onMessage', state);
     if(state.hasOwnProperty('dataMsg')){
       // console.log(state.dataMsg);
     } 
