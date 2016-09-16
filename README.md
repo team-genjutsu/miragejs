@@ -13,7 +13,7 @@ npm install --save mirage-js
 ```
 2. In client-side Javascript file require mirage-js.
 ```bash
-import { createMirage } from 'mirage-js';
+import { Mirage } from 'mirage-js';
 ```
 3. On the server, navigate to our socket-logic file on node_modules (if server is in root directory, require from './node_modules/server/mirageSocket.js');
 ```bash
@@ -22,14 +22,14 @@ const mirageSocket = require('./node_modules/server/socketLogic.js');
 
 ## Client side API methods
 
-### Begin component logic, put this code this after all the other methods have been coded
+### Begin component logic, this method should be coded after all the other methods have been coded
 ```bash
 mirage.startApp();
 ```
 
 ### Gain access to Mirage object
 ```bash
-const mirage = createMirage();
+const mirage = new Mirage();
 ```
 
 ### Insert CSS styles for component
