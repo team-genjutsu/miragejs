@@ -89,7 +89,12 @@ function trackFace(video, canvas, context, trackingObj, videoStream, img, channe
   // console.log(emoji);
   var tracker = new trackingObj.ObjectTracker('face');
   tracker.canvasOverlay = canvas;
-  var faceRect = {x: 100, y: 100, width: emoji.width * 3, height: emoji.height * 3};
+  var faceRect = {
+    x: 100,
+    y: 100,
+    width: emoji.width * 3,
+    height: emoji.height * 3
+  };
 
   //console.log('face track has been called');
   tracker.setInitialScale(4);
@@ -100,7 +105,9 @@ function trackFace(video, canvas, context, trackingObj, videoStream, img, channe
 
   // if(isTrackingBool) {
 
-  trackingObj.track(video, tracker, {camera: true});
+  trackingObj.track(video, tracker, {
+    camera: true
+  });
   tracker.on('track', function(event) {
     context.clearRect(faceRect.x - 50, faceRect.y - img.height * 3 - 50, faceRect.width + 50, faceRect.height + img.width * 3 + 50);
     //mediaState.myContext.clearRect
@@ -141,7 +148,7 @@ function trackFace(video, canvas, context, trackingObj, videoStream, img, channe
 // })();
 
 function hat(cv, ctx, rect, img) {
-    //console.log("rect in hat", rect, "cv in hat", cv);
+  //console.log("rect in hat", rect, "cv in hat", cv);
   ctx.clearRect(0, 0, 20000, 20000);
   ctx.drawImage(img, rect.x, rect.y - 5, rect.height, rect.width);
 
@@ -155,18 +162,6 @@ function cutCircle(context, x, y, radius) {
   context.fill();
 } //end cutCircle//
 
-//these functions need to be ported to proper file
-function hiddenToggle(ele1, ele2) {
-  let args = [...arguments];
-  args.forEach((ele, idx) => {
-    let tag = document.getElementById(ele);
-    if (tag.classList.contains('MRGhidden')) {
-      tag.classList.remove('MRGhidden');
-    } else {
-      tag.classList.add('MRGhidden');
-    }
-  });
-}
 
 //paste object to canvas
 // function pasteImg(video, context, width, height, x, y, source) {
@@ -182,13 +177,6 @@ function hiddenToggle(ele1, ele2) {
 // }
 // } //end paste//
 
-function disableToggle(ele1, ele2) {
-
-  let args = [...arguments];
-  args.forEach((ele, idx) => {
-    document.getElementById(ele).disabled ? document.getElementById(ele).disabled = false : document.getElementById(ele).disabled = true;
-  });
-}
 
 //gets cursor position upon mouse click that places
 //an object or starts object movement
@@ -203,12 +191,6 @@ function getCursorPosition(canvas, event) {
   return pos;
 } //end getCursorPosition//
 
-//streamline vendor prefixing for css filtering
-function setVendorCss(element, style) {
-  element.style.webkitFilter = style;
-  element.style.mozFilter = style;
-  element.style.filter = style;
-} //end setVendorCss //
 
 //draws video on canvas
 function drawVideo(v, c, w, h) {
@@ -249,207 +231,32 @@ function angularVelocity(obj, ctx, cv, cb, emoImg, animate, rafObj, evt) {
   rafObj[evt.timeStamp.toString()] = animate;
 } //end angularVelocity//
 
-function resizeMedia(win, state, container, func1, func2, func3) {
 
-  let styleWidth1 = func1(state.myVideo, win).vidWidth,
-    styleWidth2 = func1(state.peerVideo, win).vidWidth,
-    targetDims = func2(container, win);
+function receivedAnimation(localBool, animeState, mediaState, event, dataObj, func1, func2) {
+  let emoImg = new Image();
+  emoImg.src = dataObj.currentImg;
 
-  if (styleWidth1 >= styleWidth2) {
-    func3(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, targetDims);
+  animeState.temp = animeState.currentAnimation;
+  animeState.currentAnimation = animeState.anime[dataObj.animation];
+  if (localBool) {
+    animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [func1, func2], animeState.rafObj);
   } else {
-    func3(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, targetDims);
+    animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [func1, func2], animeState.rafObj);
   }
-  container.style.height = func1(container, win).vidHeight + 'px';
-}
-
-function toggleVidSize(win, state, func1, func2, func3) {
-  let arr,
-    styleWidth1 = func1(state.myVideo, win).vidWidth,
-    styleWidth2 = func1(state.peerVideo, win).vidWidth,
-    booths = ['MRGmyCanvas', 'MRGpeerCanvas'];
-  if (styleWidth1 >= styleWidth2) {
-    let dims = func2(state.myVideo, win);
-    setSizes(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, dims);
-    arr = [state.myVideo, state.myCanvas, state.peerVideo, state.peerCanvas];
-    booths.forEach( (ele, idx) => {
-      func3(ele, 'MRGpointerToggle');
-    });
-
-  } else {
-    let dims = func2(state.peerVideo, win);
-    setSizes(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, dims);
-    arr = [state.peerVideo, state.peerCanvas, state.myVideo, state.myCanvas];
-
-    booths.forEach( (ele, idx) => {
-      func3(ele, 'MRGpointerToggle');
-    });
-  }
-
-  arr.forEach((ele, idx) => {
-    if (idx < 2) {
-      ele.style.zIndex = '3';
-    } else {
-      ele.style.zIndex = '2';
-    }
-  });
+  animeState.currentAnimation = animeState.temp;
 
 }
-
-function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, dims) {
-  upVid.setAttribute('width', '' + dims.bigVidWidth);
-  upVid.setAttribute('height', '' + dims.bigVidHeight);
-
-  upContext = upCanvas.getContext('2d');
-  upCanvas.width = dims.bigVidWidth;
-  upCanvas.height = dims.bigVidHeight;
-  upContext.strokeRect(0, 0, upCanvas.width, upCanvas.height);
-
-  downVid.setAttribute('width', '' + dims.smallVidWidth);
-  downVid.setAttribute('height', '' + dims.smallVidHeight);
-
-  downContext = downCanvas.getContext('2d');
-  downCanvas.width = dims.smallVidWidth;
-  downCanvas.height = dims.smallVidHeight;
-  downContext.scale(.25, .25);
-  downContext.strokeRect(0, 0, downCanvas.width, downCanvas.height);
-}
-
-function generateDims(container, win) {
-  let containerStyle = win.getComputedStyle(container);
-  let styleWidth = containerStyle.getPropertyValue('width');
-  let videoWidth = Math.round(+styleWidth.substring(0, styleWidth.length - 2));
-  let videoHeight = Math.round((videoWidth / 4) * 3);
-
-  return {
-    vidWidth: videoWidth,
-    vidHeight: videoHeight
-  };
-}
-
-function vidDims(bigVid, win) {
-  let vidStyle = win.getComputedStyle(bigVid);
-  let styleWidth = vidStyle.getPropertyValue('width');
-  let bigVidWidth = Math.round(+styleWidth.substring(0, styleWidth.length - 2));
-  let bigVidHeight = Math.round((bigVidWidth / 4) * 3);
-  let smallVidWidth = bigVidWidth / 4;
-  let smallVidHeight = Math.round((smallVidWidth / 4) * 3);
-
-  return {
-    bigVidWidth: bigVidWidth,
-    bigVidHeight: bigVidHeight,
-    smallVidWidth: smallVidWidth,
-    smallVidHeight: smallVidHeight
-  };
-}
-
-function scaleToFill(videoTag, height, width) {
-  let video = videoTag,
-    videoRatio = 4 / 3,
-    tagRatio = width / height;
-  if (videoRatio < tagRatio) {
-    video.setAttribute('style', '-webkit-transform: scaleX(' + tagRatio / videoRatio + ')');
-  } else if (tagRatio < videoRatio) {
-    video.setAttribute('style', '-webkit-transform: scaleY(' + videoRatio / tagRatio + ')');
-  }
-}
-
-function scaleElement(vid, height, width) {
-  let video = vid;
-  let actualRatio = 4 / 3;
-  let targetRatio = width / height;
-  let adjustmentRatio = targetRatio / actualRatio;
-  let scale = actualRatio < targetRatio ? targetRatio / actualRatio : actualRatio / targetRatio;
-  video.setAttribute('style', '-webkit-transform: scale(' + scale + ')');
-}
-
-function classToggle(btnEleId, classType) {
-  if (document.getElementById(btnEleId).classList.contains(classType)) {
-    document.getElementById(btnEleId).classList.remove(classType);
-  } else {
-    document.getElementById(btnEleId).classList.add(classType);
-  }
-}
-function appendConnectButtons() {
-  //creating buttons will replace everytime so eventlistener is good. Will pull out of file
-  let connectivityBtns = document.getElementById('MRGconnectivityBtns');
-  let conButton = document.createElement('button');
-  let disconButton = document.createElement('button');
-  conButton.setAttribute('class', 'MRGbtn');
-  disconButton.setAttribute('class', 'MRGbtn');
-  conButton.setAttribute('id', 'MRGconnect');
-  disconButton.setAttribute('id', 'MRGdisconnect');
-  // conButton.innerHTML = 'Connect';
-  // disconButton.innerHTML = 'Disconnect';
-  conButton.disabled = true;
-  disconButton.disabled = true;
-  disconButton.classList.add('MRGhidden');
-  connectivityBtns.appendChild(conButton);
-  connectivityBtns.appendChild(disconButton);
-}
-
-//remove child element of passed in argument from dom
-function removeChildren(el) {
-  let element = document.getElementById(el);
-
-  while (element.firstChild) {
-    element.removeChild(element.firstChild);
-  }
-}
-
-
-//this should stop the request animation frame recursive calls and also clear the canvas
-function clearFunc(animeSt, mediaSt) {
-  for (let rafID in animeSt.rafObj) {
-    cancelAnimationFrame(animeSt.rafObj[rafID]);
-  }
-
-
-  mediaSt.myContext.clearRect(0, 0, 10000, 10000);
-  mediaSt.peerContext.clearRect(0, 0, 10000, 10000);
-}
-
-function toggleZindex() {
-  // toggle Z index of non MRG elements to have Mirage component always show
-  // only if can access dom elements
-  if (document.querySelectorAll) {
-    let domElements = document.body.getElementsByTagName('*');
-    for (let i = 0; i < domElements.length; i++) {
-
-      if (domElements[i].id.substring(0, 3) !== 'MRG') {
-        //give fixed elements z index of 1 and non fixed elements z index of -1 to keep positionality
-        window.getComputedStyle(domElements[i]).getPropertyValue('position') === 'fixed' ? domElements[i].classList.toggle('notMirageFixed') : domElements[i].classList.toggle('notMirage');
-      }
-    }
-  }
-}
-
-///end of function store///
 
 export {
-  toggleVidSize,
-  vidDims,
-  hiddenToggle,
-  disableToggle,
-  generateDims,
-  scaleToFill,
-  scaleElement,
-  classToggle,
+  receivedAnimation,
   cutCircle,
   angularVelocity,
   velocity,
   drawVideo,
-  setVendorCss,
   getCursorPosition,
   orbit,
   paste,
   bounce,
-  appendConnectButtons,
-  removeChildren,
-  clearFunc,
-  toggleZindex,
-  resizeMedia,
-  setSizes,
   trackFace,
   hat
 };

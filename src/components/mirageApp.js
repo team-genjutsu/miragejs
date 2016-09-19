@@ -1,49 +1,25 @@
 import adapter from 'webrtc-adapter';
 import io from 'socket.io-client';
+
 import {
-  filterListener,
-  animationListener,
-  clearListener,
-  myTrackingListener,
-  peerTrackingListener
-} from './listenerFuncs';
-import {
-  toggleVidSize,
-  vidDims,
   hiddenToggle,
-  disableToggle,
-  generateDims,
-  scaleToFill,
-  scaleElement,
-  classToggle,
-  cutCircle,
-  angularVelocity,
-  velocity,
-  drawVideo,
-  setVendorCss,
-  getCursorPosition,
-  orbit,
-  paste,
-  bounce,
-  appendConnectButtons,
   removeChildren,
-  clearFunc,
-  toggleZindex,
-  resizeMedia,
-  setSizes,
-  trackFace,
-  hat
-} from './funcStore';
+  classToggle
+} from './domFunctions';
+
 import {
   mediaGenerator
 } from './mediaGenerator';
+
 import {
   roomStore,
   filterStore,
   mediaStore,
   animeStore,
-  rtcStore
+  rtcStore,
+  elementStore
 } from './mirageStore';
+
 import {
   connectEvents,
   startSetup,
@@ -54,55 +30,25 @@ import {
   handleRemoteStreamRemoved,
   doCall,
   doAnswer,
-  setLocalAndSendMessage
+  setLocalAndSendMessage,
+  endCall,
+  handleRemoteStreamAdded,
+  onDataChannelCreated
 } from './mirageWebRTC';
-require('./tracking');
+
+// require('./tracking');
+// need to abstract a little bit more, and then make tracking data available
+// to user manipulation
 
 
-function mirageApp(filters, images, events) {
+function mirageApp(filters, images, events, state) {
 
-  let roomState;
-  let mediaState;
-  let filterState;
-  let animeState;
-  let rtcState;
+  // let state = {};
+  // console.log(state);
+  state.elementState = new elementStore('MRGclear', 'MRGjoin-button', 'MRGmaterialBtn', 'MRGdemo', 'MRGfixed', 'MRGbooth', 'MRGconnect', 'MRGdisconnect');
 
-  // DOM elements
-  let clearButton = document.getElementById('MRGclear');
-  let joinButton = document.getElementById('MRGjoin-button');
-  let materialBtn = document.getElementById('MRGmaterialBtn');
-  let demo = document.getElementById('MRGdemo');
-  let fixedComponent = document.getElementById('MRGfixed');
-  let boothComponent = document.getElementById('MRGbooth');
-
-
-  //turn server to use
-  //if (location.hostname != 'localhost') {
-  //  requestTurn(
-  //    'https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913'
-  //  );
-  //}
-
-
-  materialBtn.addEventListener('click', () => {
-    // need to parse through stylesheets and set z-indexes of elements to -1 with
-    // each toggle
-    demo.classList.toggle('MRGhidden');
-    toggleZindex();
-  });
-
-  materialBtn.addEventListener('drag', (event) => {
-    // console.log(event);
-  });
-
-  materialBtn.addEventListener('dragend', (event) => {
-    // console.log('drag over', event.clientX);
-    materialBtn.style.left = event.clientX + 'px';
-    materialBtn.style.top = (event.clientY - 60) + 'px';
-  });
-
-
-
+  //initial user input event
+  events.initial(state);
 
   let promisifiedOldGUM = function(constraints) {
 
@@ -111,7 +57,7 @@ function mirageApp(filters, images, events) {
       navigator.webkitGetUserMedia ||
       navigator.mozGetUserMedia);
 
-    // Some browsers just don't implement it - return a rejected promise with an error
+    // Return a rejected promise with an error
     // to keep a consistent interface
     if (!getUserMedia) {
       return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
@@ -124,14 +70,12 @@ function mirageApp(filters, images, events) {
 
   };
 
-  // Older browsers might not implement mediaDevices at all, so we set an empty object first
+  // For older browsers 
   if (navigator.mediaDevices === undefined) {
     navigator.mediaDevices = {};
   }
 
-  // Some browsers partially implement mediaDevices. We can't just assign an object
-  // with getUserMedia as it would overwrite existing properties.
-  // Here, we will just add the getUserMedia property if it's missing.
+  //add the getUserMedia property if it's missing.
   if (navigator.mediaDevices.getUserMedia === undefined) {
     navigator.mediaDevices.getUserMedia = promisifiedOldGUM;
   }
@@ -142,381 +86,114 @@ function mirageApp(filters, images, events) {
     video: true
   };
 
-  joinButton.addEventListener('click', () => {
+  state.elementState.joinButton.addEventListener('click', () => {
 
-    roomState = new roomStore(window.URL);
-    mediaState = new mediaStore('MRGmyBooth', 'MRGpeerBooth');
-    filterState = new filterStore('MRGfilterDisp', 'MRGfilter');
-    animeState = new animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
-    rtcState = new rtcStore();
+    // state.mediaState = new mediaStore('MRGmyBooth', 'MRGpeerBooth');
+    // state.filterState = new filterStore('MRGfilterDisp', 'MRGfilter');
+    // state.animeState = new animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
+
 
     //add input filters or images
-    // filterState.addFilters(mirageComponent.putFilters);
-    filterState.addFilters(filters);
-    // animeState.addEmoji(mirageComponent.putImages);
-    animeState.addEmoji(images);
+    // state.filterState.addFilters(filters);
+    // state.animeState.addEmoji(images);
 
     const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
-    roomState.roomID = document.getElementById('MRGroom-id-input').value;
-    appendConnectButtons();
+    state.roomState.roomID = document.getElementById('MRGroom-id-input').value;
 
-    animeState.emojis.forEach((ele, idx) => {
-      let btn = document.createElement('button');
-      btn.classList.add('MRGemojibtn');
-      btn.classList.add('MRGemoji');
-      let emoj = document.createElement('img');
-      emoj.src = ele;
-      emoj.style.height = '25px';
-      emoj.style.width = '25px';
-      btn.appendChild(emoj);
-      document.getElementById('MRGemojiButtons').appendChild(btn);
-    });
 
-    socket.emit('joinRoom', JSON.stringify(roomState.roomID));
+    socket.emit('joinRoom', JSON.stringify(state.roomState.roomID));
     socket.on('process', (payload) => {
       payload = JSON.parse(payload);
       if (!payload) {
         alert('Try a different room!');
       } else {
-        hiddenToggle('MRGroomApp', 'MRGboothApp');
-        //begin streaming!//
+
+        //start streaming right after inserting user preStream input
+        events.preStream(state, filters, images);
+
         navigator.mediaDevices.getUserMedia(constraints)
           .then(stream => {
 
-              boothComponent.addEventListener('drag', (event) => {
-
-              });
-
-              boothComponent.addEventListener('dragend', (event) => {
-                fixedComponent.style.left = event.clientX + 'px';
-                fixedComponent.style.top = event.clientY + 'px';
-              });
-
-              //make initiate event happen automatically when streaming begins
-              socket.emit('initiate', JSON.stringify({
-                streamId: stream.id,
-                roomId: roomState.roomID
-              }));
-
-              socket.on('readyConnect', (payload) => {
-                document.getElementById('MRGconnect').disabled = false;
-                classToggle('MRGconnect', 'MRGelementToFadeInAndOut');
-              });
+            //test for positioning user input event listener 
+            //immediately after local stream is available
+            events.localStream(state);
 
 
-              socket.on('initiated', (member) => {
+            //make initiate event happen automatically when streaming begins
+            socket.emit('initiate', JSON.stringify({
+              streamId: stream.id,
+              roomId: state.roomState.roomID
+            }));
 
-                member = JSON.parse(member);
-                mediaState.myMedia = mediaGenerator(stream, roomState.vendorUrl, 'MRGmyBooth', 'MRGmyVideo', 'MRGmyCanvas');
-                mediaState.myVideo = mediaState.myMedia.video;
-                mediaState.myCanvas = mediaState.myMedia.canvas;
-                mediaState.myContext = mediaState.myMedia.context;
-
-                //sets up local stream reference
-                rtcState.localStream = stream;
-                //set room ID shared between clients
-                roomState.roomID = member.roomId;
-
-                if (roomState.chattersClient.filter(clientChatter => clientChatter.id !== member.id).length || !roomState.chattersClient.length) {
-                  roomState.chattersClient.push(member);
-                  roomState.chatterThisClient = member.id;
-                }
-
-                //NB: animation and filter listeners needed in this particular context
-                //in order for animation and filters to be option for a user before
-                //connecting to a peer
-
-                document.getElementById('MRGconnect').addEventListener('click', () => {
-                  connectEvents(rtcState, roomState, handleRemoteStreamAdded, onDataChannelCreated, socket);
-                  classToggle('MRGconnect', 'MRGelementToFadeInAndOut');
-                  // onDataChannelCreated(rtcState.dataChannel)
-                });
-
-                socket.on('message', (message) => {
-                  if (message.type === 'offer') {
-                    if (!rtcState.isStarted) {
-                      startSetup(rtcState, roomState, handleRemoteStreamAdded, socket);
-                      otherDataChannel(event, rtcState, onDataChannelCreated, activateAnime);
-                    }
-                    rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
-                    doAnswer(rtcState, roomState, socket);
-                  } else if (message.type === 'answer' && rtcState.isStarted) {
-                    rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
-                  } else if (message.type === 'candidate' && rtcState.isStarted) {
-                    let candidate = new RTCIceCandidate({
-                      sdpMLineIndex: message.label,
-                      candidate: message.candidate
-                    });
-                    rtcState.peerConn.addIceCandidate(candidate);
-                  }
-                });
-
-              }); //end of socket.on('initiated')
-
-              function onDataChannelCreated(channel) {
-                //data channel stuff
-                channel.onopen = () => {
-
-                  // console.log('data channel onopen method triggered');
-
-                  animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], channel, false, getCursorPosition, animeState.rafObj); //remote
-
-                  animationListener(mediaState.myCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.myContext, animeState.raf, [velocity, angularVelocity], channel, true, getCursorPosition, animeState.rafObj); //local
-
-                  filterListener(mediaState.myVideo, 'MRGmyFilter', filterState.currFilter, true, channel, setVendorCss);
-
-                  filterListener(mediaState.peerVideo, 'MRGpeerFilter', filterState.currFilter, false, channel, setVendorCss);
-
-                  clearListener(channel, clearFunc, clearButton, animeState, mediaState);
-
-                  myTrackingListener(mediaState.myVideo, mediaState.myCanvas, mediaState.myContext, animeState.emoImg, tracking, channel);
-
-                  peerTrackingListener(mediaState.peerVideo, mediaState.peerCanvas, mediaState.peerContext, animeState.emoImg, channel, trackFace, tracking, rtcState.remoteStream);
-
-                  document.getElementById('MRGvideoToggle').addEventListener('click', () => {
-                    toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
-                  });
-
-                  // changing this because the multi event listener is retogglei
-                  disableToggle('MRGconnect', 'MRGdisconnect');
-
-                  window.onresize = () => {
-                    resizeMedia(window, mediaState, document.getElementById('MRGvidContainer'), generateDims, vidDims, setSizes);
-                  };
-
-                  //changing filters//
-                  filterState.filterBtn.addEventListener('click', () => {
-                    filterState.currFilter.innerHTML = filterState.filters[filterState.idx++];
-                    if (filterState.idx >= filterState.filters.length) filterState.idx = 0;
-                  }, false); //end of filter test//
-
-                  //changing animations//
-                  animeState.animeBtn.addEventListener('click', () => {
-                    animeState.currAnime.innerHTML = animeState.animeKeys[animeState.idx];
-                    animeState.currentAnimation = animeState.anime[animeState.animeKeys[animeState.idx++]];
-                    if (animeState.idx >= animeState.animeKeys.length) animeState.idx = 0;
-                  }, false);
-
-                  //adding click handler for active emoji selection
-                  Array.from(animeState.emoBtns, (ele) => {
-                    ele.addEventListener('click', (event) => {
-                      animeState.currentImg = ele.querySelectorAll('img')[0].getAttribute('src');
-                      animeState.emoImg.src = animeState.currentImg;
-                    }, false);
-                  });
-
-                  // mirageComponent.events.onData({
-                    // mediaState: mediaState,
-                    // filterState: filterState,
-                    // roomState: roomState,
-                    // animeState: animeState,
-                    // rtcState: rtcState
-                  // });
-                  events.onData({
-                    mediaState: mediaState,
-                    filterState: filterState,
-                    roomState: roomState,
-                    animeState: animeState,
-                    rtcState: rtcState
-                  });
-
-                }; //end onopen method
-
-                // for messaging if we want to integrate later
-                //looks for click event on the send button//
-                // document.getElementById('MRGsend').addEventListener('click', () => {
-                // post message in text context on your side
-                // send message object to the data channel
-                // let yourMessageObj = JSON.stringify({
-                // message: "them:" + " " + document.getElementById('MRGyourMessage').value
-                // });
-                // creates a variable with the same information to display on your side
-                // let yourMessage = "me:" + " " + document.getElementById('MRGyourMessage').value;
-                // post message in text context on your side
-                // document.getElementById('messages').textContent += yourMessage + '\n';
-                // channel.send(yourMessageObj)
-                // }) //end send click event//
-
-
-                //on data event
-                channel.onmessage = event => {
-
-                  let data = event.data;
-                  //conditionally apply or remove filter
-                  let dataObj = JSON.parse(data);
-
-                  // if (dataObj.message) {
-                  // document.getElementById('MRGmessages').textContent += dataObj.message + '\n';
-                  // }
-
-                  if (dataObj.hasOwnProperty('filter')) {
-                    if (dataObj.filter) {
-                      setVendorCss(mediaState.peerVideo, dataObj.filterType);
-                    } else {
-                      setVendorCss(mediaState.myVideo, dataObj.filterType);
-                    }
-                  }
-
-                  if (dataObj.hasOwnProperty('localEmoji')) {
-                    if (dataObj.localEmoji) {
-                      //remote display bounce animation!
-                      let emoImg = new Image();
-                      emoImg.src = dataObj.currentImg;
-
-                      animeState.temp = animeState.currentAnimation;
-                      animeState.currentAnimation = animeState.anime[dataObj.animation];
-                      animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity], animeState.rafObj);
-                      animeState.currentAnimation = animeState.temp;
-
-                    } else if (!dataObj.localEmoji) {
-                      //local display bounce animation!
-                      let emoImg = new Image();
-                      emoImg.src = dataObj.currentImg;
-
-                      animeState.temp = animeState.currentAnimation;
-                      animeState.currentAnimation = animeState.anime[dataObj.animation];
-                      animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [velocity, angularVelocity], animeState.rafObj);
-                      animeState.currentAnimation = animeState.temp;
-
-                    }
-                  }
-                  if (dataObj.hasOwnProperty('tracking')) {
-                    mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
-
-
-                    if (dataObj.tracking === 'yes') {
-                      mediaState.myContext.clearRect(0, 0, mediaState.myCanvas.width, mediaState.myCanvas.height);
-                      var emoji = new Image();
-                      emoji.src = dataObj.image;
-                      // console.log(emoji);
-                      //console.log(dataObj.faceRect);
-                      var adjustedRect = {
-                        x: dataObj.faceRect.x,
-                        y: dataObj.faceRect.y,
-                        width: dataObj.faceRect.width / 2,
-                        height: dataObj.faceRect.height / 2
-                      };
-                      hat(mediaState.myCanvas, mediaState.myContext, adjustedRect, emoji);
-                    }
-
-                  }
-
-                  if (dataObj.hasOwnProperty('myTrack')) {
-                    if (dataObj.myTrack === mediaState.myVideo) {
-                      //console.log("track me fired off");
-                      var myEmoji = new Image();
-                      myEmoji.src = dataObj.image;
-                      var tracking = dataObj.tracking;
-                      var channel = dataObj.channel;
-                      //console.log(tracking, channel);
-                      //mediaState.peerContext
-                      trackFace(mediaState.peerCanvas, mediaState.peerContext, tracking, rtcState.remoteStream, myEmoji, channel);
-                    }
-                  }
-
-                  if (dataObj.type === 'clear') {
-                    clearFunc(animeState, mediaState);
-                  }
-
-                  // mirageComponent.events.onMessage({
-                    // dataMsg: dataObj,
-                    // mediaState: mediaState,
-                    // filterState: filterState,
-                    // roomState: roomState,
-                    // animeState: animeState,
-                    // rtcState: rtcState
-                  // });
-                  events.onMessage({
-                    mediaState: mediaState,
-                    filterState: filterState,
-                    roomState: roomState,
-                    animeState: animeState,
-                    rtcState: rtcState
-                  });
-                };
-              }
-
-
-              function handleRemoteStreamAdded(event) {
-                // after adding remote sream, set the source of peer video to their stream
-                rtcState.remoteStream = event.stream;
-                mediaState.peerMedia = mediaGenerator(event.stream, roomState.vendorUrl, 'MRGpeerBooth', 'MRGpeerVideo', 'MRGpeerCanvas');
-                mediaState.peerVideo = mediaState.peerMedia.video;
-                mediaState.peerCanvas = mediaState.peerMedia.canvas;
-                mediaState.peerContext = mediaState.peerMedia.context;
-                mediaState.peerCanvas.classList.add('MRGpointerToggle');
-
-                toggleVidSize(window, mediaState, generateDims, vidDims, classToggle);
-                hiddenToggle('MRGconnect', 'MRGdisconnect');
-
-                // mirageComponent.events.stream({
-                  // mediaState: mediaState,
-                  // filterState: filterState,
-                  // roomState: roomState,
-                  // animeState: animeState,
-                  // rtcState: rtcState
-                // });
-                events.stream({
-                  mediaState: mediaState,
-                  filterState: filterState,
-                  roomState: roomState,
-                  animeState: animeState,
-                  rtcState: rtcState
-                  });
-              } ///end on stream added event///
-
-              function activateAnime() {
-                animationListener(mediaState.peerCanvas, animeState.emoImg, animeState.anime, animeState.currAnime, mediaState.peerContext, animeState.raf, [velocity, angularVelocity], rtcState.dataChannel, false, getCursorPosition, animeState.rafObj); //remote
-              }
-
-              //all this disconnect logic needs to be revamped, VERY SOON!
-              function endCall() {
-                socket.disconnect();
-                rtcState.peerConn.close();
-                rtcState.dataChannel.close();
-                // rtcState.peerConn = null;
-                rtcState.localStream.getTracks().forEach((track) => {
-                  track.stop();
-                });
-                // mediaState.myVideo.src = "";
-                // mediaState.peerVideo.src = "";
-
-                roomState = null;
-                mediaState = null;
-                filterState = null;
-                animeState = null;
-                rtcState = null;
-
-                // disableToggle('connect', 'disconnect');
-                // let element = document.getElementById("top");
-                //remove old video instances from the dom as well as connect buttons
-                removeChildren('MRGmyBooth');
-                removeChildren('MRGpeerBooth');
-                removeChildren('MRGconnectivityBtns');
-                removeChildren('MRGemojiButtons');
-
-                hiddenToggle('MRGroomApp', 'MRGboothApp');
-              }
-
-              //disconnect event
-              document.getElementById('MRGdisconnect').addEventListener('click', (event) => {
-                socket.emit('disconnect');
-                endCall();
-                hiddenToggle('MRGconnect', 'MRGdisconnect');
-              }); //end of disconnect click event//
-
-              socket.on('updateChatters', (chatter) => {
-                socket.emit('disconnect');
-                endCall();
-                // document.getElementById('MRGmessages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
-                roomState.chattersClient.splice(roomState.chattersClient.indexOf(chatter), 1);
-                // document.getElementById('connect').disabled = false;
-              });
-
-            }, //end of stream//
-            (err) => {
-              console.error(err);
+            socket.on('readyConnect', (payload) => {
+              // document.getElementById('MRGconnect').disabled = false;
+              state.elementState.connectElement.disabled = false;
+              classToggle('MRGconnect', 'MRGelementToFadeInAndOut');
             });
+
+            //disconnect event
+            state.elementState.disconnectElement.addEventListener('click', (event) => {
+              socket.emit('disconnect');
+              endCall(socket, state, removeChildren, hiddenToggle);
+              hiddenToggle('MRGconnect', 'MRGdisconnect');
+            }); //end of disconnect click event//
+
+            socket.on('updateChatters', (chatter) => {
+              socket.emit('disconnect');
+              endCall(socket, state, removeChildren, hiddenToggle);
+              // document.getElementById('MRGmessages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
+              state.roomState.chattersClient.splice(state.roomState.chattersClient.indexOf(chatter), 1);
+              // document.getElementById('connect').disabled = false;
+            });
+
+            socket.on('initiated', (member) => {
+
+              member = JSON.parse(member);
+              mediaGenerator(stream, true, state, 'MRGmyBooth', 'MRGmyVideo', 'MRGmyCanvas');
+
+              //sets up local stream reference
+              state.rtcState.localStream = stream;
+              //set room ID shared between clients
+              state.roomState.roomID = member.roomId;
+
+              if (state.roomState.chattersClient.filter(clientChatter => clientChatter.id !== member.id).length || !state.roomState.chattersClient.length) {
+                state.roomState.chattersClient.push(member);
+                state.roomState.chatterThisClient = member.id;
+              }
+
+
+              state.elementState.connectElement.addEventListener('click', () => {
+                connectEvents(state, handleRemoteStreamAdded, onDataChannelCreated, socket, events);
+                classToggle('MRGconnect', 'MRGelementToFadeInAndOut');
+                // onDataChannelCreated(rtcState.dataChannel)
+              });
+
+              socket.on('message', (message) => {
+                if (message.type === 'offer') {
+                  if (!state.rtcState.isStarted) {
+                    startSetup(state, handleRemoteStreamAdded, socket, events);
+                    otherDataChannel(event, state, onDataChannelCreated, events);
+                  }
+                  state.rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
+                  doAnswer(state.rtcState, state.roomState, socket);
+                } else if (message.type === 'answer' && state.rtcState.isStarted) {
+                  state.rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
+                } else if (message.type === 'candidate' && state.rtcState.isStarted) {
+                  let candidate = new RTCIceCandidate({
+                    sdpMLineIndex: message.label,
+                    candidate: message.candidate
+                  });
+                  state.rtcState.peerConn.addIceCandidate(candidate);
+                }
+              });
+
+            }); //end of socket.on('initiated')
+
+
+          }, //end of stream//
+          (err) => {
+            console.error(err);
+          });
 
       } //end of boolean in socket 'process' event
 
