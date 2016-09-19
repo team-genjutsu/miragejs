@@ -11,8 +11,16 @@ domReady(() => {
 
   mirage.insertChunk(); // mount mirage chunk on DOM
 
-  mirage.on('stream', (state) => {
-    console.log('stream trigger', state);
+  mirage.on('preStream', (state) => {
+    console.log('preStream test', state);
+  });
+
+  mirage.on('localStream', (state) => {
+    console.log('localStream test', state);
+  });
+
+  mirage.on('streams', (state) => {
+    console.log('streams trigger', state);
   });
 
   mirage.on('onData', (state) => {
@@ -20,10 +28,10 @@ domReady(() => {
     // state.rtcState.dataChannel.send(JSON.stringify({onData: "yo you're up in the data channels"}));
   });
 
-  mirage.on('onMessage', (state) => {
+  mirage.on('onMessage', (state, data) => {
     // console.log('onMessage', state);
-    if(state.hasOwnProperty('dataMsg')){
-      // console.log(state.dataMsg);
+    if(data.hasOwnProperty('dataObj')){
+      console.log(data.dataObj);
     } 
   });
 

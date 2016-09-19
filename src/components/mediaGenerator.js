@@ -1,4 +1,4 @@
-function mediaGenerator(stream, url, mediaHookId, vidAttr, canAttr) {
+function mediaGenerator(stream, localBool, state, mediaHookId, vidAttr, canAttr) {
 
   let vidContainer = document.getElementById('MRGvidContainer');
   let vidContainerStyle = window.getComputedStyle(vidContainer);
@@ -13,7 +13,7 @@ function mediaGenerator(stream, url, mediaHookId, vidAttr, canAttr) {
   video.setAttribute('width', '' + videoWidth);
   video.setAttribute('height', '' + videoHeight);
   document.getElementById(mediaHookId).appendChild(video);
-  video.src = url.createObjectURL(stream);
+  video.src = state.roomState.vendorUrl.createObjectURL(stream);
 
   video.play();
 
@@ -32,11 +32,21 @@ function mediaGenerator(stream, url, mediaHookId, vidAttr, canAttr) {
   context.strokeRect(0, 0, videoWidth, videoHeight);
   //end//
 
-  return {
-    video: video,
-    canvas: canvas,
-    context: context
-  };
+  if(localBool){
+    state.mediaState.myVideo = video;
+    state.mediaState.myCanvas = canvas;
+    state.mediaState.myContext = context;
+  }else{
+    state.mediaState.peerVideo = video;
+    state.mediaState.peerCanvas = canvas;
+    state.mediaState.peerContext = context;
+  }
+
+  // return {
+    // video: video,
+    // canvas: canvas,
+    // context: context
+  // };
 }
 
 export {

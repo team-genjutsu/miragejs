@@ -89,7 +89,12 @@ function trackFace(video, canvas, context, trackingObj, videoStream, img, channe
   // console.log(emoji);
   var tracker = new trackingObj.ObjectTracker('face');
   tracker.canvasOverlay = canvas;
-  var faceRect = {x: 100, y: 100, width: emoji.width * 3, height: emoji.height * 3};
+  var faceRect = {
+    x: 100,
+    y: 100,
+    width: emoji.width * 3,
+    height: emoji.height * 3
+  };
 
   //console.log('face track has been called');
   tracker.setInitialScale(4);
@@ -100,7 +105,9 @@ function trackFace(video, canvas, context, trackingObj, videoStream, img, channe
 
   // if(isTrackingBool) {
 
-  trackingObj.track(video, tracker, {camera: true});
+  trackingObj.track(video, tracker, {
+    camera: true
+  });
   tracker.on('track', function(event) {
     context.clearRect(faceRect.x - 50, faceRect.y - img.height * 3 - 50, faceRect.width + 50, faceRect.height + img.width * 3 + 50);
     //mediaState.myContext.clearRect
@@ -141,7 +148,7 @@ function trackFace(video, canvas, context, trackingObj, videoStream, img, channe
 // })();
 
 function hat(cv, ctx, rect, img) {
-    //console.log("rect in hat", rect, "cv in hat", cv);
+  //console.log("rect in hat", rect, "cv in hat", cv);
   ctx.clearRect(0, 0, 20000, 20000);
   ctx.drawImage(img, rect.x, rect.y - 5, rect.height, rect.width);
 
@@ -156,6 +163,7 @@ function cutCircle(context, x, y, radius) {
 } //end cutCircle//
 
 //these functions need to be ported to proper file
+//element manipulation
 function hiddenToggle(ele1, ele2) {
   let args = [...arguments];
   args.forEach((ele, idx) => {
@@ -182,8 +190,8 @@ function hiddenToggle(ele1, ele2) {
 // }
 // } //end paste//
 
+//element manipulation
 function disableToggle(ele1, ele2) {
-
   let args = [...arguments];
   args.forEach((ele, idx) => {
     document.getElementById(ele).disabled ? document.getElementById(ele).disabled = false : document.getElementById(ele).disabled = true;
@@ -204,6 +212,7 @@ function getCursorPosition(canvas, event) {
 } //end getCursorPosition//
 
 //streamline vendor prefixing for css filtering
+//element manipulation
 function setVendorCss(element, style) {
   element.style.webkitFilter = style;
   element.style.mozFilter = style;
@@ -249,6 +258,7 @@ function angularVelocity(obj, ctx, cv, cb, emoImg, animate, rafObj, evt) {
   rafObj[evt.timeStamp.toString()] = animate;
 } //end angularVelocity//
 
+//video and canvas dimensional manipulation
 function resizeMedia(win, state, container, func1, func2, func3) {
 
   let styleWidth1 = func1(state.myVideo, win).vidWidth,
@@ -263,6 +273,7 @@ function resizeMedia(win, state, container, func1, func2, func3) {
   container.style.height = func1(container, win).vidHeight + 'px';
 }
 
+//video and canvas dimensional manipulation
 function toggleVidSize(win, state, func1, func2, func3) {
   let arr,
     styleWidth1 = func1(state.myVideo, win).vidWidth,
@@ -272,7 +283,7 @@ function toggleVidSize(win, state, func1, func2, func3) {
     let dims = func2(state.myVideo, win);
     setSizes(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, dims);
     arr = [state.myVideo, state.myCanvas, state.peerVideo, state.peerCanvas];
-    booths.forEach( (ele, idx) => {
+    booths.forEach((ele, idx) => {
       func3(ele, 'MRGpointerToggle');
     });
 
@@ -281,7 +292,7 @@ function toggleVidSize(win, state, func1, func2, func3) {
     setSizes(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, dims);
     arr = [state.peerVideo, state.peerCanvas, state.myVideo, state.myCanvas];
 
-    booths.forEach( (ele, idx) => {
+    booths.forEach((ele, idx) => {
       func3(ele, 'MRGpointerToggle');
     });
   }
@@ -296,6 +307,7 @@ function toggleVidSize(win, state, func1, func2, func3) {
 
 }
 
+//video and canvas dimensional manipulation
 function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, dims) {
   upVid.setAttribute('width', '' + dims.bigVidWidth);
   upVid.setAttribute('height', '' + dims.bigVidHeight);
@@ -315,6 +327,7 @@ function setSizes(upVid, upCanvas, upContext, downVid, downCanvas, downContext, 
   downContext.strokeRect(0, 0, downCanvas.width, downCanvas.height);
 }
 
+//video and canvas dimensional manipulation
 function generateDims(container, win) {
   let containerStyle = win.getComputedStyle(container);
   let styleWidth = containerStyle.getPropertyValue('width');
@@ -327,6 +340,7 @@ function generateDims(container, win) {
   };
 }
 
+//video and canvas dimensional manipulation
 function vidDims(bigVid, win) {
   let vidStyle = win.getComputedStyle(bigVid);
   let styleWidth = vidStyle.getPropertyValue('width');
@@ -343,6 +357,7 @@ function vidDims(bigVid, win) {
   };
 }
 
+//not used
 function scaleToFill(videoTag, height, width) {
   let video = videoTag,
     videoRatio = 4 / 3,
@@ -354,6 +369,7 @@ function scaleToFill(videoTag, height, width) {
   }
 }
 
+//not used 
 function scaleElement(vid, height, width) {
   let video = vid;
   let actualRatio = 4 / 3;
@@ -363,6 +379,7 @@ function scaleElement(vid, height, width) {
   video.setAttribute('style', '-webkit-transform: scale(' + scale + ')');
 }
 
+//element manipulator
 function classToggle(btnEleId, classType) {
   if (document.getElementById(btnEleId).classList.contains(classType)) {
     document.getElementById(btnEleId).classList.remove(classType);
@@ -370,6 +387,8 @@ function classToggle(btnEleId, classType) {
     document.getElementById(btnEleId).classList.add(classType);
   }
 }
+
+//element manipulator
 function appendConnectButtons() {
   //creating buttons will replace everytime so eventlistener is good. Will pull out of file
   let connectivityBtns = document.getElementById('MRGconnectivityBtns');
@@ -389,6 +408,7 @@ function appendConnectButtons() {
 }
 
 //remove child element of passed in argument from dom
+//element manipulator
 function removeChildren(el) {
   let element = document.getElementById(el);
 
@@ -399,6 +419,7 @@ function removeChildren(el) {
 
 
 //this should stop the request animation frame recursive calls and also clear the canvas
+//element manipulator
 function clearFunc(animeSt, mediaSt) {
   for (let rafID in animeSt.rafObj) {
     cancelAnimationFrame(animeSt.rafObj[rafID]);
@@ -409,6 +430,7 @@ function clearFunc(animeSt, mediaSt) {
   mediaSt.peerContext.clearRect(0, 0, 10000, 10000);
 }
 
+//make a new function store of element manipulators
 function toggleZindex() {
   // toggle Z index of non MRG elements to have Mirage component always show
   // only if can access dom elements
@@ -424,9 +446,47 @@ function toggleZindex() {
   }
 }
 
+
+function receivedAnimation(localBool, animeState, mediaState, event, dataObj, func1, func2) {
+  let emoImg = new Image();
+  emoImg.src = dataObj.currentImg;
+
+  animeState.temp = animeState.currentAnimation;
+  animeState.currentAnimation = animeState.anime[dataObj.animation];
+  if (localBool) {
+    animeState.currentAnimation(mediaState.myCanvas, mediaState.myContext, event, dataObj.position, emoImg, animeState.raf, [func1, func2], animeState.rafObj);
+  } else {
+    animeState.currentAnimation(mediaState.peerCanvas, mediaState.peerContext, event, dataObj.position, emoImg, animeState.raf, [func1, func2], animeState.rafObj);
+  }
+  animeState.currentAnimation = animeState.temp;
+
+}
+
+//should go with rtc functions
+function endCall(socket, state, func1, func2) {
+  socket.disconnect();
+  state.rtcState.peerConn.close();
+  state.rtcState.dataChannel.close();
+  state.rtcState.localStream.getTracks().forEach((track) => {
+    track.stop();
+  });
+
+  for (var k in state) {
+    state[k] = null;
+  }
+
+  func1('MRGmyBooth');
+  func1('MRGpeerBooth');
+  func1('MRGconnectivityBtns');
+  func1('MRGemojiButtons');
+
+  func2('MRGroomApp', 'MRGboothApp');
+}
 ///end of function store///
 
 export {
+  endCall,
+  receivedAnimation,
   toggleVidSize,
   vidDims,
   hiddenToggle,
