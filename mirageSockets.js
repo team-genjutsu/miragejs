@@ -10,14 +10,14 @@ module.exports = function(server) {
     this.id = obj.roomId;
     this.members = [];
     this.addMember = function(member) {
-      this.members.push(member)
-    }
+      this.members.push(member);
+    };
   }
 
   //member constructor
   function Member(socketId, roomId, initiator) {
     this.id = socketId;
-    this.roomId = roomId
+    this.roomId = roomId;
     this.initiator = initiator;
     this.signalId = null;
   }
@@ -25,11 +25,11 @@ module.exports = function(server) {
 
   io.sockets.on('connection', function(socket) {
     connections.push(socket);
-    console.log(socket.id + ' joined!')
+    console.log(socket.id + ' joined!');
 
     //disconnecting users
     socket.once('disconnect', function() {
-      console.log('disconnect triggered')
+      console.log('disconnect triggered');
 
       // console.log('room:  ', rooms[0])
 
@@ -46,21 +46,21 @@ module.exports = function(server) {
             rooms[idx].members.forEach((el, id) => {
               io.to(el.id).emit('updateChatters', member);
               socket.disconnect();
-            })
+            });
           }
 
           ele.members.splice(ele.members.indexOf(member), 1);
           if (!rooms[idx].members.length) rooms.splice(idx, 1);
         }
 
-      })
+      });
 
       // console.log('after going through and disconnecting sockets',rooms)
       connections.splice(connections.indexOf(socket), 1);
       // console.log(socket.id + ' left room ' + member.roomId)
 
       // console.log('room:  ', rooms[0])
-    })
+    });
 
     //join room logic
     socket.on('joinRoom', (payload) => {
@@ -77,7 +77,7 @@ module.exports = function(server) {
         io.to(socket.id).emit('process', JSON.stringify(true));
       }
 
-    })
+    });
 
     //initiate
     socket.on('initiate', (payload) => {
@@ -91,17 +91,17 @@ module.exports = function(server) {
       if (existingRoom.length === 0) {
 
         room = new Room(payload);
-        member = new Member(socket.id, payload.roomId, true)
+        member = new Member(socket.id, payload.roomId, true);
         room.addMember(member);
         rooms.push(room);
 
       } else if (existingRoom[0].members.length === 1) {
 
-        member = new Member(socket.id, payload.roomId, false)
-        existingRoom[0].addMember(member)
+        member = new Member(socket.id, payload.roomId, false);
+        existingRoom[0].addMember(member);
         existingRoom[0].members.forEach((ele, idx) => {
           io.to(ele.id).emit('readyConnect', JSON.stringify('both connected'));
-        })
+        });
       }
       io.to(socket.id).emit('initiated', JSON.stringify(member));
 
@@ -128,5 +128,5 @@ module.exports = function(server) {
 
     }); //end of signaling
 
-  })
+  });
 };

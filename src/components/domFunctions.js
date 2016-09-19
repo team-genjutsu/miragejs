@@ -156,7 +156,7 @@ function classToggle(btnEleId, classType) {
 }
 
 //element manipulator
-function appendConnectButtons() {
+function appendConnectButtons(state) {
   //creating buttons will replace everytime so eventlistener is good. Will pull out of file
   let connectivityBtns = document.getElementById('MRGconnectivityBtns');
   let conButton = document.createElement('button');
@@ -172,6 +172,8 @@ function appendConnectButtons() {
   disconButton.classList.add('MRGhidden');
   connectivityBtns.appendChild(conButton);
   connectivityBtns.appendChild(disconButton);
+  state.elementState.connectElement = conButton;
+  state.elementState.disconnectElement = disconButton;
 }
 
 //remove child element of passed in argument from dom
