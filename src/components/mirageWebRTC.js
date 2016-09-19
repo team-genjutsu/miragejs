@@ -120,6 +120,26 @@ function setLocalAndSendMessage(sessionDescription, rtcState, roomState, socket)
   sendMessage(sessionDescription, 'other', roomState, socket);
 } //close misc webRTC helper function
 
+function endCall(socket, state, func1, func2) {
+  socket.disconnect();
+  state.rtcState.peerConn.close();
+  state.rtcState.dataChannel.close();
+  state.rtcState.localStream.getTracks().forEach((track) => {
+    track.stop();
+  });
+
+  for (var k in state) {
+    state[k] = null;
+  }
+
+  func1('MRGmyBooth');
+  func1('MRGpeerBooth');
+  func1('MRGconnectivityBtns');
+  func1('MRGemojiButtons');
+
+  func2('MRGroomApp', 'MRGboothApp');
+}
+
 export {
   connectEvents,
   startSetup,
@@ -130,5 +150,6 @@ export {
   handleRemoteStreamRemoved,
   doCall,
   doAnswer,
-  setLocalAndSendMessage
+  setLocalAndSendMessage,
+  endCall
 };

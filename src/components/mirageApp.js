@@ -8,34 +8,33 @@ import {
   peerTrackingListener
 } from './listenerFuncs';
 import {
-  endCall,
   receivedAnimation,
-  toggleVidSize,
-  vidDims,
-  hiddenToggle,
-  disableToggle,
-  generateDims,
-  scaleToFill,
-  scaleElement,
-  classToggle,
   cutCircle,
   angularVelocity,
   velocity,
   drawVideo,
-  setVendorCss,
   getCursorPosition,
   orbit,
   paste,
   bounce,
-  appendConnectButtons,
-  removeChildren,
-  clearFunc,
-  toggleZindex,
-  resizeMedia,
-  setSizes,
   trackFace,
   hat
 } from './funcStore';
+import {
+  disableToggle,
+  hiddenToggle,
+  setVendorCss,
+  toggleVidSize,
+  toggleZindex,
+  clearFunc,
+  removeChildren,
+  resizeMedia,
+  setSizes,
+  generateDims,
+  vidDims,
+  classToggle,
+  appendConnectButtons
+} from './domFunctions';
 import {
   mediaGenerator
 } from './mediaGenerator';
@@ -56,7 +55,8 @@ import {
   handleRemoteStreamRemoved,
   doCall,
   doAnswer,
-  setLocalAndSendMessage
+  setLocalAndSendMessage,
+  endCall
 } from './mirageWebRTC';
 require('./tracking');
 
@@ -267,7 +267,7 @@ function mirageApp(filters, images, events) {
                 peerTrackingListener(state.mediaState.peerVideo, state.mediaState.peerCanvas, state.mediaState.peerContext, state.animeState.emoImg, channel, trackFace, tracking, state.rtcState.remoteStream);
 
                 document.getElementById('MRGvideoToggle').addEventListener('click', () => {
-                  toggleVidSize(window, state.mediaState, generateDims, vidDims, classToggle);
+                  toggleVidSize(window, state.mediaState, generateDims, vidDims, classToggle, setSizes);
                 });
 
                 // changing this because the multi event listener is retogglei
@@ -401,7 +401,7 @@ function mirageApp(filters, images, events) {
 
               state.mediaState.peerCanvas.classList.add('MRGpointerToggle');
 
-              toggleVidSize(window, state.mediaState, generateDims, vidDims, classToggle);
+              toggleVidSize(window, state.mediaState, generateDims, vidDims, classToggle, setSizes);
 
               hiddenToggle('MRGconnect', 'MRGdisconnect');
 
