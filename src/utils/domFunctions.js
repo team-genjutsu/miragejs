@@ -41,21 +41,26 @@ function resizeMedia(win, state, container, func1, func2, func3) {
 }
 
 //video and canvas dimensional manipulation
-function toggleVidSize(win, state, func1, func2, func3, func4) {
+function toggleVidSize(win, state, localCanvasId, remoteCanvasId, func1, func2, func3, func4) {
+  console.log('toggle vid size triggered');
   let arr,
     styleWidth1 = func1(state.myVideo, win).vidWidth,
     styleWidth2 = func1(state.peerVideo, win).vidWidth,
-    booths = ['MRGmyCanvas', 'MRGpeerCanvas'];
+    booths = [localCanvasId, remoteCanvasId];
+
   if (styleWidth1 >= styleWidth2) {
     let dims = func2(state.myVideo, win);
+
     func4(state.peerVideo, state.peerCanvas, state.peerContext, state.myVideo, state.myCanvas, state.myContext, dims);
     arr = [state.myVideo, state.myCanvas, state.peerVideo, state.peerCanvas];
+
     booths.forEach((ele, idx) => {
       func3(ele, 'MRGpointerToggle');
     });
 
   } else {
     let dims = func2(state.peerVideo, win);
+
     func4(state.myVideo, state.myCanvas, state.myContext, state.peerVideo, state.peerCanvas, state.peerContext, dims);
     arr = [state.peerVideo, state.peerCanvas, state.myVideo, state.myCanvas];
 

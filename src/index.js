@@ -7,32 +7,64 @@ import {
   mirageApp
 } from './components/mirageApp';
 
-import {
-  roomStore,
-  filterStore,
-  mediaStore,
-  animeStore,
-  rtcStore,
-  elementStore
-} from './components/mirageStore';
 
 export function Mirage() {
 
-  this.putFilters = null;
-  this.putImages = null;
-  this.state = {
-    roomState: new roomStore(window.URL),
-    rtcState: new rtcStore()
-  };
-  
-  this.events = {
-    // stream: null,
-    // onMessage: null,
-    // onData: null
-  };
+  this.domIds = null;
+
+  this.state = {};
+
+  this.events = {};
+
+  Object.defineProperties(this.events, {
+    'initial': {
+      value: null,
+      writable: true
+    },
+    'preStream': {
+      value: null,
+      writable: true
+    },
+    'localStream': {
+      value: null,
+      writable: true
+    },
+    'readyConnect': {
+      value: null,
+      writable: true
+    },
+    'connectTriggered': {
+      value: null,
+      writable: true
+    },
+    'streams': {
+      value: null,
+      writable: true
+    },
+    'onMessage': {
+      value: null,
+      writable: true
+    },
+    'onData': {
+      value: null,
+      writable: true
+    },
+    'nonInitiatorData': {
+      value: null,
+      writable: true
+    },
+    'end': {
+      value: null,
+      writable: true
+    }
+  });
+
+  Object.preventExtensions(this.events);
 
   this.on = (event, func) => {
-    this.events[event] = func;
+    if (this.events.hasOwnProperty(event)) {
+      this.events[event] = func;
+    }
   };
 
   //methods for mirage component usage, very opinionated//
@@ -41,7 +73,7 @@ export function Mirage() {
   //end opinions//
 
   this.startApp = () => {
-    mirageApp(this.putFilters, this.putImages, this.events, this.state);
+    mirageApp(this.events, this.state, this.domIds);
   };
-  
+
 }

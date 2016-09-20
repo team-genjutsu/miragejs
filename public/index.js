@@ -3,7 +3,7 @@ import {
 } from './../src/index';
 import {
   domReady
-} from './../src/components/domReady';
+} from './../src/utils/domReady';
 
 import {
   filterListener,
@@ -11,7 +11,7 @@ import {
   clearListener,
   myTrackingListener,
   peerTrackingListener
-} from './../src/components/listenerFuncs';
+} from './../src/utils/listenerFuncs';
 
 import {
   receivedAnimation,
@@ -25,7 +25,7 @@ import {
   bounce,
   trackFace,
   hat
-} from './../src/components/funcStore';
+} from './../src/utils/funcStore';
 
 import {
   disableToggle,
@@ -41,18 +41,12 @@ import {
   vidDims,
   classToggle,
   appendConnectButtons
-} from './../src/components/domFunctions';
+} from './../src/utils/domFunctions';
 
 import {
-  mediaGenerator
-} from './../src/components/mediaGenerator';
-
-import {
-  elementStore,
-  mediaStore,
   filterStore,
   animeStore
-} from './../src/components/mirageStore';
+} from './../src/utils/utilStore';
 
 require('./../src/components/tracking');
 
@@ -66,41 +60,41 @@ domReady(() => {
 
   mirage.insertChunk(); // mount mirage chunk on DOM
 
-  
+  // mirage.domIds = ['MRGjoin-button', 'MRGconnect', 'MRGdisconnect', 'MRGroom-id-input', 'MRGmyBooth', 'MRGmyVideo', 'MRGmyCanvas', 'MRGpeerBooth', 'MRGpeerVideo', 'MRGpeerCanvas'];
+
   ///beginning of manipulation/event access methods///
   //manipulation at beginning of mirage process
   mirage.on('initial', (state) => {
 
-    state.elementState.materialBtn.addEventListener('click', () => {
+    document.getElementById('MRGmaterialBtn').addEventListener('click', () => {
       // need to parse through stylesheets and set z-indexes of elements to -1 with
       // each toggle
-      state.elementState.demo.classList.toggle('MRGhidden');
+      document.getElementById('MRGdemo').classList.toggle('MRGhidden');
       toggleZindex();
     });
 
-    state.elementState.materialBtn.addEventListener('drag', (event) => {
+    document.getElementById('MRGmaterialBtn').addEventListener('drag', (event) => {
       // console.log(event);
     });
 
-    state.elementState.materialBtn.addEventListener('dragend', (event) => {
+    document.getElementById('MRGmaterialBtn').addEventListener('dragend', (event) => {
       // console.log('drag over', event.clientX);
-      state.elementState.materialBtn.style.left = event.clientX + 'px';
-      state.elementState.materialBtn.style.top = (event.clientY - 60) + 'px';
+      document.getElementById('MRGmaterialBtn').style.left = event.clientX + 'px';
+      document.getElementById('MRGmaterialBtn').style.top = (event.clientY - 60) + 'px';
     });
   });
 
 
   //manipulation right before MediaDevices process starts
-  mirage.on('preStream', (state, filters, images) => {
+  mirage.on('preStream', (state) => {
 
-    state.mediaState = new mediaStore('MRGmyBooth', 'MRGpeerBooth');
     state.filterState = new filterStore('MRGfilterDisp', 'MRGfilter');
     state.animeState = new animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
 
 
     //add input filters or images
-    state.filterState.addFilters(filters);
-    state.animeState.addEmoji(images);
+    // state.filterState.addFilters(filters);
+    // state.animeState.addEmoji(images);
 
     appendConnectButtons(state);
 
@@ -118,13 +112,13 @@ domReady(() => {
 
     hiddenToggle('MRGroomApp', 'MRGboothApp');
 
-    state.elementState.boothComponent.addEventListener('drag', (event) => {
+    document.getElementById('MRGbooth').addEventListener('drag', (event) => {
 
     });
 
-    state.elementState.boothComponent.addEventListener('dragend', (event) => {
-      state.elementState.fixedComponent.style.left = event.clientX + 'px';
-      state.elementState.fixedComponent.style.top = event.clientY + 'px';
+    document.getElementById('MRGbooth').addEventListener('dragend', (event) => {
+      document.getElementById('MRGfixed').style.left = event.clientX + 'px';
+      document.getElementById('MRGfixed').style.top = event.clientY + 'px';
     });
   });
 
@@ -134,15 +128,24 @@ domReady(() => {
     console.log('localStream test', state);
   });
 
+  //manipulation during socket 'readyConnect' event which signals clients that connection is ready
+  mirage.on('readyConnect', (state) => {
+    state.elementState.connectElement.disabled = false;
+    classToggle(state.elementState.connectId, 'MRGelementToFadeInAndOut');
+  });
+
+  //manipulation right after connection event happens
+  mirage.on('connectTriggered', (state) => {
+    classToggle(state.elementState.connectId, 'MRGelementToFadeInAndOut');
+  });
+
 
   //manipulation right after remote stream becomes available
   mirage.on('streams', (state) => {
 
-    mediaGenerator(state.rtcState.remoteStream, false, state, 'MRGpeerBooth', 'MRGpeerVideo', 'MRGpeerCanvas');
-
     state.mediaState.peerCanvas.classList.add('MRGpointerToggle');
 
-    toggleVidSize(window, state.mediaState, generateDims, vidDims, classToggle, setSizes);
+    toggleVidSize(window, state.mediaState, 'MRGmyCanvas', 'MRGpeerCanvas', generateDims, vidDims, classToggle, setSizes);
 
     hiddenToggle('MRGconnect', 'MRGdisconnect');
   });
@@ -159,17 +162,17 @@ domReady(() => {
 
     filterListener(state.mediaState.peerVideo, 'MRGpeerFilter', state.filterState.currFilter, false, state.rtcState.dataChannel, setVendorCss);
 
-    clearListener(state.rtcState.dataChannel, clearFunc, state.elementState.clearButton, state.animeState, state.mediaState);
+    clearListener(state.rtcState.dataChannel, clearFunc, document.getElementById('MRGclear'), state.animeState, state.mediaState);
 
     myTrackingListener(state.mediaState.myVideo, state.mediaState.myCanvas, state.mediaState.myContext, state.animeState.emoImg, tracking, state.rtcState.dataChannel);
 
     peerTrackingListener(state.mediaState.peerVideo, state.mediaState.peerCanvas, state.mediaState.peerContext, state.animeState.emoImg, state.rtcState.dataChannel, trackFace, tracking, state.rtcState.remoteStream);
 
     document.getElementById('MRGvideoToggle').addEventListener('click', () => {
-      toggleVidSize(window, state.mediaState, generateDims, vidDims, classToggle, setSizes);
+      toggleVidSize(window, state.mediaState, 'MRGmyCanvas', 'MRGpeerCanvas', generateDims, vidDims, classToggle, setSizes);
     });
 
-    // changing this because the multi event listener is retogglei
+    // changing this because the multi event listener is retoggling
     disableToggle('MRGconnect', 'MRGdisconnect');
 
     window.onresize = () => {
@@ -263,16 +266,28 @@ domReady(() => {
   //manipulation of nonInitializer client logic when data channel
   //becomes available for them
   mirage.on('nonInitiatorData', (state) => {
-  
+
     animationListener(state.mediaState.peerCanvas, state.animeState.emoImg, state.animeState.anime, state.animeState.currAnime, state.mediaState.peerContext, state.animeState.raf, [velocity, angularVelocity], state.rtcState.dataChannel, false, getCursorPosition, state.animeState.rafObj);
+
+  });
+
+  mirage.on('end', (state) => {
+    let parentNodes = [
+      'MRGmyBooth',
+      'MRGpeerBooth',
+      'MRGconnectivityBtns',
+      'MRGemojiButtons'
+    ];
+
+    parentNodes.forEach((ele) => {
+      removeChildren(ele);
+    });
+
+    hiddenToggle('MRGroomApp', 'MRGboothApp');
 
   });
   ///end of event access methods///
 
-  mirage.putFilters = []; //add filters
-  mirage.putImages = []; //add images
-
   mirage.startApp(); // start mirage logic
-
 
 });

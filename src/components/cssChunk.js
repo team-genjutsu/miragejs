@@ -123,34 +123,22 @@ background: -ms-linear-gradient(left, rgba(226,226,226,1) 0%, rgba(219,219,219,1
   height: 100%;
   width: 100%;
 }
-#MRGmyBooth {
-  position: absolute;
-}
-#MRGpeerBooth {
-  position: absolute;
-}
 #MRGmyVideo {
   text-align: center;
-  position: absolute;
   z-index: 2;
   visibility: visible;
 }
 #MRGpeerVideo {
   text-align: center;
-  position: absolute;
   z-index: 2;
   visibility: visible;
 }
 #MRGmyCanvas {
   text-align: center;
-  z-index: 2147483000;
-  position: absolute;
   visibility: visible;
 }
 #MRGpeerCanvas {
   text-align: center;
-  z-index: 2147483000;
-  position: absolute;
   visibility: visible;
 }
 .MRGbtn {
