@@ -121,7 +121,7 @@ background: -ms-linear-gradient(left, rgba(226,226,226,1) 0%, rgba(219,219,219,1
 #MRGvidContainer {
   margin: auto;
   height: 100%;
-  width: 100%;
+  width: 90%;
 }
 #MRGmyVideo {
   text-align: center;
