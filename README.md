@@ -55,32 +55,54 @@ mirage.putImages = ['https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.6/asset
 
 ## Run your own functions and animations within select events. They take no input, but 'state' is accessible, see below 
 
-
-### When stream event triggers (both local and remote streams accessible) 
+### 'initial' event triggers immediately after mirage process begins
 ```bash
-mirage.on('stream', (state) => {
-    // console.log(state);
-  });
+mirage.on('initial', (state, filters, images) => {
+     //console.log(state);
+});
 ```
 
-### When onData event triggers (data channel becomes accessible for sending data)
+### 'preStream' event triggers immediately before local stream becomes available
+```bash
+mirage.on('preStream', (state, filters, images) => {
+     //console.log(state);
+});
+```
+
+### 'localStream' event triggers immediately after local stream becomes available
+```bash
+mirage.on('localStream', (state) => {
+     //console.log(state);
+});
+```
+
+### 'streams' event triggers (both local and remote streams accessible) 
+```bash
+mirage.on('streams', (state) => {
+    // console.log(state);
+});
+```
+
+### 'onData' event triggers (data channel becomes accessible for sending data)
 ```bash
 mirage.on('onData', (state) => {
     // console.log(state);
     state.rtcState.dataChannel.send(JSON.stringify({onData: "yo you're up in the data channels"}));
-  });
-  ```
-  
-### When onMessage event triggers (incoming data becomes accessible)
-```bash
-mirage.on('onMessage', (state) => {
-    // console.log(state);
-    if(state.hasOwnProperty('dataMsg')){
-      console.log(state.dataMsg);
-    } 
-  });
+});
 ```
-
+  
+### 'onMessage' event triggers (incoming data becomes accessible)
+```bash
+mirage.on('onMessage', (state, dataObj) => {
+    // console.log(state, dataObj);
+});
+```
+### Data becomes available to 'non-initiator' client (available via state.rtcState.dataChannel property)
+```bash
+mirage.on('nonInitiatorData', (state) => {
+     // console.log(state);
+});
+```
 
 ## States
 
@@ -142,12 +164,25 @@ state.animeState = {
 
 ### RTC State
 ```bash
-state.rtc = {
+state.rtcState = {
   localStream: //local video stream
   remoteStream: //remote video stream
   dataChannel: //data channel shared between clients
 }
 ```
+
+### Element State (DOM nodes)
+```bash
+state.elementState = {
+  clearButton: document.getElementById(clearId);
+  joinButton: document.getElementById(joinId);
+  materialBtn: document.getElementById(materialId);
+  demo: document.getElementById(demoId);
+  fixedComponent: document.getElementById(fixedId);
+  boothComponent: document.getElementById(boothId);
+  connectElement: document.getElementById(connectId);
+  disconnectElement: document.getElementById(disconnectId);
+}
 
 ## Our Team
 * Kevin Liu - [github.com/kevoutthebox](https://github.com/kevoutthebox)
