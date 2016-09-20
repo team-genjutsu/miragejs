@@ -1,4 +1,4 @@
-  onmessage = function(event) {
+onmessage = function(event) {
 
 
   var data = event.data[0];
@@ -84,17 +84,17 @@
     }
 
     if (stageSum < stageThreshold) {
-//console.log("eval false", stageSum, stageThreshold);
+      //console.log("eval false", stageSum, stageThreshold);
       postMessage({
         status: false
       });
 
     }
   }
-//console.log("eval true");
+  //console.log("eval true");
   postMessage({
-     status: true
-   });
+    status: true
+  });
 
 
 };

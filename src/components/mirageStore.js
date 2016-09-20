@@ -20,6 +20,7 @@ function roomStore(url) {
   this.chattersClient = [];
   this.chatterThisClient = null;
   this.roomID = null;
+  this.startMedia = false;
 }
 
 function mediaStore(localBooth, remoteBooth) {
@@ -107,10 +108,22 @@ function rtcStore() {
   };
 }
 
+function elementStore(clearId, joinId, materialId, demoId, fixedId, boothId, connectId, disconnectId){
+  this.clearButton = document.getElementById(clearId);
+  this.joinButton = document.getElementById(joinId);
+  this.materialBtn = document.getElementById(materialId);
+  this.demo = document.getElementById(demoId);
+  this.fixedComponent = document.getElementById(fixedId);
+  this.boothComponent = document.getElementById(boothId);
+  this.connectElement = document.getElementById(connectId);
+  this.disconnectElement = document.getElementById(disconnectId);
+}
+
 export {
   roomStore,
   filterStore,
   mediaStore,
   animeStore,
-  rtcStore
+  rtcStore,
+  elementStore
 };
