@@ -1,4 +1,16 @@
-function mediaGenerator(stream, localBool, state, mediaHookId, vidAttr, canAttr) {
+function mediaGenerator(stream, localBool, state) {
+
+  //please god, don't judge me for this monstrosity!
+  let boothId, vidId, canId;
+  if(localBool){
+    boothId = state.elementState.localBoothId;
+    vidId = state.elementState.localVidId;
+    canId = state.elementState.localCanvasId;
+  }else{
+    boothId = state.elementState.remoteBoothId;
+    vidId = state.elementState.remoteVidId;
+    canId = state.elementState.remoteCanvasId;
+  }
 
   let vidContainer = document.getElementById('MRGvidContainer');
   let vidContainerStyle = window.getComputedStyle(vidContainer);
@@ -9,18 +21,18 @@ function mediaGenerator(stream, localBool, state, mediaHookId, vidAttr, canAttr)
   let videoHeight = Math.round((videoWidth / 4) * 3);
   vidContainer.style.height = videoHeight +'px';
   let video = document.createElement('video');
-  video.setAttribute('id', vidAttr);
+  video.setAttribute('id', vidId);
   video.setAttribute('width', '' + videoWidth);
   video.setAttribute('height', '' + videoHeight);
-  document.getElementById(mediaHookId).appendChild(video);
+  document.getElementById(boothId).appendChild(video);
   video.src = state.roomState.vendorUrl.createObjectURL(stream);
 
   video.play();
 
   //draw local overlay canvas//
   let canvas = document.createElement('canvas');
-  canvas.setAttribute('id', canAttr);
-  document.getElementById(mediaHookId).appendChild(canvas);
+  canvas.setAttribute('id', canId);
+  document.getElementById(boothId).appendChild(canvas);
   let context = canvas.getContext('2d');
 
   //width and height should eventually be translated to exact coordination
@@ -31,6 +43,12 @@ function mediaGenerator(stream, localBool, state, mediaHookId, vidAttr, canAttr)
   //draws blank canvas on top of video
   context.strokeRect(0, 0, videoWidth, videoHeight);
   //end//
+
+  //crucial styling//
+  document.getElementById(boothId).style.position = 'absolute';
+  video.style.position = 'absolute';
+  canvas.style.position = 'absolute';
+  canvas.style.zIndex = '2147483000';
 
   if(localBool){
     state.mediaState.myVideo = video;

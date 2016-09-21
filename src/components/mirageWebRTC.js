@@ -1,8 +1,8 @@
 'use strict';
 
-function connectEvents(state, func1, func2, socket, events) {
+function connectEvents(state, handRemStream, func2, socket, events, mediaGenerator) {
   // console.log('connectEvent function: ' + rtcState);
-  startSetup(state, func1, socket, events);
+  startSetup(state, handRemStream, socket, events, mediaGenerator);
   //data channel creation
 
   //create data channel
@@ -13,21 +13,21 @@ function connectEvents(state, func1, func2, socket, events) {
   doCall(state.rtcState, state.roomState, socket);
 }
 
-function startSetup(state, func, socket, events) {
+function startSetup(state, handRemStream, socket, events, mediaGenerator) {
   // console.log('startSetup? ', rtcState.isStarted, rtcState.localStream);
   if (!state.rtcState.isStarted && typeof state.rtcState.localStream !== 'undefined') {
     // console.log('creating peer connection');
-    createPeerConnection(state, func, socket, events);
+    createPeerConnection(state, handRemStream, socket, events, mediaGenerator);
     state.rtcState.peerConn.addStream(state.rtcState.localStream);
     state.rtcState.isStarted = true;
   }
 }
 
-function createPeerConnection(state, func, socket, events) {
+function createPeerConnection(state, handRemStream, socket, events, mediaGenerator) {
   try {
     state.rtcState.peerConn = new RTCPeerConnection(state.rtcState.pcConfig);
     state.rtcState.peerConn.onicecandidate = () => handleIceCandidate(event, state.roomState, socket);
-    state.rtcState.peerConn.onaddstream = () => func(event, state, events); //handleRemoteStreamAdded;
+    state.rtcState.peerConn.onaddstream = () => handRemStream(event, state, events, mediaGenerator); //handleRemoteStreamAdded;
     state.rtcState.peerConn.onremovestream = handleRemoteStreamRemoved;
     state.rtcState.peerConn.oniceconnectionstatechange = () => handleIceConnStateChange(event, state.rtcState);
   } catch (err) {
@@ -117,7 +117,7 @@ function setLocalAndSendMessage(sessionDescription, rtcState, roomState, socket)
   sendMessage(sessionDescription, 'other', roomState, socket);
 } //close misc webRTC helper function
 
-function endCall(socket, state, func1, func2) {
+function endCall(socket, state, events) {
   socket.disconnect();
   state.rtcState.peerConn.close();
   state.rtcState.dataChannel.close();
@@ -129,18 +129,14 @@ function endCall(socket, state, func1, func2) {
     state[k] = null;
   }
 
-  func1('MRGmyBooth');
-  func1('MRGpeerBooth');
-  func1('MRGconnectivityBtns');
-  func1('MRGemojiButtons');
-
-  func2('MRGroomApp', 'MRGboothApp');
+  events.end(state);
 }
 
-function handleRemoteStreamAdded(event, state, events) {
+function handleRemoteStreamAdded(event, state, events, mediaGenerator) {
   // after adding remote sream, set the source of peer video to their stream
   state.rtcState.remoteStream = event.stream;
 
+  mediaGenerator(state.rtcState.remoteStream, false, state);
   //user input for streams event listener
   events.streams(state);
 }

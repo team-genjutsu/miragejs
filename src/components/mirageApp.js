@@ -2,20 +2,12 @@ import adapter from 'webrtc-adapter';
 import io from 'socket.io-client';
 
 import {
-  hiddenToggle,
-  removeChildren,
-  classToggle
-} from './domFunctions';
-
-import {
   mediaGenerator
 } from './mediaGenerator';
 
 import {
   roomStore,
-  filterStore,
   mediaStore,
-  animeStore,
   rtcStore,
   elementStore
 } from './mirageStore';
@@ -41,11 +33,11 @@ import {
 // to user manipulation
 
 
-function mirageApp(filters, images, events, state) {
+function mirageApp(events, state, domIds) {
 
-  // let state = {};
-  // console.log(state);
-  state.elementState = new elementStore('MRGclear', 'MRGjoin-button', 'MRGmaterialBtn', 'MRGdemo', 'MRGfixed', 'MRGbooth', 'MRGconnect', 'MRGdisconnect');
+  domIds = domIds || ['MRGjoin-button', 'MRGconnect', 'MRGdisconnect', 'MRGroom-id-input', 'MRGmyBooth', 'MRGmyVideo', 'MRGmyCanvas', 'MRGpeerBooth', 'MRGpeerVideo', 'MRGpeerCanvas'];
+
+  state.elementState = new elementStore(domIds);
 
   //initial user input event
   events.initial(state);
@@ -91,14 +83,18 @@ function mirageApp(filters, images, events, state) {
     // state.mediaState = new mediaStore('MRGmyBooth', 'MRGpeerBooth');
     // state.filterState = new filterStore('MRGfilterDisp', 'MRGfilter');
     // state.animeState = new animeStore('MRGanimation', 'MRGanimateDisp', 'MRGemoji', [paste, bounce, orbit]);
+    state.rtcState = new rtcStore();
+    state.roomState = new roomStore(window.URL);
+    state.mediaState = new mediaStore(state.elementState.localBoothId, state.elementState.remoteBoothId);
 
 
     //add input filters or images
     // state.filterState.addFilters(filters);
     // state.animeState.addEmoji(images);
 
+    //make user input for room id input field
     const socket = io.connect(); //io.connect('https://463505aa.ngrok.io/')
-    state.roomState.roomID = document.getElementById('MRGroom-id-input').value;
+    state.roomState.roomID = document.getElementById(state.elementState.roomInputId).value;
 
 
     socket.emit('joinRoom', JSON.stringify(state.roomState.roomID));
@@ -109,7 +105,7 @@ function mirageApp(filters, images, events, state) {
       } else {
 
         //start streaming right after inserting user preStream input
-        events.preStream(state, filters, images);
+        events.preStream(state);
 
         navigator.mediaDevices.getUserMedia(constraints)
           .then(stream => {
@@ -126,21 +122,22 @@ function mirageApp(filters, images, events, state) {
             }));
 
             socket.on('readyConnect', (payload) => {
-              // document.getElementById('MRGconnect').disabled = false;
-              state.elementState.connectElement.disabled = false;
-              classToggle('MRGconnect', 'MRGelementToFadeInAndOut');
+              
+              //user input for readyConnect event
+              events.readyConnect(state);
             });
 
             //disconnect event
             state.elementState.disconnectElement.addEventListener('click', (event) => {
               socket.emit('disconnect');
-              endCall(socket, state, removeChildren, hiddenToggle);
-              hiddenToggle('MRGconnect', 'MRGdisconnect');
+              endCall(socket, state, events);
+              state.elementState = new elementStore(domIds);
             }); //end of disconnect click event//
 
             socket.on('updateChatters', (chatter) => {
               socket.emit('disconnect');
-              endCall(socket, state, removeChildren, hiddenToggle);
+              endCall(socket, state, events);
+              state.elementState = new elementStore(domIds);
               // document.getElementById('MRGmessages').textContent += 'notification: ' + chatter + ' has left.' + '\n';
               state.roomState.chattersClient.splice(state.roomState.chattersClient.indexOf(chatter), 1);
               // document.getElementById('connect').disabled = false;
@@ -149,7 +146,7 @@ function mirageApp(filters, images, events, state) {
             socket.on('initiated', (member) => {
 
               member = JSON.parse(member);
-              mediaGenerator(stream, true, state, 'MRGmyBooth', 'MRGmyVideo', 'MRGmyCanvas');
+              mediaGenerator(stream, true, state);
 
               //sets up local stream reference
               state.rtcState.localStream = stream;
@@ -163,15 +160,16 @@ function mirageApp(filters, images, events, state) {
 
 
               state.elementState.connectElement.addEventListener('click', () => {
-                connectEvents(state, handleRemoteStreamAdded, onDataChannelCreated, socket, events);
-                classToggle('MRGconnect', 'MRGelementToFadeInAndOut');
-                // onDataChannelCreated(rtcState.dataChannel)
+                connectEvents(state, handleRemoteStreamAdded, onDataChannelCreated, socket, events, mediaGenerator);
+
+                //user input for connectTriggered event
+                events.connectTriggered(state);
               });
 
               socket.on('message', (message) => {
                 if (message.type === 'offer') {
                   if (!state.rtcState.isStarted) {
-                    startSetup(state, handleRemoteStreamAdded, socket, events);
+                    startSetup(state, handleRemoteStreamAdded, socket, events, mediaGenerator);
                     otherDataChannel(event, state, onDataChannelCreated, events);
                   }
                   state.rtcState.peerConn.setRemoteDescription(new RTCSessionDescription(message));
